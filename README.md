@@ -63,7 +63,9 @@ Administrer > CiviContribute > Passerelle de paiement
 _Si vous ne le voyez pas c’est que le type passerelle HelloAsso n’est pas actif. Dans ce cas, il faut l’activer dans la table civicrm_payment_processor_type.is_active =1. Ou alors faire un cv flush ou drush cvapi sytem.flush afin que le managed soit correctement pris en compte)_
 
 Une fois votre passerelle de paiement créer vous avez les id de production et de test (voir image dans la documentation)
+
 **Votre passerelle de paiement de production** (ici d’[id_production] = 4)
+
 **Votre passerelle de test  : Son [id_test] est ID de production - 1**, donc ici se serait [id_test]= 3.( car la passerelle est créée avant celui de production et depuis les version de civicrm > 5.65 on ne voit plus l’id de test)
 Vision de la version 5.65  (voir image dans la documentation)
 
@@ -77,11 +79,12 @@ Dans votre compte HelloAsso il faut dans “Mon Compte > Intégrations et API”
 - EN WORDPRESS 
   - Pour votre production : https://[host]/wp-admin/admin.php?page=CiviCRM&q=civicrm/payment/ipn/[id_production]
   - Pour votre test (sandBox) : https://[host]/wp-admin/admin.php?page=CiviCRM&q=civicrm/payment/ipn/[id_test]
+
 _avec [host] : domaine de votre site exemple “monsite.com”_
 
 # Remarques
-Lors des tests sur la SandBox
-Utiliser une carte CB de test prévue : (https://docs.sips.worldline-solutions.com/fr/cartes-de-test.html.)
+Lors des tests sur la SandBox. Utiliser une carte CB de test prévue : (https://docs.sips.worldline-solutions.com/fr/cartes-de-test.html.)
+
 Ne pas utiliser les cartes mastercard (cela ne fonctionne pas et vous évite une perte de temps de test)
 
 
