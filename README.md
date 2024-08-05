@@ -1,6 +1,6 @@
 # HelloAsso payment processor
 
-la verion avec image se trouve dans la [documentation](https://docs.google.com/document/d/1vIahUu0339Ie-DJn4ks_U38a3Q56KZT82TDPtDrk6E8/edit)
+_la version avec image se trouve dans la [documentation](https://docs.google.com/document/d/1vIahUu0339Ie-DJn4ks_U38a3Q56KZT82TDPtDrk6E8/edit)_
 
 L’extension Helloasso-payment-processor permet la création et le paiement de contributions (dons, inscriptions, adhésions) dans CiviCRM via la passerelle de paiement HelloAsso (“HelloAsso Checkout” uniquement). 
 
@@ -62,10 +62,10 @@ Administrer > CiviContribute > Passerelle de paiement
 
 _Si vous ne le voyez pas c’est que le type passerelle HelloAsso n’est pas actif. Dans ce cas, il faut l’activer dans la table civicrm_payment_processor_type.is_active =1. Ou alors faire un cv flush ou drush cvapi sytem.flush afin que le managed soit correctement pris en compte)_
 
-une fois votre passerelle de paiement créer vous avez les id de production et de test (voir image dans documentaion)
-**Votre passerelle de paiement de production** (ici d’[id_production] = 4) 
+Une fois votre passerelle de paiement créer vous avez les id de production et de test (voir image dans la documentation)
+**Votre passerelle de paiement de production** (ici d’[id_production] = 4)
 **Votre passerelle de test  : Son [id_test] est ID de production - 1**, donc ici se serait [id_test]= 3.( car la passerelle est créée avant celui de production et depuis les version de civicrm > 5.65 on ne voit plus l’id de test)
-Vision de la version 5.65 (voir image dans documentaion)
+Vision de la version 5.65  (voir image dans la documentation)
 
 # Notification URLCallBack
 
@@ -102,9 +102,9 @@ Si vous ne le voyez pas c’est que le type passerelle HelloAsso n’est pas act
   - specs du traitement des échecs (à faire pour une version suivante)
 
 # License
-HelloAsso Payment Processor for CiviCRM.
-Makoa n’a aucun lien avec HelloAsso.
-This program is free software: you can redistribute it and/or modify it. This is an [extension for CiviCRM](https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/), licensed under AGPL-3.0.
+- HelloAsso Payment Processor for CiviCRM.
+- Makoa n’a aucun lien avec HelloAsso.
+- This program is free software: you can redistribute it and/or modify it. This is an [extension for CiviCRM](https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/), licensed under AGPL-3.0.
 
 
 
