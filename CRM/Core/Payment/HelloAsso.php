@@ -166,9 +166,9 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $backUrl = $this->getGoBackUrl($params['qfKey']);
         $errorUrl = $this->getCancelUrl($params['qfKey']);
         $returnUrl = $this->getReturnSuccessUrl($params['qfKey']);
-        Civi::log()->debug(' > backUrl : '. print_r($backUrl,1));
-        Civi::log()->debug(' > errorUrl : '. print_r($errorUrl,1));
-        Civi::log()->debug(' > returnUrl : '. print_r($returnUrl,1));
+        // Civi::log()->debug(' > backUrl : '. print_r($backUrl,1));
+        // Civi::log()->debug(' > errorUrl : '. print_r($errorUrl,1));
+        // Civi::log()->debug(' > returnUrl : '. print_r($returnUrl,1));
 
         // // https://antoine2-dev.fhp.makoa.net/civicrm/contribute/transact?_qf_ThankYou_display=1&qfKey=CRMContributeControllerContributionldprdsvtf1ckw84sc00w440gggkcgkk80cs4s0sw400g4sgw4_735
         // $returnUrl =  str_replace("civicrm/contribute/transact?_qf_ThankYou_display=1","civicrm/payment/ipn/3?_qf_ThankYou_display=1", $returnUrl);   // 'https://antoine2-dev.fhp.makoa.net/civicrm/payment/ipn/3';
