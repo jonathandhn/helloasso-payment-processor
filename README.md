@@ -26,8 +26,9 @@ Contributeurs :
 API HelloAsso - HelloAsso-2024-Extension-CiviCRM
 
 # Requirements
-- PHP v7.2+
-- CiviCRM 5.65 or later (hopefully)
+- PHP v7.2+, v8.3
+- CiviCRM 5.65, 5.76.3 or later (hopefully)
+
 
 
 # Getting Started
