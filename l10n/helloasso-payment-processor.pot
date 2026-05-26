@@ -1,0 +1,776 @@
+# POT template for HelloAsso Payment Processor
+
+msgid ""
+msgstr ""
+"Project-Id-Version: helloasso-payment-processor 2.0.0\n"
+"POT-Creation-Date: 2026-05-26 22:52+0000\n"
+"PO-Revision-Date: 2026-05-26 22:52+0000\n"
+"Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
+"Language-Team: Translations\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%1 (#%2)"
+msgstr ""
+
+msgid "A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1"
+msgstr ""
+
+msgid "Active l'intégration frontend standard HelloAsso basée sur CRM.payment et mjwshared."
+msgstr ""
+
+msgid "Active la mire OAuth HelloAsso partagée. Quand ce réglage est désactivé, l'interface mire n'est plus proposée sur les pages processeur HelloAsso."
+msgstr ""
+
+msgid "Active les contrôles automatiques à T+5 puis T+15 après création d'un checkout HelloAsso. Le suivi long des changements ultérieurs, notamment les remboursements, reste indépendant."
+msgstr ""
+
+msgid "Active par défaut l'enregistrement automatique du webhook HelloAsso live pour cette instance CiviCRM. Décochez seulement si une autre instance garde la maîtrise de l'URL webhook."
+msgstr ""
+
+msgid "Active par défaut l'enregistrement automatique du webhook HelloAsso pour cette instance CiviCRM. Décochez seulement si plusieurs instances CiviCRM partagent la même organisation HelloAsso et que vous voulez gérer le webhook manuellement."
+msgstr ""
+
+msgid "Activer automatiquement le webhook"
+msgstr ""
+
+msgid "Activez d'abord le switch mire ci-dessous puis enregistrez la page avant de lancer la connexion."
+msgstr ""
+
+msgid "Actualiser cette page de réglages HelloAsso"
+msgstr ""
+
+msgid "Aucun processeur HelloAsso correspondant n'a été trouvé sur cette instance."
+msgstr ""
+
+msgid "Aucune adresse email principale n'est disponible pour lancer le checkout HelloAsso de la contribution %1."
+msgstr ""
+
+msgid "Aucune clé API live n'est enregistrée sur ce processeur. Vous pouvez donc activer le mode mire production sur ce processeur si la liaison OAuth a été validée."
+msgstr ""
+
+msgid "Aucune clé API sandbox n'est enregistrée sur ce processeur. La mire HelloAsso sandbox est donc proposée par défaut."
+msgstr ""
+
+msgid "Aucune connexion HelloAsso active n'est disponible pour cette Checkout Option."
+msgstr ""
+
+msgid "Aucune contribution correspondante. Webhook ignoré."
+msgstr ""
+
+msgid "Aucune organisation HelloAsso n'est encore liée."
+msgstr ""
+
+msgid "Aucune organisation HelloAsso production n'est encore liée à ce processeur."
+msgstr ""
+
+msgid "Aucune organisation HelloAsso sandbox n'est encore liée à ce processeur."
+msgstr ""
+
+msgid "Aucune organisation n'est encore liée sur ce rail."
+msgstr ""
+
+msgid "Base HelloAsso API URL for live payments. Keep the default production URL unless HelloAsso explicitly instructs otherwise."
+msgstr ""
+
+msgid "Base HelloAsso API URL for sandbox payments. Keep the sandbox default unless HelloAsso explicitly instructs otherwise."
+msgstr ""
+
+msgid "Ce bloc permet de connecter la mire HelloAsso production sur ce processeur live : liaison OAuth, organisation liée, webhook et clé de signature. Le rail de paiement live ne peut basculer sur la mire que si ce processeur n'utilise plus de clés API classiques."
+msgstr ""
+
+msgid "Ce bouton reste désactivé tant que le client ID et le client secret partagés de la mire HelloAsso ne sont pas configurés."
+msgstr ""
+
+msgid "Cette page sert à renseigner le client partagé, afficher l'état de liaison et lancer la connexion HelloAsso. Le switch général d'activation de la mire se règle depuis les paramètres HelloAsso."
+msgstr ""
+
+msgid "Client ID dédié à la mire HelloAsso production."
+msgstr ""
+
+msgid "Client ID dédié à la mire HelloAsso sandbox."
+msgstr ""
+
+msgid "Client ID fourni par HelloAsso pour la mire partagée. Ne pas versionner cette valeur dans un dépôt public."
+msgstr ""
+
+msgid "Client ID partagé"
+msgstr ""
+
+msgid "Client ID partagé sandbox"
+msgstr ""
+
+msgid "Client Id"
+msgstr ""
+
+msgid "Client Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
+msgstr ""
+
+msgid "Client Secret"
+msgstr ""
+
+msgid "Client Secret Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
+msgstr ""
+
+msgid "Client secret dédié à la mire HelloAsso production."
+msgstr ""
+
+msgid "Client secret dédié à la mire HelloAsso sandbox."
+msgstr ""
+
+msgid "Client secret fourni par HelloAsso pour la mire partagée. À conserver localement sur l'instance CiviCRM."
+msgstr ""
+
+msgid "Client secret partagé"
+msgstr ""
+
+msgid "Client secret partagé sandbox"
+msgstr ""
+
+msgid "Clé API classique"
+msgstr ""
+
+msgid "Clé de signature webhook enregistrée : %1"
+msgstr ""
+
+msgid "Comma-separated contribution status names to include, for example \"Completed,Pending\"."
+msgstr ""
+
+msgid "Comma-separated contribution status names to include, for example \"Pending,Failed\"."
+msgstr ""
+
+msgid "Configuration du processeur HelloAsso %1 (%2) invalide :"
+msgstr ""
+
+msgid "Connecter la production à HelloAsso"
+msgstr ""
+
+msgid "Connecter le sandbox à HelloAsso"
+msgstr ""
+
+msgid "Connecter à HelloAsso"
+msgstr ""
+
+msgid "Connexion HelloAsso production"
+msgstr ""
+
+msgid "Connexion HelloAsso sandbox"
+msgstr ""
+
+msgid "Contribution ID"
+msgstr ""
+
+msgid "Contribution en ligne"
+msgstr ""
+
+msgid "Contribution en ligne : %1"
+msgstr ""
+
+msgid "Contribution statuses"
+msgstr ""
+
+msgid "Des identifiants API live sont encore présents sur ce processeur. La mire production peut être reliée et testée, mais le mode de paiement live reste bloqué sur la clé API classique tant que ces identifiants ne sont pas retirés."
+msgstr ""
+
+msgid "Des identifiants API sandbox sont déjà présents sur ce processeur. Le mode par clé API reste le choix le plus prudent tant que vous ne basculez pas explicitement."
+msgstr ""
+
+msgid "Domain mismatch detected: this CiviCRM instance runs on a different host than the one authorized for the HelloAsso link: %1. OAuth callbacks will not function correctly on this staging/dev instance."
+msgstr ""
+
+msgid "Due before"
+msgstr ""
+
+msgid "Déconnecter l'organisation liée"
+msgstr ""
+
+msgid "Endpoint HelloAsso utilisé pour échanger le code d'autorisation et rafraîchir les jetons OAuth."
+msgstr ""
+
+msgid "Enregistrer les réglages de la mire"
+msgstr ""
+
+msgid "Enter the HelloAsso client ID used by this payment processor for the selected environment. Keep the live and test values aligned with the matching HelloAsso application."
+msgstr ""
+
+msgid "Enter the HelloAsso client secret paired with the client ID above. Store the live and sandbox secrets separately."
+msgstr ""
+
+msgid "Enter the HelloAsso organization slug or organization name expected by this processor when building API calls and payment links."
+msgstr ""
+
+msgid "Erreur API HelloAsso (%1)"
+msgstr ""
+
+msgid "Erreur HelloAsso"
+msgstr ""
+
+msgid "Erreur inconnue lors de la préparation de la redirection HelloAsso."
+msgstr ""
+
+msgid "Fiabilisation du statut pour les automatisations (T+5 / T+15 min)"
+msgstr ""
+
+msgid "File d'attente pour le traitement des webhooks"
+msgstr ""
+
+msgid "Force processing for a specific contribution."
+msgstr ""
+
+msgid "Gestion du webhook : %1"
+msgstr ""
+
+msgid "Gestion sécurisée des URL d'échec et d'annulation"
+msgstr ""
+
+msgid "HelloAsso"
+msgstr ""
+
+msgid "HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement."
+msgstr ""
+
+msgid "HelloAsso API error (%1)"
+msgstr ""
+
+msgid "HelloAsso Organization Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
+msgstr ""
+
+msgid "HelloAsso Payments Processor"
+msgstr ""
+
+msgid "HelloAsso aide les associations à collecter des paiements en ligne et propose ses services gratuitement. Elle prend à sa charge tous les frais de transaction pour que vous puissiez bénéficier de la totalité des sommes versées par vos publics, sans frais. Les contributions volontaires laissées par ces derniers sont leur unique source de revenus."
+msgstr ""
+
+msgid "HelloAsso authentication is currently being refreshed. Please retry the payment."
+msgstr ""
+
+msgid "HelloAsso authorization screen is selected for this processor, but no linked HelloAsso organization is stored yet."
+msgstr ""
+
+msgid "HelloAsso linked organization has been disconnected."
+msgstr ""
+
+msgid "HelloAsso live API calls require SSL verification to be enabled."
+msgstr ""
+
+msgid "HelloAsso notification signature cannot be verified because the local signing key is missing."
+msgstr ""
+
+msgid "HelloAsso notification signature is required but missing."
+msgstr ""
+
+msgid "HelloAsso notification signature mismatch."
+msgstr ""
+
+msgid "HelloAsso organization %1 is now linked."
+msgstr ""
+
+msgid "HelloAsso partner authorization"
+msgstr ""
+
+msgid "HelloAsso partner authorization cannot be refreshed."
+msgstr ""
+
+msgid "HelloAsso partner authorization could not be refreshed locally."
+msgstr ""
+
+msgid "HelloAsso partner authorization could not be stored locally."
+msgstr ""
+
+msgid "HelloAsso partner authorization did not return an organization slug."
+msgstr ""
+
+msgid "HelloAsso partner authorization failed: %1"
+msgstr ""
+
+msgid "HelloAsso partner authorization is currently being refreshed. Please retry the payment."
+msgstr ""
+
+msgid "HelloAsso partner authorization is disabled."
+msgstr ""
+
+msgid "HelloAsso partner authorization is not linked to an organization."
+msgstr ""
+
+msgid "HelloAsso partner authorization refresh token has expired."
+msgstr ""
+
+msgid "HelloAsso partner authorization requires SSL verification to be enabled."
+msgstr ""
+
+msgid "HelloAsso partner authorization response is missing OAuth tokens."
+msgstr ""
+
+msgid "HelloAsso partner authorization state is invalid or expired."
+msgstr ""
+
+msgid "HelloAsso partner client ID and secret must be configured before connecting an organization."
+msgstr ""
+
+msgid "HelloAsso partner linked organization token"
+msgstr ""
+
+msgid "HelloAsso partner settings have been saved on this page."
+msgstr ""
+
+msgid "HelloAsso partner webhook signature cannot be verified because the local signature key is missing."
+msgstr ""
+
+msgid "HelloAsso partner webhook signature is required but missing."
+msgstr ""
+
+msgid "HelloAsso partner webhook signature mismatch."
+msgstr ""
+
+msgid "HelloAsso payment is temporarily unavailable: HelloAsso connection must be restored by an administrator."
+msgstr ""
+
+msgid "HelloAsso payment processor not found: %1"
+msgstr ""
+
+msgid "HelloAsso per-processor authorization state"
+msgstr ""
+
+msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
+msgstr ""
+
+msgid "HelloAsso processor authorization state could not be encoded."
+msgstr ""
+
+msgid "HelloAsso refunds are disabled by this extension."
+msgstr ""
+
+msgid "HelloAsso webhook payload could not be stored in the queue."
+msgstr ""
+
+msgid "HelloAsso: API Key Authentication Failed"
+msgstr ""
+
+msgid "HelloAsso: API Key Check Failed"
+msgstr ""
+
+msgid "HelloAsso: Authorization Check Failed"
+msgstr ""
+
+msgid "HelloAsso: Authorization Expired"
+msgstr ""
+
+msgid "HelloAsso: Authorization Expiring Soon"
+msgstr ""
+
+msgid "HelloAsso: Authorization Renewal Failed"
+msgstr ""
+
+msgid "HelloAsso: Domain Mismatch (Staging/Dev Instance)"
+msgstr ""
+
+msgid "HelloAsso: Incomplete V2 Upgrade"
+msgstr ""
+
+msgid "HelloAsso: Payment Method Missing"
+msgstr ""
+
+msgid "HelloAsso: Payment Method Requires Review"
+msgstr ""
+
+msgid "HelloAsso: Reconnection Required"
+msgstr ""
+
+msgid "HelloAsso: Schema Check Failed"
+msgstr ""
+
+msgid "HelloAsso: Webhook Domain Mismatch"
+msgstr ""
+
+msgid "HelloAsso: Webhook Not Configured"
+msgstr ""
+
+msgid "HelloAsso: analyser les trxn_id legacy concaténés (%1 cas)"
+msgstr ""
+
+msgid "HelloAsso: rapport final des trxn_id legacy restants"
+msgstr ""
+
+msgid "HelloAsso: réparer les trxn_id legacy (lot %1, contributions %2 à %3)"
+msgstr ""
+
+msgid "HelloAsso: trop de cas (%1) pour la réparation GUI. Utiliser le mode terminal."
+msgstr ""
+
+msgid "ID du processeur de paiement : %1"
+msgstr ""
+
+msgid "ID du processeur live"
+msgstr ""
+
+msgid "ID du processeur sandbox"
+msgstr ""
+
+msgid "Impossible de mettre à jour la contribution %1."
+msgstr ""
+
+msgid "Impossible de recharger la contribution %1."
+msgstr ""
+
+msgid "Impossible de retrouver la contribution à mettre à jour pour le checkout HelloAsso."
+msgstr ""
+
+msgid "Internal storage for sandbox authorization-screen state per HelloAsso payment processor. Do not edit manually."
+msgstr ""
+
+msgid "Internal storage for the linked organization OAuth token. Do not edit manually."
+msgstr ""
+
+msgid "Intégration Afform / Form Builder"
+msgstr ""
+
+msgid "Jeton d'accès valable jusqu'au : %1"
+msgstr ""
+
+msgid "La contribution %1 est verrouillée par DonRec. Le statut pris en compte pour le reçu fiscal diffère du statut actuel de la passerelle de paiement HelloAsso (%2). Les métadonnées ont été synchronisées, mais le statut de la contribution n'a pas été modifié."
+msgstr ""
+
+msgid "La liaison HelloAsso ne peut plus être renouvelée%1%2. Reconnectez l'organisation avant d'accepter de nouveaux paiements par la mire."
+msgstr ""
+
+msgid "La mire est désactivée globalement. Activez-la dans les paramètres HelloAsso puis revenez sur cette page pour connecter une organisation."
+msgstr ""
+
+msgid "La valeur du %1 n'est pas autorisée par HelloAsso."
+msgstr ""
+
+msgid "Laisser vide pour conserver le secret actuel."
+msgstr ""
+
+msgid "Le %1 contient des caractères non autorisés (règle HelloAsso)."
+msgstr ""
+
+msgid "Le %1 doit contenir au moins 3 caractères (règle HelloAsso)."
+msgstr ""
+
+msgid "Le %1 doit contenir au moins une voyelle (règle HelloAsso)."
+msgstr ""
+
+msgid "Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso)."
+msgstr ""
+
+msgid "Le %1 ne doit pas contenir de chiffres (règle HelloAsso)."
+msgstr ""
+
+msgid "Le bouton officiel ci-dessus ouvre la connexion HelloAsso. Si vous avez besoin d'ajuster les identifiants client ou de vérifier l'état de liaison, utilisez d'abord le lien d'ouverture des réglages."
+msgstr ""
+
+msgid "Le choix opérationnel entre clé API et mire reste sur la fiche du processeur. Cette page sert à activer le parcours mire, expliquer son fonctionnement et lancer la connexion."
+msgstr ""
+
+msgid "Le dernier renouvellement de la liaison HelloAsso a échoué. Vérifiez le prochain job de maintenance ou reconnectez l'organisation si le problème persiste."
+msgstr ""
+
+msgid "Le nom et le prénom ne doivent pas être identiques (règle HelloAsso)."
+msgstr ""
+
+msgid "Le switch ci-dessous active ou masque l'interface mire sur les processeurs HelloAsso. Les identifiants client partagés et le lancement de la connexion restent gérés depuis les écrans mire dédiés."
+msgstr ""
+
+msgid "Liaison d'autorisation valable jusqu'au : %1"
+msgstr ""
+
+msgid "Limit"
+msgstr ""
+
+msgid "Liée le : %1"
+msgstr ""
+
+msgid "Maximum number of contributions to process per payment processor."
+msgstr ""
+
+msgid "Mire HelloAsso"
+msgstr ""
+
+msgid "Mire HelloAsso : URL d'autorisation"
+msgstr ""
+
+msgid "Mire HelloAsso : URL du token"
+msgstr ""
+
+msgid "Mire HelloAsso : activer la connexion partagée"
+msgstr ""
+
+msgid "Mire HelloAsso : client ID partagé"
+msgstr ""
+
+msgid "Mire HelloAsso : client ID production"
+msgstr ""
+
+msgid "Mire HelloAsso : client ID sandbox"
+msgstr ""
+
+msgid "Mire HelloAsso : client secret partagé"
+msgstr ""
+
+msgid "Mire HelloAsso : client secret production"
+msgstr ""
+
+msgid "Mire HelloAsso : client secret sandbox"
+msgstr ""
+
+msgid "Mire HelloAsso production"
+msgstr ""
+
+msgid "Mire HelloAsso sandbox"
+msgstr ""
+
+msgid "Missing authorization columns: %1"
+msgstr ""
+
+msgid "Missing indexes: %1"
+msgstr ""
+
+msgid "Missing metadata columns: %1"
+msgstr ""
+
+msgid "Missing site URL"
+msgstr ""
+
+msgid "Mode de connexion live"
+msgstr ""
+
+msgid "Mode de connexion sandbox"
+msgstr ""
+
+msgid "No active HelloAsso payment processor found for mode %1."
+msgstr ""
+
+msgid "Nombre maximum de contributions HelloAsso traitées par processeur pendant une exécution normale du cron."
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Objet HelloAsso introuvable (404). Les révérifications courte et longue ont été désactivées pour éviter des appels répétés."
+msgstr ""
+
+msgid "One or more HelloAsso authorization links have expired and must be reconnected: %1"
+msgstr ""
+
+msgid "One or more HelloAsso authorization links will expire soon: %1"
+msgstr ""
+
+msgid "One or more HelloAsso links expect automatic webhook registration, but no webhook is stored yet: %1. Reconnect the authorization screen to push the webhook, or disable automatic webhook registration on that processor if another CiviCRM instance must keep manual control of the HelloAsso webhook URL."
+msgstr ""
+
+msgid "One or more HelloAsso payment processors have no payment method configured: %1. Configure a payment method on the processor; new processors use Credit Card by default."
+msgstr ""
+
+msgid "One or more HelloAsso payment processors still rely on API keys that could not authenticate: %1"
+msgstr ""
+
+msgid "One or more HelloAsso payment processors use Check as their payment method: %1. Review the processor configuration and select Credit Card or your existing HelloAsso online payment method."
+msgstr ""
+
+msgid "Only process contributions received on or after this date/time."
+msgstr ""
+
+msgid "Only process contributions received on or before this date/time."
+msgstr ""
+
+msgid "Only process follow-ups due on or before this date/time. Leave empty to disable this filter."
+msgstr ""
+
+msgid "Only process long follow-ups due on or before this date/time. Leave empty to use now."
+msgstr ""
+
+msgid "Only scheduled follow-ups"
+msgstr ""
+
+msgid "Organisation liée : %1"
+msgstr ""
+
+msgid "Organisation production liée : %1"
+msgstr ""
+
+msgid "Organisation sandbox liée : %1"
+msgstr ""
+
+msgid "Organization Name"
+msgstr ""
+
+msgid "Ouvrez d'abord les réglages de cette mire pour saisir le client ID et le client secret partagés, puis revenez lancer la connexion."
+msgstr ""
+
+msgid "Ouvrir les paramètres HelloAsso"
+msgstr ""
+
+msgid "Ouvrir les réglages de cette mire"
+msgstr ""
+
+msgid "Ouvrir les réglages de la mire"
+msgstr ""
+
+msgid "Ouvrir les réglages de la mire production"
+msgstr ""
+
+msgid "Parametres HelloAsso"
+msgstr ""
+
+msgid "Parcours mire HelloAsso"
+msgstr ""
+
+msgid "Payload webhook HelloAsso invalide dans la file."
+msgstr ""
+
+msgid "Payment processor ID"
+msgstr ""
+
+msgid "Place les webhooks HelloAsso dans la file PaymentprocessorWebhook au lieu de les traiter immédiatement."
+msgstr ""
+
+msgid "Pont d'intégration standard (mjwshared)"
+msgstr ""
+
+msgid "Pour une première configuration : activez la mire ici, enregistrez la page, puis ouvrez le rail sandbox ou production pour saisir le client ID et le client secret avant de lancer la connexion."
+msgstr ""
+
+msgid "Process first step"
+msgstr ""
+
+msgid "Process scheduled HelloAsso payment follow-ups and targeted synchronisations."
+msgstr ""
+
+msgid "Process scheduled long-window HelloAsso consistency checks."
+msgstr ""
+
+msgid "Process second step"
+msgstr ""
+
+msgid "Processeur ciblé :"
+msgstr ""
+
+msgid "Publie une Checkout Option HelloAsso pour Afform / Form Builder en s'appuyant sur le mécanisme de checkout du core CiviCRM."
+msgstr ""
+
+msgid "Receive date from"
+msgstr ""
+
+msgid "Receive date to"
+msgstr ""
+
+msgid "Refresh linked HelloAsso authorizations once their current refresh tokens reach mid-life."
+msgstr ""
+
+msgid "Refuse les webhooks HelloAsso dont la signature legacy invoiceID/sig est absente ou invalide."
+msgstr ""
+
+msgid "Refuse les webhooks partenaire HelloAsso dont le header x-ha-signature est absent ou invalide quand une clé de signature webhook est enregistrée pour ce processeur."
+msgstr ""
+
+msgid "Renseignez d'abord le client ID et le client secret partagés sur la page de réglages de la mire, puis revenez lancer la connexion."
+msgstr ""
+
+msgid "Restrict maintenance to one linked HelloAsso payment processor."
+msgstr ""
+
+msgid "Restrict processing to one HelloAsso payment processor."
+msgstr ""
+
+msgid "Sandbox client ID for HelloAsso test payments."
+msgstr ""
+
+msgid "Sandbox client secret for HelloAsso test payments."
+msgstr ""
+
+msgid "Sandbox organization slug or name used for test API calls."
+msgstr ""
+
+msgid "Taille maximale des lots de traitement (Cron)"
+msgstr ""
+
+msgid "The HelloAsso API key health check could not be completed: %1"
+msgstr ""
+
+msgid "The HelloAsso authorization check could not be completed: %1"
+msgstr ""
+
+msgid "The HelloAsso partner settings form token is invalid. Please reload the page and try again."
+msgstr ""
+
+msgid "The HelloAsso schema check could not be completed: %1"
+msgstr ""
+
+msgid "The HelloAsso v2 schema upgrade is incomplete. %1 Run <code>cv updb</code> and then <code>cv flush</code> before relying on webhook queueing, follow-up sync, or legacy repair."
+msgstr ""
+
+msgid "The HelloAsso webhook registered for %1 points to a different domain. Inbound payments will not be processed on this CiviCRM instance: %2."
+msgstr ""
+
+msgid "The last HelloAsso authorization renewal failed for: %1. The maintenance job will retry; reconnect if the failure continues."
+msgstr ""
+
+msgid "URL d'autorisation"
+msgstr ""
+
+msgid "URL de callback à déclarer chez HelloAsso :"
+msgstr ""
+
+msgid "URL de l'écran d'autorisation HelloAsso. En production, la valeur par défaut est https://auth.helloasso.com/authorize."
+msgstr ""
+
+msgid "URL du token"
+msgstr ""
+
+msgid "URL webhook enregistrée : %1"
+msgstr ""
+
+msgid "Unknown authentication failure"
+msgstr ""
+
+msgid "Unsupported HelloAsso connection mode."
+msgstr ""
+
+msgid "Unsupported HelloAsso webhook ownership mode."
+msgstr ""
+
+msgid "Upgrade Batch (%1 => %2)"
+msgstr ""
+
+msgid "Vous avez ouvert directement le processeur de test HelloAsso. CiviCRM enregistre les valeurs live et test ensemble sur cet écran. Pour éviter d'écraser la production, vous allez être redirigé vers la fiche principale du processeur live associé."
+msgstr ""
+
+msgid "Vous serez redirigé vers HelloAsso pour effectuer le paiement."
+msgstr ""
+
+msgid "Vérification stricte de la signature historique"
+msgstr ""
+
+msgid "Vérification stricte de la signature partenaire"
+msgstr ""
+
+msgid "Webhook dupliqué ignoré."
+msgstr ""
+
+msgid "When enabled, only contributions with a scheduled HelloAsso follow-up are processed."
+msgstr ""
+
+msgid "géré par cette instance CiviCRM"
+msgstr ""
+
+msgid "instead of"
+msgstr ""
+
+msgid "manuel / autre instance maîtresse"
+msgstr ""
+
+msgid "production"
+msgstr ""
+
+msgid "refresh refused"
+msgstr ""
+
+msgid "sandbox"
+msgstr ""
+
+msgid "Évite de renvoyer les utilisateurs vers des URL CiviCRM ou AJAX fragiles lorsqu'un paiement est annulé ou échoue."
+msgstr ""
+

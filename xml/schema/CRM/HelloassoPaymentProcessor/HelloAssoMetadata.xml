@@ -4,7 +4,7 @@
   <base>CRM/HelloassoPaymentProcessor</base>
   <class>HelloAssoMetadata</class>
   <name>civicrm_hello_asso_metadata</name>
-  <comment>FIXME</comment>
+  <comment>HelloAsso payment reconciliation metadata</comment>
   <log>true</log>
 
  <field>
@@ -56,5 +56,189 @@
       <type>Number</type>
     </html> 
   </field>
+
+  <field>
+    <name>checkout_intent_id</name>
+    <title>Checkout intent ID</title>
+    <type>int</type>
+    <default>NULL</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <field>
+    <name>helloasso_payment_id</name>
+    <title>HelloAsso Payment ID</title>
+    <type>int</type>
+    <default>NULL</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <field>
+    <name>event_type</name>
+    <title>Last event type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>state</name>
+    <title>Last known state</title>
+    <type>varchar</type>
+    <length>64</length>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>payment_processor_id</name>
+    <title>Payment processor ID</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <field>
+    <name>sync_origin_date</name>
+    <title>Sync origin date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>sync_next_date</name>
+    <title>Next scheduled sync date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>sync_last_date</name>
+    <title>Last sync date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>sync_attempt_count</name>
+    <title>Sync attempt count</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <field>
+    <name>sync_error_count</name>
+    <title>Sync technical error count</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <field>
+    <name>long_sync_scheme</name>
+    <title>Long follow-up scheme</title>
+    <type>varchar</type>
+    <length>16</length>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>long_sync_origin_date</name>
+    <title>Long sync origin date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>long_sync_next_date</name>
+    <title>Next scheduled long sync date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>long_sync_last_date</name>
+    <title>Last long sync date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>long_sync_attempt_count</name>
+    <title>Long sync attempt count</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <field>
+    <name>long_sync_error_count</name>
+    <title>Long sync technical error count</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <required>false</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+
+  <index>
+    <name>index_contribution_id</name>
+    <fieldName>contribution_id</fieldName>
+  </index>
+
+  <index>
+    <name>index_checkout_intent_id</name>
+    <fieldName>checkout_intent_id</fieldName>
+  </index>
+
+  <index>
+    <name>index_helloasso_payment_id</name>
+    <fieldName>helloasso_payment_id</fieldName>
+  </index>
+
+  <index>
+    <name>index_payment_processor_id_sync_next_date</name>
+    <fieldName>payment_processor_id</fieldName>
+    <fieldName>sync_next_date</fieldName>
+  </index>
+
+  <index>
+    <name>index_sync_next_date</name>
+    <fieldName>sync_next_date</fieldName>
+  </index>
+
+  <index>
+    <name>index_payment_processor_id_long_sync_next_date</name>
+    <fieldName>payment_processor_id</fieldName>
+    <fieldName>long_sync_next_date</fieldName>
+  </index>
 
 </table>

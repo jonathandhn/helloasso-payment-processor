@@ -10,19 +10,26 @@
     <author>Antoine BREHERET</author>
     <email>breheret@makoa.fr</email>
   </maintainer>
+  <maintainer>
+    <author>Jonathan Dahan</author>
+    <email>jonathan@dhn.one</email>
+  </maintainer>
   <urls>
     <url desc="Main Extension Page">https://lab.civicrm.org/extensions/helloasso-payment-processor</url>
     <url desc="Documentation">https://lab.civicrm.org/extensions/helloasso-payment-processor</url>
     <url desc="Support">https://lab.civicrm.org/extensions/helloasso-payment-processor/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-06-25</releaseDate>
-  <version>1.0.0</version>
+  <releaseDate>2026-05-21</releaseDate>
+  <version>2.0.0</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.67</ver>
+    <ver>6.14</ver>
   </compatibility>
-  <comments>This is a Payment Processor for HelloAsso.</comments>
+  <requires>
+    <ext>mjwshared</ext>
+  </requires>
+  <comments>This is a Payment Processor for HelloAsso. Version 2 development and multi-CMS validation by Jonathan Dahan.</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -33,10 +40,12 @@
     <angularModule>crmHelloassoPaymentProcessor</angularModule>
   </civix>
   <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>smarty-v2@1.0.1</mixin>
     <mixin>entity-types-php@1.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
   <upgrader>CRM_HelloassoPaymentProcessor_Upgrader</upgrader>
 </extension>

@@ -30,7 +30,7 @@ SET FOREIGN_KEY_CHECKS=1;
 -- *
 -- * civicrm_hello_asso_metadata
 -- *
--- * FIXME
+-- * HelloAsso payment reconciliation metadata
 -- *
 -- *******************************************************/
 CREATE TABLE `civicrm_hello_asso_metadata` (
@@ -38,7 +38,65 @@ CREATE TABLE `civicrm_hello_asso_metadata` (
   `contribution_id` int unsigned COMMENT 'FK to Contribution',
   `signing_key` text NOT NULL COMMENT 'Key used to sign contribution',
   `helloasso_ref_cmd_id` int NULL DEFAULT NULL,
+  `checkout_intent_id` int NULL DEFAULT NULL,
+  `helloasso_payment_id` int NULL DEFAULT NULL,
+  `event_type` varchar(64) NULL DEFAULT NULL,
+  `state` varchar(64) NULL DEFAULT NULL,
+  `payment_processor_id` int unsigned NULL DEFAULT NULL,
+  `sync_origin_date` datetime NULL DEFAULT NULL,
+  `sync_next_date` datetime NULL DEFAULT NULL,
+  `sync_last_date` datetime NULL DEFAULT NULL,
+  `sync_attempt_count` int unsigned NULL DEFAULT 0,
+  `sync_error_count` int unsigned NULL DEFAULT 0,
+  `long_sync_scheme` varchar(16) NULL DEFAULT NULL,
+  `long_sync_origin_date` datetime NULL DEFAULT NULL,
+  `long_sync_next_date` datetime NULL DEFAULT NULL,
+  `long_sync_last_date` datetime NULL DEFAULT NULL,
+  `long_sync_attempt_count` int unsigned NULL DEFAULT 0,
+  `long_sync_error_count` int unsigned NULL DEFAULT 0,
   PRIMARY KEY (`id`),
+  INDEX `index_contribution_id` (`contribution_id`),
+  INDEX `index_checkout_intent_id` (`checkout_intent_id`),
+  INDEX `index_helloasso_payment_id` (`helloasso_payment_id`),
+  INDEX `index_payment_processor_id_sync_next_date` (`payment_processor_id`, `sync_next_date`),
+  INDEX `index_sync_next_date` (`sync_next_date`),
+  INDEX `index_payment_processor_id_long_sync_next_date` (`payment_processor_id`, `long_sync_next_date`),
   CONSTRAINT FK_civicrm_hello_asso_metadata_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE
+)
+ENGINE=InnoDB;
+
+-- /*******************************************************
+-- *
+-- * civicrm_hello_asso_processor_auth
+-- *
+-- * HelloAsso per-processor OAuth and webhook state
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_hello_asso_processor_auth` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `payment_processor_id` int unsigned NOT NULL,
+  `connection_mode` varchar(32) NULL DEFAULT NULL,
+  `organization_slug` varchar(255) NULL DEFAULT NULL,
+  `access_token` text NULL,
+  `refresh_token` text NULL,
+  `expires_at` int unsigned NULL DEFAULT NULL,
+  `refresh_issued_at` int unsigned NULL DEFAULT NULL,
+  `refresh_expires_at` int unsigned NULL DEFAULT NULL,
+  `refresh_status` varchar(32) NULL DEFAULT NULL,
+  `last_refresh_error` text NULL,
+  `last_refresh_error_date` datetime NULL DEFAULT NULL,
+  `last_refresh_http_status` int unsigned NULL DEFAULT NULL,
+  `linked_at` datetime NULL DEFAULT NULL,
+  `redirect_uri` text NULL,
+  `webhook_ownership` varchar(32) NULL DEFAULT NULL,
+  `webhook_url` text NULL,
+  `webhook_signature_key` text NULL,
+  `webhook_updated_at` datetime NULL DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_payment_processor_id` (`payment_processor_id`),
+  KEY `index_connection_mode` (`connection_mode`),
+  KEY `index_organization_slug` (`organization_slug`)
 )
 ENGINE=InnoDB;

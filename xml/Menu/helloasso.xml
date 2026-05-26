@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/setting/helloasso</path>
+    <page_callback>CRM_Admin_Form_Generic</page_callback>
+    <title>HelloAsso settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+    <adminGroup>System Settings</adminGroup>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/preferences/helloasso</path>
+    <page_callback>CRM_Admin_Form_Generic</page_callback>
+    <title>HelloAsso settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+    <adminGroup>System Settings</adminGroup>
+  </item>
+  <item>
+    <path>civicrm/helloasso/partner</path>
+    <page_callback>CRM_HelloassoPaymentProcessor_Page_PartnerAuth</page_callback>
+    <title>HelloAsso partner authorization</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/helloasso/partner/callback</path>
+    <page_callback>CRM_HelloassoPaymentProcessor_Page_PartnerAuth</page_callback>
+    <title>HelloAsso partner authorization callback</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>
