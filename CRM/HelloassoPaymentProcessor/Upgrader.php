@@ -409,14 +409,14 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     }
 
     $this->addTask(
-      E::ts('HelloAsso: analyser les trxn_id legacy concaténés (%1 cas)', [1 => $candidateCount]),
+      E::ts('HelloAsso: analyze concatenated legacy trxn_id values (%1 cases)', [1 => $candidateCount]),
       'taskLegacyRepairScan',
       $candidateCount
     );
 
     if ($candidateCount > self::LEGACY_TRXN_GUI_LIMIT) {
       $this->addTask(
-        E::ts('HelloAsso: trop de cas (%1) pour la réparation GUI. Utiliser le mode terminal.', [1 => $candidateCount]),
+        E::ts('HelloAsso: too many cases (%1) for GUI repair. Use terminal mode.', [1 => $candidateCount]),
         'taskLegacyRepairTooManyCandidates',
         $candidateCount,
         self::LEGACY_TRXN_GUI_LIMIT
@@ -428,7 +428,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
       $firstId = reset($batchIds);
       $lastId = end($batchIds);
       $this->addTask(
-        E::ts('HelloAsso: réparer les trxn_id legacy (lot %1, contributions %2 à %3)', [
+        E::ts('HelloAsso: repair legacy trxn_id values (batch %1, contributions %2 to %3)', [
           1 => $batchIndex + 1,
           2 => $firstId,
           3 => $lastId,
@@ -439,7 +439,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     }
 
     $this->addTask(
-      E::ts('HelloAsso: rapport final des trxn_id legacy restants'),
+      E::ts('HelloAsso: final report of remaining legacy trxn_id values'),
       'taskLegacyRepairReport'
     );
 

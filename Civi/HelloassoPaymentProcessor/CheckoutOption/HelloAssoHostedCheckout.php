@@ -54,7 +54,7 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
 
   public function getAfformSettings(bool $testMode): array {
     return [
-      'description' => E::ts('Vous serez redirigé vers HelloAsso pour effectuer le paiement.'),
+      'description' => E::ts('You will be redirected to HelloAsso to complete your payment.'),
     ];
   }
 
@@ -65,17 +65,30 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
   public function startCheckout(CheckoutSession $session): void {
     /** @var \CRM_Core_Payment_HelloAsso $processor */
     $processor = $this->getQuickformProcessor($session->isTestMode());
+    $landingUrl = $session->getLandingUrl();
     $redirectUrl = $processor->startHostedCheckoutForContribution($session->getContributionId(), [
-      'landing_url' => $session->getLandingUrl(),
-      'return_url' => $session->getLandingUrl(),
-      'cancel_url' => $session->getLandingUrl(),
-      'error_url' => $session->getLandingUrl(),
+      'landing_url' => $landingUrl,
+      'return_url' => $landingUrl,
+      'cancel_url' => $this->addResultMarker($landingUrl, 'cancel'),
+      'error_url' => $landingUrl,
     ]);
 
     $session->setResponseItem('redirect', $redirectUrl);
   }
 
   public function continueCheckout(CheckoutSession $session): void {
+    if (($_GET['helloasso_result'] ?? '') === 'cancel') {
+      $session->cancel();
+      try {
+        $processor = $this->getQuickformProcessor($session->isTestMode());
+        $processor->cancelHostedCheckoutFollowUps($session->getContributionId());
+      }
+      catch (\Throwable $e) {
+        \Civi::log()->warning('Unable to stop HelloAsso follow-ups after checkout cancellation: ' . $e->getMessage());
+      }
+      return;
+    }
+
     /** @var \CRM_Core_Payment_HelloAsso $processor */
     $processor = $this->getQuickformProcessor($session->isTestMode());
     $state = $processor->synchronizeContributionForHostedCheckout($session->getContributionId());
@@ -97,13 +110,18 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
     $session->pending();
   }
 
+  private function addResultMarker(string $url, string $result): string {
+    $separator = strpos($url, '?') === FALSE ? '?' : '&';
+    return $url . $separator . 'helloasso_result=' . rawurlencode($result);
+  }
+
   protected function getConnectionDetails(bool $testMode = FALSE, bool $strictMode = FALSE): array {
     $connection = $testMode ? $this->testConnection : $this->liveConnection;
     if (!$connection && !$strictMode) {
       $connection = $this->liveConnection ?: $this->testConnection;
     }
     if (!$connection) {
-      throw new \CRM_Core_Exception(E::ts("Aucune connexion HelloAsso active n'est disponible pour cette Checkout Option."));
+      throw new \CRM_Core_Exception(E::ts("No active HelloAsso connection is available for this Checkout Option."));
     }
 
     return $connection;

@@ -117,10 +117,10 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     $processorAuthConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
     $webhookRegistration = $paymentProcessorId ? $processorAuthConfig->getWebhookRegistration($paymentProcessorId) : NULL;
     $webhookOwnership = $paymentProcessorId ? $processorAuthConfig->getWebhookOwnership($paymentProcessorId) : NULL;
-    $screenLabel = $isTestProcessor ? E::ts('Mire HelloAsso sandbox') : E::ts('Mire HelloAsso');
-    $sharedClientIdLabel = $isTestProcessor ? E::ts('Client ID partagé sandbox') : E::ts('Client ID partagé');
-    $sharedClientSecretLabel = $isTestProcessor ? E::ts('Client secret partagé sandbox') : E::ts('Client secret partagé');
-    $connectLabel = $isTestProcessor ? E::ts('Connecter le sandbox à HelloAsso') : E::ts('Connecter à HelloAsso');
+    $screenLabel = $isTestProcessor ? E::ts('HelloAsso sandbox authorization screen') : E::ts('HelloAsso authorization screen');
+    $sharedClientIdLabel = $isTestProcessor ? E::ts('Sandbox shared client ID') : E::ts('Shared client ID');
+    $sharedClientSecretLabel = $isTestProcessor ? E::ts('Sandbox shared client secret') : E::ts('Shared client secret');
+    $connectLabel = $isTestProcessor ? E::ts('Connect sandbox to HelloAsso') : E::ts('Connect to HelloAsso');
     $connectButtonHtml = helloasso_payment_processor_get_authorize_button_html($connectUrl, $connectLabel);
     $linkedAtLabel = helloasso_payment_processor_format_datetime($link['linked_at'] ?? NULL);
     $accessExpiresAtLabel = helloasso_payment_processor_format_datetime($link['expires_at'] ?? NULL);
@@ -131,11 +131,11 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     $html = '<div class="crm-block crm-form-block">';
     $html .= '<h3>' . $screenLabel . '</h3>';
     if ($paymentProcessorId) {
-      $html .= '<p><strong>' . E::ts('ID du processeur de paiement : %1', [1 => $paymentProcessorId]) . '</strong></p>';
+      $html .= '<p><strong>' . E::ts('Payment processor ID: %1', [1 => $paymentProcessorId]) . '</strong></p>';
     }
     $html .= '<p>' . helloasso_payment_processor_get_partner_required_notice() . '</p>';
-    $html .= '<p class="description">' . E::ts("Cette page sert à renseigner le client partagé, afficher l'état de liaison et lancer la connexion HelloAsso. Le switch général d'activation de la mire se règle depuis les paramètres HelloAsso.") . '</p>';
-    $html .= '<p class="description"><a href="' . $settingsUrl . '">' . E::ts('Ouvrir les paramètres HelloAsso') . '</a></p>';
+    $html .= '<p class="description">' . E::ts("This page is used to enter the shared client, display the link status and start the HelloAsso connection. The general authorization-screen activation switch is configured in the HelloAsso settings.") . '</p>';
+    $html .= '<p class="description"><a href="' . $settingsUrl . '">' . E::ts('Open HelloAsso settings') . '</a></p>';
     $html .= '<form method="post" action="' . $formActionUrlEscaped . '">';
     $html .= '<input type="hidden" name="helloasso_partner_form_token" value="' . $formToken . '">';
     $html .= '<input type="hidden" name="helloasso_partner_form_action" value="save">';
@@ -144,56 +144,56 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     $html .= '<td><input class="huge" type="text" id="helloasso_partner_client_id" name="helloasso_partner_client_id" value="' . $clientId . '"></td></tr>';
     $html .= '<tr><td><label for="helloasso_partner_client_secret">' . $sharedClientSecretLabel . '</label></td>';
     $html .= '<td><input class="huge" type="password" id="helloasso_partner_client_secret" name="helloasso_partner_client_secret" value="">';
-    $html .= '<br><span class="description">' . E::ts('Laisser vide pour conserver le secret actuel.') . '</span></td></tr>';
-    $html .= '<tr><td><label for="helloasso_partner_authorize_url">' . E::ts("URL d'autorisation") . '</label></td>';
+    $html .= '<br><span class="description">' . E::ts('Leave blank to keep the current secret.') . '</span></td></tr>';
+    $html .= '<tr><td><label for="helloasso_partner_authorize_url">' . E::ts("Authorization URL") . '</label></td>';
     $html .= '<td><input class="huge" type="text" id="helloasso_partner_authorize_url" name="helloasso_partner_authorize_url" value="' . $authorizeUrl . '"></td></tr>';
-    $html .= '<tr><td><label for="helloasso_partner_token_url">' . E::ts('URL du token') . '</label></td>';
+    $html .= '<tr><td><label for="helloasso_partner_token_url">' . E::ts('Token URL') . '</label></td>';
     $html .= '<td><input class="huge" type="text" id="helloasso_partner_token_url" name="helloasso_partner_token_url" value="' . $tokenUrl . '"></td></tr>';
     $html .= '</table>';
-    $html .= '<p><button class="button crm-form-submit default" type="submit">' . E::ts('Enregistrer les réglages de la mire') . '</button></p>';
+    $html .= '<p><button class="button crm-form-submit default" type="submit">' . E::ts('Save authorization-screen settings') . '</button></p>';
     $html .= '</form>';
-    $html .= '<p><strong>' . E::ts('URL de callback à déclarer chez HelloAsso :') . '</strong><br><code>' . $redirectUri . '</code></p>';
+    $html .= '<p><strong>' . E::ts('Callback URL to declare at HelloAsso:') . '</strong><br><code>' . $redirectUri . '</code></p>';
     if ($paymentProcessorId) {
-      $html .= '<p class="description">' . E::ts('Gestion du webhook : %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $html .= '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
       if (!empty($webhookRegistration['url'])) {
-        $html .= '<p class="description">' . E::ts('URL webhook enregistrée : %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $html .= '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if (!empty($webhookRegistration['signatureKey'])) {
-        $html .= '<p class="description">' . E::ts('Clé de signature webhook enregistrée : %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $html .= '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
     }
 
     if (!$partnerAuth->isEnabled()) {
-      $html .= '<p class="status warning">' . E::ts('La mire est désactivée globalement. Activez-la dans les paramètres HelloAsso puis revenez sur cette page pour connecter une organisation.') . '</p>';
+      $html .= '<p class="status warning">' . E::ts('The authorization screen is disabled globally. Enable it in HelloAsso settings, then return to this page to connect an organization.') . '</p>';
     }
     elseif ($link) {
-      $html .= '<p class="status success">' . E::ts('Organisation liée : %1', [1 => htmlspecialchars($link['organization_slug'] ?? '', ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $html .= '<p class="status success">' . E::ts('Organization linked: %1', [1 => htmlspecialchars($link['organization_slug'] ?? '', ENT_QUOTES, 'UTF-8')]) . '</p>';
       if (($link['refresh_status'] ?? '') === 'reconnect_required') {
         $httpStatus = !empty($link['last_refresh_http_status']) ? ' HTTP ' . (int) $link['last_refresh_http_status'] : '';
         $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
-        $html .= '<p class="status warning">' . E::ts("La liaison HelloAsso ne peut plus être renouvelée%1%2. Reconnectez l'organisation avant d'accepter de nouveaux paiements par la mire.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+        $html .= '<p class="status warning">' . E::ts("The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
       }
       elseif (($link['refresh_status'] ?? '') === 'refresh_failed') {
-        $html .= '<p class="status warning">' . E::ts("Le dernier renouvellement de la liaison HelloAsso a échoué. Vérifiez le prochain job de maintenance ou reconnectez l'organisation si le problème persiste.") . '</p>';
+        $html .= '<p class="status warning">' . E::ts("The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
       }
       if ($linkedAtLabel !== '') {
-        $html .= '<p>' . E::ts('Liée le : %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $html .= '<p>' . E::ts('Linked on: %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if ($accessExpiresAtLabel !== '') {
-        $html .= '<p>' . E::ts("Jeton d'accès valable jusqu'au : %1", [1 => htmlspecialchars($accessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $html .= '<p>' . E::ts("Access token valid until: %1", [1 => htmlspecialchars($accessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if ($refreshExpiresAtLabel !== '') {
-        $html .= '<p>' . E::ts("Liaison d'autorisation valable jusqu'au : %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $html .= '<p>' . E::ts("Authorization link valid until: %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       $html .= '<p>' . $connectButtonHtml . '</p>';
       $html .= '<form method="post" action="' . $formActionUrlEscaped . '">';
       $html .= '<input type="hidden" name="helloasso_partner_form_token" value="' . $formToken . '">';
       $html .= '<input type="hidden" name="helloasso_partner_form_action" value="unlink">';
-      $html .= '<p><button class="button" type="submit">' . E::ts("Déconnecter l'organisation liée") . '</button></p>';
+      $html .= '<p><button class="button" type="submit">' . E::ts("Disconnect the linked organization") . '</button></p>';
       $html .= '</form>';
     }
     else {
-      $html .= '<p class="status">' . E::ts("Aucune organisation HelloAsso n'est encore liée.") . '</p>';
+      $html .= '<p class="status">' . E::ts("No HelloAsso organization is linked yet.") . '</p>';
       $html .= '<p>' . $connectButtonHtml . '</p>';
     }
 

@@ -11,7 +11,7 @@ return [
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => E::ts('Parametres HelloAsso'),
+        'label' => E::ts('HelloAsso settings'),
         'name' => 'helloasso_payment_processor_settings',
         'url' => 'civicrm/admin/setting/helloasso?reset=1',
         'permission' => 'administer CiviCRM',
