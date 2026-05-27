@@ -236,23 +236,7 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
   }
 
   private function getPostCallbackReturnUrl(int $paymentProcessorId): string {
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework === 'WordPress') {
-      return $this->getPartnerPageUrl('reset=1&processor_id=' . $paymentProcessorId);
-    }
-
-    return $this->getPaymentProcessorEditUrl($paymentProcessorId);
-  }
-
-  private function getPaymentProcessorEditUrl(int $paymentProcessorId): string {
-    return CRM_Utils_System::url(
-      'civicrm/admin/paymentProcessor/edit',
-      'action=update&id=' . $paymentProcessorId . '&reset=1',
-      TRUE,
-      NULL,
-      FALSE,
-      TRUE
-    );
+    return $this->getPartnerPageUrl('reset=1&processor_id=' . $paymentProcessorId);
   }
 
 }
