@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"POT-Creation-Date: 2026-05-27 17:39+0000\n"
-"PO-Revision-Date: 2026-05-27 17:39+0000\n"
+"POT-Creation-Date: 2026-05-28 15:11+0000\n"
+"PO-Revision-Date: 2026-05-28 15:11+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -28,6 +28,9 @@ msgid "Authorization URL"
 msgstr ""
 
 msgid "Authorization link valid until: %1"
+msgstr ""
+
+msgid "Authorized partner domain: %1"
 msgstr ""
 
 msgid "Automatically enable the webhook"
@@ -207,6 +210,9 @@ msgstr ""
 msgid "HelloAsso authorization-screen flow"
 msgstr ""
 
+msgid "HelloAsso did not return any partner notification URL on this client."
+msgstr ""
+
 msgid "HelloAsso endpoint used to exchange the authorization code and refresh OAuth tokens."
 msgstr ""
 
@@ -240,6 +246,9 @@ msgstr ""
 msgid "HelloAsso organization %1 is now linked."
 msgstr ""
 
+msgid "HelloAsso partner API status: reachable."
+msgstr ""
+
 msgid "HelloAsso partner authorization"
 msgstr ""
 
@@ -256,6 +265,9 @@ msgid "HelloAsso partner authorization did not return an organization slug."
 msgstr ""
 
 msgid "HelloAsso partner authorization failed: %1"
+msgstr ""
+
+msgid "HelloAsso partner authorization failed: %1 (%2)"
 msgstr ""
 
 msgid "HelloAsso partner authorization is currently being refreshed. Please retry the payment."
@@ -282,6 +294,9 @@ msgstr ""
 msgid "HelloAsso partner client ID and secret must be configured before connecting an organization."
 msgstr ""
 
+msgid "HelloAsso partner information could not be retrieved: %1"
+msgstr ""
+
 msgid "HelloAsso partner linked organization token"
 msgstr ""
 
@@ -298,6 +313,9 @@ msgid "HelloAsso partner webhook signature mismatch."
 msgstr ""
 
 msgid "HelloAsso payment is temporarily unavailable: HelloAsso connection must be restored by an administrator."
+msgstr ""
+
+msgid "HelloAsso payment is temporarily unavailable: the linked organization is not currently allowed by HelloAsso to receive online payments."
 msgstr ""
 
 msgid "HelloAsso payment processor not found: %1"
@@ -355,6 +373,9 @@ msgid "HelloAsso: Domain Mismatch (Staging/Dev Instance)"
 msgstr ""
 
 msgid "HelloAsso: Incomplete V2 Upgrade"
+msgstr ""
+
+msgid "HelloAsso: Organization Cannot Receive Payments"
 msgstr ""
 
 msgid "HelloAsso: Payment Method Missing"
@@ -483,6 +504,9 @@ msgstr ""
 msgid "One or more HelloAsso authorization links will expire soon: %1"
 msgstr ""
 
+msgid "One or more HelloAsso linked organizations are not currently allowed by HelloAsso to receive online payments. Check their administrative status before accepting new payments through the authorization screen: %1"
+msgstr ""
+
 msgid "One or more HelloAsso links expect automatic webhook registration, but no webhook is stored yet: %1. Reconnect the authorization screen to push the webhook, or disable automatic webhook registration on that processor if another CiviCRM instance must keep manual control of the HelloAsso webhook URL."
 msgstr ""
 
@@ -535,6 +559,15 @@ msgid "Organization Name"
 msgstr ""
 
 msgid "Organization linked: %1"
+msgstr ""
+
+msgid "Partner API privileges: %1"
+msgstr ""
+
+msgid "Partner account: %1"
+msgstr ""
+
+msgid "Partner notification URLs returned by HelloAsso: %1"
 msgstr ""
 
 msgid "Payment processor ID"
@@ -693,6 +726,9 @@ msgstr ""
 msgid "The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists."
 msgstr ""
 
+msgid "The linked HelloAsso organization is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen."
+msgstr ""
+
 msgid "The official button above opens the HelloAsso connection. If you need to adjust client credentials or check the link status, use the settings link first."
 msgstr ""
 
@@ -769,6 +805,12 @@ msgid "managed by this CiviCRM instance"
 msgstr ""
 
 msgid "manual / another instance in control"
+msgstr ""
+
+msgid "none"
+msgstr ""
+
+msgid "payment refused"
 msgstr ""
 
 msgid "production"

@@ -454,6 +454,11 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
       $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
       $html .= '<p class="status warning">' . E::ts("The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
     }
+    elseif (($organizationLink['refresh_status'] ?? '') === 'organization_blocked') {
+      $httpStatus = !empty($organizationLink['last_refresh_http_status']) ? ' HTTP ' . (int) $organizationLink['last_refresh_http_status'] : '';
+      $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
+      $html .= '<p class="status warning">' . E::ts("The linked HelloAsso organization is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+    }
     elseif (($organizationLink['refresh_status'] ?? '') === 'refresh_failed') {
       $html .= '<p class="status warning">' . E::ts("The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
     }
@@ -688,6 +693,7 @@ function helloasso_payment_processor_civicrm_check(&$messages): void {
     $missingWebhook = [];
     $refreshFailed = [];
     $reconnectRequired = [];
+    $organizationBlocked = [];
 
     $domainMismatches = [];
     $webhookMismatches = [];
@@ -702,6 +708,11 @@ function helloasso_payment_processor_civicrm_check(&$messages): void {
         $status = !empty($link['last_refresh_http_status']) ? 'HTTP ' . (int) $link['last_refresh_http_status'] : E::ts('refresh refused');
         $date = helloasso_payment_processor_format_datetime($link['last_refresh_error_date'] ?? NULL);
         $reconnectRequired[] = sprintf('%s (%s%s)', $linkedLabel, $status, $date !== '' ? ', ' . htmlspecialchars($date, ENT_QUOTES, 'UTF-8') : '');
+      }
+      elseif ($refreshStatus === 'organization_blocked') {
+        $status = !empty($link['last_refresh_http_status']) ? 'HTTP ' . (int) $link['last_refresh_http_status'] : E::ts('payment refused');
+        $date = helloasso_payment_processor_format_datetime($link['last_refresh_error_date'] ?? NULL);
+        $organizationBlocked[] = sprintf('%s (%s%s)', $linkedLabel, $status, $date !== '' ? ', ' . htmlspecialchars($date, ENT_QUOTES, 'UTF-8') : '');
       }
       elseif ($refreshStatus === 'refresh_failed') {
         $refreshFailed[] = $linkedLabel;
@@ -780,6 +791,16 @@ function helloasso_payment_processor_civicrm_check(&$messages): void {
         E::ts('HelloAsso: Reconnection Required'),
         \Psr\Log\LogLevel::ERROR,
         'fa-unlink'
+      );
+    }
+
+    if ($organizationBlocked) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'helloasso_payment_processor_organization_blocked',
+        E::ts('One or more HelloAsso linked organizations are not currently allowed by HelloAsso to receive online payments. Check their administrative status before accepting new payments through the authorization screen: %1', [1 => implode('; ', $organizationBlocked)]),
+        E::ts('HelloAsso: Organization Cannot Receive Payments'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-ban'
       );
     }
 
