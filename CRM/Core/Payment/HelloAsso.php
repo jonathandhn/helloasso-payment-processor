@@ -298,15 +298,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         if (!$helloAssoPaymentId || $refundAmount <= 0) {
             throw new PaymentProcessorException(E::ts('HelloAsso refund cannot be requested without a payment ID and a positive amount.'));
         }
+        $this->assertFullRefundAmount($helloAssoPaymentId, $refundAmount);
 
         $refundOperation = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->refundPayment(
             $this->getPaymentProcessorConfig(),
             $this->_is_test,
-            $helloAssoPaymentId,
-            [
-                'amount' => (int) round($refundAmount * 100),
-                'sendRefundMail' => TRUE,
-            ]
+            $helloAssoPaymentId
         );
 
         if (empty($refundOperation['id'])) {
@@ -324,6 +321,26 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             'refund_status' => 'Completed',
             'fee_amount' => 0,
         ];
+    }
+
+    private function assertFullRefundAmount(int $helloAssoPaymentId, float $refundAmount): void
+    {
+        $paymentProcessorId = (int) $this->getPaymentProcessorId();
+        $financialTrxn = civicrm_api3('FinancialTrxn', 'get', [
+            'sequential' => 1,
+            'trxn_id' => (string) $helloAssoPaymentId,
+            'payment_processor_id' => $paymentProcessorId,
+            'options' => ['limit' => 1],
+        ]);
+
+        if (empty($financialTrxn['values'][0]['total_amount'])) {
+            throw new PaymentProcessorException(E::ts('HelloAsso refund cannot be requested because the original CiviCRM payment could not be found.'));
+        }
+
+        $originalAmount = (float) $financialTrxn['values'][0]['total_amount'];
+        if (abs($originalAmount - $refundAmount) > 0.0001) {
+            throw new PaymentProcessorException(E::ts('HelloAsso only supports full refunds through this integration. Partial refunds must be handled manually in HelloAsso.'));
+        }
     }
 
     private function createCheckoutIntentAndStore(\Civi\Payment\PropertyBag $propertyBag, array $options): array

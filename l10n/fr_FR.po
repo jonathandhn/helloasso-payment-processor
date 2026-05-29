@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-05-29 08:57+0000\n"
+"PO-Revision-Date: 2026-05-29 09:45+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -336,6 +336,10 @@ msgstr "Objet HelloAsso introuvable (404). Les révérifications courte et longu
 msgid "HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation."
 msgstr "Paiements en ligne HelloAsso, connexions par mire, webhooks sécurisés et rapprochement des paiements."
 
+#. Maintained French translation
+msgid "HelloAsso only supports full refunds through this integration. Partial refunds must be handled manually in HelloAsso."
+msgstr "HelloAsso prend uniquement en charge les remboursements complets dans cette intégration. Les remboursements partiels doivent être traités manuellement dans HelloAsso."
+
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:48
 msgid "HelloAsso organization %1 is now linked."
 msgstr "L'organisation HelloAsso %1 est désormais liée."
@@ -458,6 +462,10 @@ msgstr "Mire HelloAsso production"
 #. Maintained French translation
 msgid "HelloAsso production connection"
 msgstr "Connexion HelloAsso production"
+
+#. Maintained French translation
+msgid "HelloAsso refund cannot be requested because the original CiviCRM payment could not be found."
+msgstr "Le remboursement HelloAsso ne peut pas être demandé car le paiement CiviCRM d'origine est introuvable."
 
 #. Maintained French translation
 msgid "HelloAsso refund cannot be requested without a payment ID and a positive amount."
