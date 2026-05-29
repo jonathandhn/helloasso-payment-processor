@@ -282,6 +282,50 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         ];
     }
 
+    public function supportsRefund(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_enable_refunds');
+    }
+
+    public function doRefund(&$params): array
+    {
+        if (!$this->supportsRefund()) {
+            throw new PaymentProcessorException(E::ts('HelloAsso refunds are disabled by this extension.'));
+        }
+
+        $helloAssoPaymentId = (int) ($params['trxn_id'] ?? 0);
+        $refundAmount = (float) ($params['amount'] ?? 0);
+        if (!$helloAssoPaymentId || $refundAmount <= 0) {
+            throw new PaymentProcessorException(E::ts('HelloAsso refund cannot be requested without a payment ID and a positive amount.'));
+        }
+
+        $refundOperation = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->refundPayment(
+            $this->getPaymentProcessorConfig(),
+            $this->_is_test,
+            $helloAssoPaymentId,
+            [
+                'amount' => (int) round($refundAmount * 100),
+                'sendRefundMail' => TRUE,
+            ]
+        );
+
+        if (empty($refundOperation['id'])) {
+            throw new PaymentProcessorException(E::ts('HelloAsso accepted the refund request but did not return a refund operation ID.'));
+        }
+
+        CRM_Core_Session::setStatus(
+            E::ts('HelloAsso has accepted the refund request. The local CiviCRM refund has been recorded immediately; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization.'),
+            E::ts('HelloAsso refund requested'),
+            'success'
+        );
+
+        return [
+            'refund_trxn_id' => (string) $refundOperation['id'],
+            'refund_status' => 'Completed',
+            'fee_amount' => 0,
+        ];
+    }
+
     private function createCheckoutIntentAndStore(\Civi\Payment\PropertyBag $propertyBag, array $options): array
     {
         $contributionId = !empty($options['contribution_id']) ? (int) $options['contribution_id'] : (int) $propertyBag->getContributionID();

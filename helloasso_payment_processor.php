@@ -11,6 +11,26 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
  */
 function helloasso_payment_processor_civicrm_config(&$config): void {
   _helloasso_payment_processor_civix_civicrm_config($config);
+
+  Civi::dispatcher()->addListener(
+    'civi.api.prepare',
+    ['CRM_HelloassoPaymentProcessor_APIWrapper_PaymentProcessorRefund', 'onApiPrepare'],
+    -50
+  );
+}
+
+/**
+ * Implements hook_civicrm_apiWrappers().
+ */
+function helloasso_payment_processor_civicrm_apiWrappers(&$wrappers, $apiRequest): void {
+  if ((int) ($apiRequest['version'] ?? 0) !== 3) {
+    return;
+  }
+  if (!in_array(strtolower($apiRequest['entity'] ?? ''), ['paymentprocessor', 'payment_processor'], TRUE) || strtolower($apiRequest['action'] ?? '') !== 'refund') {
+    return;
+  }
+
+  $wrappers[] = new CRM_HelloassoPaymentProcessor_APIWrapper_PaymentProcessorRefund();
 }
 
 /**

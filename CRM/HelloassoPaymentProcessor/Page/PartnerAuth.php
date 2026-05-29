@@ -138,7 +138,9 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
         $partnerInformation = $partnerAuth->getPartnerInformation();
       }
       catch (Exception $e) {
-        $partnerInformationError = $e->getMessage();
+        if (!$this->isPartnerInformationForbidden($e)) {
+          $partnerInformationError = $e->getMessage();
+        }
       }
     }
 
@@ -230,6 +232,16 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
 
   private function isPostRequest(): bool {
     return strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST';
+  }
+
+  /**
+   * Some HelloAsso partner clients can use OAuth and webhook registration but
+   * are not allowed to read /v5/partners/me. Keep this diagnostic optional.
+   */
+  private function isPartnerInformationForbidden(Exception $e): bool {
+    return strpos($e->getMessage(), '(403)') !== FALSE
+      || stripos($e->getMessage(), 'HTTP 403') !== FALSE
+      || stripos($e->getMessage(), 'forbidden') !== FALSE;
   }
 
   private function getFormToken(): string {

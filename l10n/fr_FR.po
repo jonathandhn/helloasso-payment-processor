@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-05-28 15:11+0000\n"
+"PO-Revision-Date: 2026-05-29 08:57+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -229,6 +229,10 @@ msgstr "Le nom de l'organisation HelloAsso n'est pas renseigné sur cette passer
 msgid "HelloAsso Payments Processor"
 msgstr "Processeur de paiement HelloAsso"
 
+#. Maintained French translation
+msgid "HelloAsso accepted the refund request but did not return a refund operation ID."
+msgstr "HelloAsso a accepté la demande de remboursement mais n'a pas retourné d'identifiant d'opération de remboursement."
+
 msgid "HelloAsso authentication is currently being refreshed. Please retry the payment."
 msgstr ""
 
@@ -295,6 +299,10 @@ msgstr "Endpoint HelloAsso utilisé pour échanger le code d'autorisation et raf
 #. Maintained French translation
 msgid "HelloAsso error"
 msgstr "Erreur HelloAsso"
+
+#. Maintained French translation
+msgid "HelloAsso has accepted the refund request. The local CiviCRM refund has been recorded immediately; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization."
+msgstr "HelloAsso a accepté la demande de remboursement. Le remboursement local CiviCRM a été enregistré immédiatement ; l'état final du remboursement HelloAsso sera confirmé ensuite par webhook ou synchronisation planifiée."
 
 #. Maintained French translation
 msgid "HelloAsso helps associations collect online payments and provides its services free of charge. It covers all transaction fees so that you can receive the full amount paid by your supporters, without fees. Voluntary contributions left by them are its only source of revenue."
@@ -450,6 +458,14 @@ msgstr "Mire HelloAsso production"
 #. Maintained French translation
 msgid "HelloAsso production connection"
 msgstr "Connexion HelloAsso production"
+
+#. Maintained French translation
+msgid "HelloAsso refund cannot be requested without a payment ID and a positive amount."
+msgstr "Le remboursement HelloAsso ne peut pas être demandé sans identifiant de paiement et montant positif."
+
+#. Maintained French translation
+msgid "HelloAsso refund requested"
+msgstr "Remboursement HelloAsso demandé"
 
 #: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:186
 msgid "HelloAsso refunds are disabled by this extension."
