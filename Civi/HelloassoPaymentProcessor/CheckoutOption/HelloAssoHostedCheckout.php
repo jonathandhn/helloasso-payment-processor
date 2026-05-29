@@ -77,8 +77,9 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
   }
 
   public function continueCheckout(CheckoutSession $session): void {
+    $this->clearCheckoutValidationMessages();
     if (($_GET['helloasso_result'] ?? '') === 'cancel') {
-      $session->cancel();
+      $this->cancelCheckoutSession($session);
       try {
         $processor = $this->getQuickformProcessor($session->isTestMode());
         $processor->cancelHostedCheckoutFollowUps($session->getContributionId());
@@ -108,6 +109,34 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
     }
 
     $session->pending();
+  }
+
+  private function cancelCheckoutSession(CheckoutSession $session): void {
+    try {
+      $session->cancel();
+    }
+    catch (\Throwable $e) {
+      \Civi::log()->warning('Unable to mark HelloAsso checkout contribution as cancelled: ' . $e->getMessage());
+      $status = new \ReflectionProperty($session, 'status');
+      $status->setAccessible(TRUE);
+      $status->setValue($session, CheckoutSession::STATUS_CANCEL);
+    }
+  }
+
+  private function clearCheckoutValidationMessages(): void {
+    $session = \CRM_Core_Session::singleton();
+    $messages = $session->getStatus(TRUE);
+    foreach ($messages as $message) {
+      if (!empty($message['options']['helloasso_checkout_validation'])) {
+        continue;
+      }
+      \CRM_Core_Session::setStatus(
+        $message['text'] ?? '',
+        $message['title'] ?? '',
+        $message['type'] ?? 'alert',
+        $message['options'] ?? []
+      );
+    }
   }
 
   private function addResultMarker(string $url, string $result): string {

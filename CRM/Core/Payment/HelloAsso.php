@@ -447,7 +447,9 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     private function validateHelloAssoPayerNames(string $firstName, string $lastName): void
     {
         $throwError = function ($msg) {
-            CRM_Core_Session::setStatus($msg, E::ts('HelloAsso error'), 'error');
+            CRM_Core_Session::setStatus($msg, E::ts('HelloAsso error'), 'error', [
+                'helloasso_checkout_validation' => TRUE,
+            ]);
             throw new PaymentProcessorException($msg);
         };
 
