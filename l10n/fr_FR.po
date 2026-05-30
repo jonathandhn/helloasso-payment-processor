@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-05-29 09:45+0000\n"
+"PO-Revision-Date: 2026-05-30 18:01+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -301,8 +301,8 @@ msgid "HelloAsso error"
 msgstr "Erreur HelloAsso"
 
 #. Maintained French translation
-msgid "HelloAsso has accepted the refund request. The local CiviCRM refund has been recorded immediately; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization."
-msgstr "HelloAsso a accepté la demande de remboursement. Le remboursement local CiviCRM a été enregistré immédiatement ; l'état final du remboursement HelloAsso sera confirmé ensuite par webhook ou synchronisation planifiée."
+msgid "HelloAsso has accepted the refund request for payment %1. Refund operation %2 has been recorded in CiviCRM; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization."
+msgstr "HelloAsso a accepté la demande de remboursement du paiement %1. L'opération de remboursement %2 a été enregistrée dans CiviCRM ; l'état final du remboursement HelloAsso sera confirmé ensuite par webhook ou synchronisation planifiée."
 
 #. Maintained French translation
 msgid "HelloAsso helps associations collect online payments and provides its services free of charge. It covers all transaction fees so that you can receive the full amount paid by your supporters, without fees. Voluntary contributions left by them are its only source of revenue."

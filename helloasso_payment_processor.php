@@ -61,6 +61,11 @@ function helloasso_payment_processor_civicrm_alterMenu(&$items): void {
  * Implements hook_civicrm_buildForm().
  */
 function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void {
+  if ($formName === 'CRM_Mjwshared_Form_PaymentRefund') {
+    helloasso_payment_processor_lock_mjwshared_refund_amount($form);
+    return;
+  }
+
   if ($formName === 'CRM_Admin_Form_Generic' && helloasso_payment_processor_is_helloasso_settings_form()) {
     helloasso_payment_processor_inject_settings_page_panel();
     return;
@@ -415,6 +420,70 @@ function helloasso_payment_processor_get_payment_processor(int $paymentProcessor
   }
 }
 
+function helloasso_payment_processor_lock_mjwshared_refund_amount(CRM_Core_Form $form): void {
+  $paymentProcessorId = helloasso_payment_processor_get_refund_form_payment_processor_id();
+  $processor = $paymentProcessorId ? helloasso_payment_processor_get_payment_processor($paymentProcessorId) : NULL;
+  if (($processor['class_name'] ?? NULL) !== 'Payment_HelloAsso') {
+    return;
+  }
+
+  if (method_exists($form, 'elementExists') && !$form->elementExists('refund_amount')) {
+    return;
+  }
+
+  try {
+    $form->freeze(['refund_amount']);
+  }
+  catch (Throwable $e) {
+    try {
+      $form->getElement('refund_amount')->freeze();
+    }
+    catch (Throwable $ignored) {
+    }
+  }
+
+  CRM_Core_Resources::singleton()->addScript(<<<'JS'
+CRM.$(function($) {
+  var $refundAmount = $('#refund_amount');
+  if ($refundAmount.length) {
+    $refundAmount.prop('readonly', true).attr('aria-readonly', 'true').addClass('crm-form-readonly');
+  }
+});
+JS
+  );
+}
+
+function helloasso_payment_processor_get_refund_form_payment_processor_id(): ?int {
+  $paymentId = CRM_Utils_Request::retrieveValue('payment_id', 'Positive', NULL, FALSE, 'REQUEST');
+  if ($paymentId) {
+    $paymentProcessorId = CRM_Core_DAO::singleValueQuery(
+      'SELECT payment_processor_id FROM civicrm_financial_trxn WHERE id = %1',
+      [1 => [(int) $paymentId, 'Integer']]
+    );
+    return $paymentProcessorId ? (int) $paymentProcessorId : NULL;
+  }
+
+  $contributionId = CRM_Utils_Request::retrieveValue('contribution_id', 'Positive', NULL, FALSE, 'REQUEST');
+  if (!$contributionId) {
+    return NULL;
+  }
+
+  $paymentProcessorId = CRM_Core_DAO::singleValueQuery(
+    "SELECT ft.payment_processor_id
+     FROM civicrm_financial_trxn ft
+     INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id
+     WHERE eft.entity_table = 'civicrm_contribution'
+       AND eft.entity_id = %1
+       AND ft.is_payment = 1
+       AND ft.total_amount > 0
+     ORDER BY ft.id DESC
+     LIMIT 1",
+    [1 => [(int) $contributionId, 'Integer']]
+  );
+
+  return $paymentProcessorId ? (int) $paymentProcessorId : NULL;
+}
+
 function helloasso_payment_processor_render_settings_page_launch_panel(
   string $title,
   ?array $processor,
@@ -562,6 +631,11 @@ function helloasso_payment_processor_inject_settings_page_panel(): void {
  * Implements hook_civicrm_postProcess().
  */
 function helloasso_payment_processor_civicrm_postProcess($formName, &$form): void {
+  if ($formName === 'CRM_Mjwshared_Form_PaymentRefund') {
+    helloasso_payment_processor_show_refund_success_message();
+    return;
+  }
+
   if ($formName !== 'CRM_Admin_Form_PaymentProcessor') {
     return;
   }
@@ -1170,6 +1244,24 @@ function helloasso_payment_processor_civicrm_cron($job = NULL): void {
       Civi::log()->error('HelloAsso cron sync failed: ' . $e->getMessage());
     }
   }
+}
+
+function helloasso_payment_processor_show_refund_success_message(): void {
+  $session = CRM_Core_Session::singleton();
+  $refund = $session->get('last_refund', 'helloasso_payment_processor');
+  $session->set('last_refund', NULL, 'helloasso_payment_processor');
+  if (empty($refund['payment_id']) || empty($refund['refund_operation_id'])) {
+    return;
+  }
+
+  CRM_Core_Session::setStatus(
+    E::ts('HelloAsso has accepted the refund request for payment %1. Refund operation %2 has been recorded in CiviCRM; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization.', [
+      1 => (string) $refund['payment_id'],
+      2 => (string) $refund['refund_operation_id'],
+    ]),
+    E::ts('HelloAsso refund requested'),
+    'success'
+  );
 }
 
 /**
