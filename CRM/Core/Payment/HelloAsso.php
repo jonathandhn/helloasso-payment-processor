@@ -1286,7 +1286,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 break;
 
             case 'Refunded':
-                $contributionChanged = $this->updateContributionStatus($contribution->id, 'Refunded') || $contributionChanged;
+                $contributionChanged = $this->markContributionRefunded($contribution, $paymentData) || $contributionChanged;
                 $resolved = TRUE;
                 break;
         }
@@ -1314,12 +1314,145 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return FALSE;
         }
 
-        civicrm_api3('Payment', 'create', [
+        $paymentDate = $this->formatCiviBusinessTimestamp($paymentData['date'] ?? NULL);
+        $paymentParams = [
             'trxn_id' => $paymentData['id'],
             'payment_processor_id' => $this->getPaymentProcessorId(),
             'contribution_id' => $contribution->id,
             'total_amount' => $contribution->total_amount,
+        ];
+        if ($paymentDate) {
+            $paymentParams['trxn_date'] = $paymentDate;
+        }
+
+        civicrm_api3('Payment', 'create', $paymentParams);
+
+        if ($paymentDate) {
+            CRM_Core_DAO::executeQuery(
+                'UPDATE civicrm_contribution SET receive_date = %1 WHERE id = %2',
+                [
+                    1 => [$paymentDate, 'Timestamp'],
+                    2 => [(int) $contribution->id, 'Integer'],
+                ]
+            );
+        }
+
+        return TRUE;
+    }
+
+    private function markContributionRefunded(CRM_Contribute_BAO_Contribution $contribution, array $paymentData): bool
+    {
+        $changed = FALSE;
+        $refundOperation = $this->extractSuccessfulRefundOperation($paymentData);
+        if ($refundOperation && !$this->hasLocalRefundPayment($contribution->id, (string) $refundOperation['id'])) {
+            $this->recordHelloAssoRefundPayment($contribution, $paymentData, $refundOperation);
+            $changed = TRUE;
+        }
+
+        return $this->updateContributionStatusDirectly($contribution->id, 'Refunded') || $changed;
+    }
+
+    private function extractSuccessfulRefundOperation(array $paymentData): ?array
+    {
+        foreach ($paymentData['refundOperations'] ?? [] as $refundOperation) {
+            if (empty($refundOperation['id'])) {
+                continue;
+            }
+            $state = (string) ($refundOperation['state'] ?? '');
+            if ($state === '' || in_array($state, ['Processed', 'Refunded', 'Succeeded', 'Success', 'Init'], TRUE)) {
+                return $refundOperation;
+            }
+        }
+
+        return NULL;
+    }
+
+    private function hasLocalRefundPayment(int $contributionId, string $refundTrxnId = ''): bool
+    {
+        $where = [
+            'eft.entity_table = "civicrm_contribution"',
+            'eft.entity_id = %1',
+            'ft.total_amount < 0',
+        ];
+        $params = [1 => [$contributionId, 'Integer']];
+        if ($refundTrxnId !== '') {
+            $where[] = 'ft.trxn_id = %2';
+            $params[2] = [$refundTrxnId, 'String'];
+        }
+
+        return (bool) CRM_Core_DAO::singleValueQuery(
+            'SELECT ft.id
+             FROM civicrm_financial_trxn ft
+             INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id
+             WHERE ' . implode(' AND ', $where) . '
+             LIMIT 1',
+            $params
+        );
+    }
+
+    private function recordHelloAssoRefundPayment(CRM_Contribute_BAO_Contribution $contribution, array $paymentData, array $refundOperation): void
+    {
+        $originalPaymentId = $this->findLocalPaymentId((int) $contribution->id, (string) ($paymentData['id'] ?? ''));
+        $refundAmount = !empty($refundOperation['amount'])
+            ? ((float) $refundOperation['amount'] / 100)
+            : (float) $contribution->total_amount;
+
+        $params = [
+            'contribution_id' => (int) $contribution->id,
+            'trxn_id' => (string) $refundOperation['id'],
+            'total_amount' => 0 - abs($refundAmount),
+            'fee_amount' => 0,
+            'payment_processor_id' => $this->getPaymentProcessorId(),
+        ];
+
+        if ($originalPaymentId) {
+            $params['cancelled_payment_id'] = $originalPaymentId;
+        }
+
+        if (!empty($refundOperation['creationDate'])) {
+            $params['trxn_date'] = $this->formatCiviBusinessTimestamp($refundOperation['creationDate']);
+        }
+
+        civicrm_api3('Payment', 'create', $params);
+    }
+
+    private function findLocalPaymentId(int $contributionId, string $helloAssoPaymentId): ?int
+    {
+        if ($helloAssoPaymentId === '') {
+            return NULL;
+        }
+
+        $payment = civicrm_api3('Payment', 'get', [
+            'sequential' => 1,
+            'contribution_id' => $contributionId,
+            'trxn_id' => $helloAssoPaymentId,
+            'options' => ['limit' => 1],
         ]);
+
+        return !empty($payment['values'][0]['id']) ? (int) $payment['values'][0]['id'] : NULL;
+    }
+
+    private function updateContributionStatusDirectly(int $contributionId, string $statusName): bool
+    {
+        $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusName);
+        $contribution = $this->loadContributionById($contributionId);
+        if ($contribution && (int) $contribution->contribution_status_id === (int) $statusId) {
+            return FALSE;
+        }
+
+        if ($contribution && $this->isContributionStatusLockedByDonRec($contribution, (int) $statusId)) {
+            $this->logDonRecStatusMismatch($contributionId, $statusName);
+            return FALSE;
+        }
+
+        CRM_Core_DAO::executeQuery(
+            'UPDATE civicrm_contribution SET contribution_status_id = %1, cancel_date = %2 WHERE id = %3',
+            [
+                1 => [$statusId, 'Integer'],
+                2 => [$this->formatCiviBusinessTimestamp('now'), 'Timestamp'],
+                3 => [$contributionId, 'Integer'],
+            ]
+        );
 
         return TRUE;
     }
@@ -1342,7 +1475,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             ->addWhere('id', '=', $contributionId);
 
         if (in_array($statusName, ['Failed', 'Pending refund', 'Refunded'], TRUE)) {
-            $update->addValue('cancel_date', 'now');
+            $update->addValue('cancel_date', $this->formatCiviBusinessTimestamp('now'));
         }
 
         $update->execute();
@@ -2223,6 +2356,26 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         try {
             return (new DateTimeImmutable((string) $value))->format('YmdHis');
+        }
+        catch (Exception $e) {
+            return (string) $value;
+        }
+    }
+
+    private function formatCiviBusinessTimestamp($value): ?string
+    {
+        if ($value === NULL || $value === '') {
+            return NULL;
+        }
+
+        try {
+            $dateTime = is_int($value) || (is_string($value) && ctype_digit($value) && strlen((string) $value) === 10)
+                ? (new DateTimeImmutable('@' . (int) $value))
+                : new DateTimeImmutable((string) $value);
+
+            return $dateTime
+                ->setTimezone(new DateTimeZone(date_default_timezone_get()))
+                ->format('YmdHis');
         }
         catch (Exception $e) {
             return (string) $value;
