@@ -733,12 +733,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         try {
-            $this->validatePartnerWebhookSignature((string) $rawData);
-
-            if ($this->isWebhookQueueEnabled()) {
-                $this->queueWebhookPayload($params, (string) $rawData);
-                CRM_Utils_System::civiExit();
-            }
+            $partnerSignatureTrusted = $this->validatePartnerWebhookSignature((string) $rawData);
 
             $invoiceId = $params['metadata']['invoiceID'] ?? NULL;
             $sig = $params['metadata']['sig'] ?? NULL;
@@ -749,16 +744,25 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 CRM_Utils_System::civiExit();
             }
 
-            if ($invoiceId) {
-                $this->validateNotificationSignature($contribution->id, $invoiceId, $sig);
+            if ($this->isWebhookQueueEnabled()) {
+                $this->queueWebhookPayload($params, (string) $rawData);
+                CRM_Utils_System::civiExit();
             }
 
-            $this->applyHelloAssoPaymentState(
-                $contribution,
-                $params['data'],
-                $params['data']['order'] ?? [],
-                $eventType
-            );
+            $legacySignatureTrusted = $invoiceId
+                ? $this->validateNotificationSignature($contribution->id, $invoiceId, $sig)
+                : FALSE;
+
+            $trustedPayload = $partnerSignatureTrusted || $legacySignatureTrusted;
+            $authoritativePayload = $trustedPayload
+                ? [$params['data'], $params['data']['order'] ?? []]
+                : $this->fetchAuthoritativeWebhookPaymentState($params, $contribution);
+            if (!$authoritativePayload) {
+                Civi::log()->warning('HelloAsso webhook ignored because it has no verifiable signature and no locally expected HelloAsso object identifier.');
+                CRM_Utils_System::civiExit();
+            }
+
+            $this->applyHelloAssoPaymentState($contribution, $authoritativePayload[0], $authoritativePayload[1], $eventType);
         }
         catch (PaymentProcessorException $e) {
             Civi::log()->error('HelloAsso webhook validation failed: ' . $e->getMessage());
@@ -811,16 +815,24 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 return TRUE;
             }
 
-            if ($invoiceId) {
-                $this->validateNotificationSignature($contribution->id, $invoiceId, $sig);
+            $legacySignatureTrusted = $invoiceId
+                ? $this->validateNotificationSignature($contribution->id, $invoiceId, $sig)
+                : FALSE;
+
+            $authoritativePayload = $legacySignatureTrusted
+                ? [$payload['data'], $payload['data']['order'] ?? []]
+                : $this->fetchAuthoritativeWebhookPaymentState($payload, $contribution);
+            if (!$authoritativePayload) {
+                \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+                    ->addWhere('id', '=', $webhookEvent['id'])
+                    ->addValue('status', 'success')
+                    ->addValue('message', E::ts('Untrusted webhook ignored; no locally expected HelloAsso object identifier.'))
+                    ->addValue('processed_date', 'now')
+                    ->execute();
+                return TRUE;
             }
 
-            $this->applyHelloAssoPaymentState(
-                $contribution,
-                $payload['data'],
-                $payload['data']['order'] ?? [],
-                $payload['eventType'] ?? NULL
-            );
+            $this->applyHelloAssoPaymentState($contribution, $authoritativePayload[0], $authoritativePayload[1], $payload['eventType'] ?? NULL);
 
             \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
                 ->addWhere('id', '=', $webhookEvent['id'])
@@ -1516,14 +1528,14 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         ));
     }
 
-    private function validateNotificationSignature(int $contributionId, string $invoiceId, ?string $signature): void
+    private function validateNotificationSignature(int $contributionId, string $invoiceId, ?string $signature): bool
     {
         $strictSignature = $this->isWebhookSignatureRequired();
         if (empty($signature)) {
             if ($strictSignature) {
                 throw new PaymentProcessorException(E::ts('HelloAsso notification signature is required but missing.'));
             }
-            return;
+            return FALSE;
         }
 
         $metadata = $this->loadMetadataForContribution($contributionId);
@@ -1531,16 +1543,18 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             if ($strictSignature) {
                 throw new PaymentProcessorException(E::ts('HelloAsso notification signature cannot be verified because the local signing key is missing.'));
             }
-            return;
+            return FALSE;
         }
 
         $expectedSignature = hash_hmac('sha256', $invoiceId, $metadata->signing_key);
         if (!hash_equals($expectedSignature, $signature)) {
             throw new PaymentProcessorException(E::ts('HelloAsso notification signature mismatch.'));
         }
+
+        return TRUE;
     }
 
-    private function validatePartnerWebhookSignature(string $rawData): void
+    private function validatePartnerWebhookSignature(string $rawData): bool
     {
         $signature = $this->getPartnerWebhookSignatureHeader();
         $signatureKey = $this->getPartnerWebhookSignatureKey();
@@ -1551,7 +1565,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             if ($strictSignature && $signatureKey) {
                 throw new PaymentProcessorException(E::ts('HelloAsso partner webhook signature is required but missing.'));
             }
-            return;
+            return FALSE;
         }
 
         if (!$signatureKey) {
@@ -1560,13 +1574,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             }
 
             Civi::log()->warning('HelloAsso partner webhook signature received but no local signature key is configured for processor ' . $this->getPaymentProcessorId() . '.');
-            return;
+            return FALSE;
         }
 
         $expectedSignature = hash_hmac('sha256', $rawData, $signatureKey);
         if (!hash_equals($expectedSignature, $signature)) {
             throw new PaymentProcessorException(E::ts('HelloAsso partner webhook signature mismatch.'));
         }
+
+        return TRUE;
     }
 
     private function getPartnerWebhookSignatureHeader(): ?string
@@ -1669,6 +1685,55 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $checkoutIntentId = $params['data']['order']['checkoutIntentId'] ?? NULL;
         if ($checkoutIntentId) {
             return $this->loadContributionByCheckoutIntentId((int) $checkoutIntentId);
+        }
+
+        return NULL;
+    }
+
+    private function fetchAuthoritativeWebhookPaymentState(array $params, CRM_Contribute_BAO_Contribution $contribution): ?array
+    {
+        $metadata = $this->loadMetadataForContribution((int) $contribution->id);
+
+        $paymentId = $params['data']['id'] ?? NULL;
+        if ($paymentId) {
+            if (empty($metadata->helloasso_payment_id) || (string) $metadata->helloasso_payment_id !== (string) $paymentId) {
+                return NULL;
+            }
+
+            Civi::log()->warning('HelloAsso webhook has no locally verifiable signature. Confirming known payment state with the HelloAsso API before applying it.');
+            $payment = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getPayment(
+                $this->getPaymentProcessorConfig(),
+                $this->_is_test,
+                (int) $paymentId,
+                ['withFailedRefundOperation' => 'true']
+            );
+
+            if ((string) ($payment['id'] ?? '') !== (string) $paymentId) {
+                throw new PaymentProcessorException(E::ts('HelloAsso webhook payment ID could not be confirmed by the API.'));
+            }
+
+            return [$payment, $payment['order'] ?? []];
+        }
+
+        $checkoutIntentId = $params['data']['order']['checkoutIntentId'] ?? NULL;
+        if ($checkoutIntentId) {
+            if (empty($metadata->checkout_intent_id) || (string) $metadata->checkout_intent_id !== (string) $checkoutIntentId) {
+                return NULL;
+            }
+
+            Civi::log()->warning('HelloAsso webhook has no locally verifiable signature. Confirming known checkout intent state with the HelloAsso API before applying it.');
+            $checkoutIntent = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getCheckoutIntent(
+                $this->getPaymentProcessorConfig(),
+                $this->_is_test,
+                (int) $checkoutIntentId,
+                ['withFailedRefundOperation' => 'true']
+            );
+
+            foreach ($checkoutIntent['order']['payments'] ?? [] as $payment) {
+                return [$payment, $checkoutIntent['order'] ?? []];
+            }
+
+            throw new PaymentProcessorException(E::ts('HelloAsso webhook checkout intent could not be confirmed with a payment by the API.'));
         }
 
         return NULL;

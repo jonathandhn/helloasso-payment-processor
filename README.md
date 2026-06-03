@@ -105,6 +105,39 @@ La connexion d'une organisation par la mire ne bascule pas silencieusement un
 processeur live configuré par clé API. Le mode de connexion du processeur doit
 être sélectionné explicitement.
 
+Une même organisation sandbox peut légitimement diffuser ses webhooks vers
+plusieurs instances CiviCRM, par exemple via un relais de test. En revanche,
+la connexion OAuth par mire doit être considérée comme exclusive pour un même
+couple client HelloAsso / organisation / environnement : reconnecter une autre
+instance peut invalider les refresh tokens déjà stockés ailleurs. Dans ce cas,
+une seule instance doit être propriétaire de la mire ; les autres peuvent
+recevoir les webhooks diffusés mais ne doivent pas gérer leur propre liaison
+OAuth concurrente avec les mêmes identifiants.
+
+### Restauration D'Une Sauvegarde Avec Mire
+
+Après restauration d'une sauvegarde, les tokens et informations webhook
+restaurés peuvent ne plus refléter l'état actuel côté HelloAsso.
+
+- Si la sauvegarde est récente et qu'aucune autre instance n'a reconnecté la
+  même mire, le refresh token restauré devrait permettre de récupérer un nouvel
+  access token au prochain appel API.
+- Si le refresh token restauré est expiré ou a été invalidé par une autre
+  reconnexion, l'extension marque la liaison comme `reconnect_required` ou
+  `refresh_failed` et une reconnexion administrateur est nécessaire.
+- Si la sauvegarde est restaurée sur un autre domaine, les alertes CiviCRM
+  signalent les écarts entre le domaine courant, l'URL de callback OAuth et
+  l'URL webhook enregistrée.
+- Les webhooks signés restent acceptés seulement si la clé de signature locale
+  correspond à celle enregistrée côté HelloAsso. Les webhooks non signés ou non
+  vérifiables ne valident pas directement un paiement ; ils ne déclenchent une
+  confirmation API que pour un objet HelloAsso déjà connu localement.
+
+Après un restore, vérifier les alertes CiviCRM HelloAsso, l'état
+`refresh_status`, l'URL webhook et le domaine de callback. Ne reconnecter la
+mire que sur l'instance qui doit être propriétaire de cette organisation et de
+cet environnement.
+
 ## Webhooks Et Fiabilité
 
 En mode mire avec gestion automatique du webhook, l'extension enregistre
@@ -138,6 +171,33 @@ Par défaut :
 - la signature historique `invoiceID` / `sig` n'est pas exigée ;
 - deux revérifications courtes sont programmées après le checkout ;
 - le suivi long reste indépendant afin de détecter un remboursement postérieur.
+
+### Signatures Des Webhooks
+
+L'extension connaît deux mécanismes de signature, car les sites peuvent
+recevoir à la fois des notifications historiques configurées manuellement et
+des notifications créées par la mire.
+
+| Réglage | Défaut | Mécanisme | Effet |
+| --- | ---: | --- | --- |
+| `helloasso_v2_require_partner_webhook_signature` | Activé | Mire / `x-ha-signature` | En mode mire, exige que le header `x-ha-signature` corresponde à la clé de signature stockée lors de l'enregistrement du webhook. Peut être désactivé pour un relais webhook ou une architecture multi-instances qui ne transmet pas cette signature telle quelle. |
+| `helloasso_v2_require_webhook_signature` | Désactivé | Legacy / `metadata.invoiceID` + `metadata.sig` | Exige l'ancien HMAC local basé sur l'`invoiceID`. À activer seulement si les webhooks historiques envoyés à cette instance portent bien cette signature. |
+
+Une signature présente et vérifiable doit toujours être correcte. Une
+signature absente peut être tolérée selon les réglages ci-dessus, mais le
+payload n'est alors pas considéré comme une preuve suffisante de paiement.
+
+Pour les webhooks non signés ou non vérifiables, l'extension ne valide jamais
+directement l'état reçu. Elle appelle l'API HelloAsso uniquement si le webhook
+référence un objet déjà attendu localement, c'est-à-dire un
+`helloasso_payment_id` ou un `checkout_intent_id` stocké dans les métadonnées
+de la contribution. Un webhook qui ne correspond qu'à un `invoiceID` local est
+ignoré comme preuve directe ; les jobs de suivi se chargent du rattrapage.
+
+Ce comportement protège les installations en transition V1/V2 et les agences
+qui utilisent un relais commun : un webhook destiné à un autre client ne doit
+pas pouvoir valider une contribution locale ni provoquer des appels API
+HelloAsso sur des identifiants inconnus.
 
 ## Tâches Planifiées
 
@@ -179,18 +239,38 @@ cv api3 Job.process_helloasso_long_followup due_before=now limit=15
 
 ## Réglages V2
 
-Les réglages principaux sont disponibles sur la page **HelloAsso settings** :
+Les réglages principaux sont disponibles sur la page **HelloAsso settings**.
+Certains réglages techniques restent déclarés pour permettre une surcharge par
+configuration ou API, mais ne sont pas exposés dans l'interface afin d'éviter
+de désactiver accidentellement des protections de base.
 
-| Réglage | Défaut | Rôle |
-| --- | ---: | --- |
-| Pont d'intégration standard (`mjwshared`) | Activé | Intègre le processeur au frontend CiviCRM. |
-| Gestion sécurisée des URL d'échec et d'annulation | Activée | Sécurise les retours utilisateurs. |
-| File d'attente pour le traitement des webhooks | Activée | Traite les notifications de façon asynchrone. |
-| Fiabilisation du statut (`T+5` / `T+15`) | Activée | Rattrape un retour ou un webhook manquant. |
-| Intégration Afform / Form Builder | Activée | Expose la Checkout Option HelloAsso. |
-| Vérification stricte de la signature historique | Désactivée | Contrôle l'ancien mécanisme `invoiceID` / `sig`. |
-| Vérification stricte de la signature partenaire | Activée | Contrôle `x-ha-signature` lorsqu'une clé est disponible. |
-| Mire HelloAsso : activer la connexion partagée | Désactivée | Affiche et autorise le parcours de connexion partenaire. |
+| Setting | Défaut | Exposé dans l'UI | Rôle |
+| --- | ---: | --- | --- |
+| `helloasso_v2_standard_frontend_bridge` | Activé | Non | Active le pont frontend `CRM.payment` / `mjwshared` utilisé par les formulaires classiques et Webform. |
+| `helloasso_v2_safe_abort_urls` | Activé | Non | Remplace les URL d'annulation ou d'erreur fragiles par une URL sûre lorsque le contexte est AJAX ou CiviCRM interne. |
+| `helloasso_v2_queue_webhooks` | Activé | Oui, page globale | Place les webhooks dans la file `PaymentprocessorWebhook` au lieu de les traiter immédiatement. |
+| `helloasso_v2_followup_enabled` | Activé | Oui, page globale | Programme les contrôles courts `T+5` / `T+15` après création d'un checkout. |
+| `helloasso_v2_afform_checkout` | Activé | Oui, page globale | Expose la Checkout Option HelloAsso pour Afform / Form Builder. |
+| `helloasso_enable_refunds` | Désactivé | Oui, page globale | Autorise les remboursements complets HelloAsso depuis l'écran de remboursement CiviCRM. |
+| `helloasso_v2_cron_limit` | `15` | Oui, page globale | Limite le nombre de contributions traitées par processeur lors des jobs de maintenance. |
+| `helloasso_v2_require_webhook_signature` | Désactivé | Oui, page globale | Rejette les webhooks legacy dont la signature `invoiceID` / `sig` est absente ou invalide. |
+| `helloasso_v2_require_partner_webhook_signature` | Activé | Oui, page globale | Rejette les webhooks mire dont `x-ha-signature` est absent ou invalide lorsqu'une clé de signature est stockée. Peut être désactivé pour les architectures multi-instances ou avec relais webhook. |
+| `helloasso_partner_auth_enabled` | Désactivé | Oui, page globale | Affiche et autorise les pages de connexion par mire HelloAsso. |
+| `helloasso_partner_client_id` | Vide | Non | Ancien réglage partagé de client ID mire, conservé pour compatibilité. |
+| `helloasso_partner_client_secret` | Vide | Non | Ancien réglage partagé de client secret mire, conservé pour compatibilité. |
+| `helloasso_partner_client_id_test` | Vide | Oui, page mire sandbox | Client ID partenaire pour la mire sandbox. |
+| `helloasso_partner_client_secret_test` | Vide | Oui, page mire sandbox | Client secret partenaire pour la mire sandbox. |
+| `helloasso_partner_client_id_live` | Vide | Oui, page mire production | Client ID partenaire pour la mire production. |
+| `helloasso_partner_client_secret_live` | Vide | Oui, page mire production | Client secret partenaire pour la mire production. |
+| `helloasso_partner_authorize_url` | `https://auth.helloasso.com/authorize` | Oui, pages mire | URL d'autorisation OAuth HelloAsso. |
+| `helloasso_partner_token_url` | `https://api.helloasso.com/oauth2/token` | Oui, pages mire | URL d'échange et de renouvellement des tokens OAuth. |
+| `helloasso_partner_link_json` | Vide | Non, interne | Stockage legacy interne de liaison mire. Ne pas modifier manuellement. |
+| `helloasso_processor_auth_json` | Vide | Non, interne | Stockage legacy interne de l'état mire par processeur. Ne pas modifier manuellement. |
+
+Les données opérationnelles par processeur de la mire sont stockées dans la
+table dédiée de l'extension lorsque le schéma est à jour. Les deux réglages
+JSON internes ne sont conservés que comme stockage historique ou fallback de
+migration.
 
 ## Contributions Et Intégrations Spécifiques
 

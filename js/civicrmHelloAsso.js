@@ -132,6 +132,25 @@
       }
     },
 
+    bindDrupalAjaxRedirectCommand: function() {
+      if (typeof Drupal === 'undefined' || !Drupal.AjaxCommands || Drupal.AjaxCommands.prototype.helloassoRedirect) {
+        return;
+      }
+
+      Drupal.AjaxCommands.prototype.helloassoRedirect = function(ajax, response) {
+        if (!response.url) {
+          return;
+        }
+
+        try {
+          window.top.location.href = response.url;
+        }
+        catch (e) {
+          window.location.href = response.url;
+        }
+      };
+    },
+
     handleReload: function() {
       CRM.payment.debugging(this.name, 'HandleReload');
       CRM.payment.getBillingForm();
@@ -147,6 +166,8 @@
     },
 
     init: function() {
+      this.bindDrupalAjaxRedirectCommand();
+
       if (typeof CRM.payment === 'undefined' || typeof CRM.vars.helloassoPayment === 'undefined') {
         return;
       }

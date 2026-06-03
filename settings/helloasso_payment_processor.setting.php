@@ -22,11 +22,6 @@ return [
     'title' => E::ts("Standard frontend bridge (mjwshared)"),
     'description' => E::ts("Enable the standard HelloAsso frontend integration based on CRM.payment and mjwshared."),
     'html_attributes' => [],
-    'settings_pages' => [
-      'helloasso' => [
-        'weight' => 10,
-      ],
-    ],
   ],
   'helloasso_v2_safe_abort_urls' => [
     'name' => 'helloasso_v2_safe_abort_urls',
@@ -38,11 +33,6 @@ return [
     'title' => E::ts("Secure handling of failure and cancellation URLs"),
     'description' => E::ts("Avoid redirecting users to fragile CiviCRM or AJAX URLs when a payment is cancelled or fails."),
     'html_attributes' => [],
-    'settings_pages' => [
-      'helloasso' => [
-        'weight' => 20,
-      ],
-    ],
   ],
   'helloasso_v2_queue_webhooks' => [
     'name' => 'helloasso_v2_queue_webhooks',
@@ -89,6 +79,22 @@ return [
     'settings_pages' => [
       'helloasso' => [
         'weight' => 55,
+      ],
+    ],
+  ],
+  'helloasso_enable_refunds' => [
+    'name' => 'helloasso_enable_refunds',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'title' => E::ts('Enable HelloAsso refunds'),
+    'description' => E::ts('Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. HelloAsso partial refunds remain unsupported by this integration.'),
+    'html_attributes' => [],
+    'settings_pages' => [
+      'helloasso' => [
+        'weight' => 58,
       ],
     ],
   ],
