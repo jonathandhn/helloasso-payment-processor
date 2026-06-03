@@ -1187,17 +1187,14 @@ function helloasso_payment_processor_get_editable_sandbox_processor(CRM_Core_For
 }
 
 function helloasso_payment_processor_has_partner_client_credentials(?bool $isTest = NULL): bool {
+  $credentials = new CRM_HelloassoPaymentProcessor_PartnerCredentials();
   if ($isTest === TRUE) {
-    return trim((string) Civi::settings()->get('helloasso_partner_client_id_test')) !== ''
-      && trim((string) Civi::settings()->get('helloasso_partner_client_secret_test')) !== '';
+    return $credentials->hasCredentials(TRUE);
   }
   if ($isTest === FALSE) {
-    return trim((string) Civi::settings()->get('helloasso_partner_client_id_live')) !== ''
-      && trim((string) Civi::settings()->get('helloasso_partner_client_secret_live')) !== '';
+    return $credentials->hasCredentials(FALSE);
   }
-
-  return trim((string) Civi::settings()->get('helloasso_partner_client_id')) !== ''
-    && trim((string) Civi::settings()->get('helloasso_partner_client_secret')) !== '';
+  return FALSE;
 }
 
 /**

@@ -114,50 +114,93 @@ class CRM_HelloassoPaymentProcessor_Service {
   }
 
   /**
-   * Return the organization linked through the optional partner auth screen.
+   * Return the organization linked through the authorization screen.
+   *
+   * @param bool $isTest
+   *   TRUE for sandbox, FALSE for production.
    *
    * @return array|null
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function getPartnerLinkedOrganization(): ?array {
-    return (new CRM_HelloassoPaymentProcessor_PartnerAuth())->getLinkedOrganization();
+  public function getPartnerLinkedOrganization(bool $isTest = FALSE): ?array {
+    return $this->getPreferredPartnerAuth($isTest)->getLinkedOrganization();
   }
 
   /**
-   * List payments using the optional partner authorization token.
+   * List payments using the authorization-screen token.
    *
+   * @param bool $isTest
+   *   TRUE for sandbox, FALSE for production.
    * @param array $query
    *
    * @return array
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function listPartnerOrganizationPayments(array $query = []): array {
-    return (new CRM_HelloassoPaymentProcessor_PartnerAuth())->listOrganizationPayments($query);
+  public function listPartnerOrganizationPayments($isTest = FALSE, array $query = []): array {
+    if (is_array($isTest)) {
+      $query = $isTest;
+      $isTest = FALSE;
+    }
+    $isTest = (bool) $isTest;
+    return $this->getPreferredPartnerAuth($isTest)->listOrganizationPayments($query);
   }
 
   /**
-   * Retrieve a payment using the optional partner authorization token.
+   * Retrieve a payment using the authorization-screen token.
    *
    * @param int $paymentId
    * @param array $query
+   * @param bool $isTest
+   *   TRUE for sandbox, FALSE for production.
    *
    * @return array
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function getPartnerPayment(int $paymentId, array $query = []): array {
-    return (new CRM_HelloassoPaymentProcessor_PartnerAuth())->getPayment($paymentId, $query);
+  public function getPartnerPayment(int $paymentId, array $query = [], bool $isTest = FALSE): array {
+    return $this->getPreferredPartnerAuth($isTest)->getPayment($paymentId, $query);
   }
 
   /**
-   * Retrieve a checkout intent using the optional partner authorization token.
+   * Retrieve a checkout intent using the authorization-screen token.
    *
    * @param int $checkoutIntentId
    * @param array $query
+   * @param bool $isTest
+   *   TRUE for sandbox, FALSE for production.
    *
    * @return array
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function getPartnerCheckoutIntent(int $checkoutIntentId, array $query = []): array {
-    return (new CRM_HelloassoPaymentProcessor_PartnerAuth())->getCheckoutIntent($checkoutIntentId, $query);
+  public function getPartnerCheckoutIntent(int $checkoutIntentId, array $query = [], bool $isTest = FALSE): array {
+    return $this->getPreferredPartnerAuth($isTest)->getCheckoutIntent($checkoutIntentId, $query);
+  }
+
+  private function getPreferredPartnerAuth(bool $isTest): CRM_HelloassoPaymentProcessor_PartnerAuth {
+    $processor = $this->getPreferredPartnerProcessorConfig($isTest);
+    return new CRM_HelloassoPaymentProcessor_PartnerAuth((int) $processor['id']);
+  }
+
+  private function getPreferredPartnerProcessorConfig(bool $isTest): array {
+    $processorAuthConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
+    $processors = $this->getProcessorConfigs($isTest, TRUE);
+
+    foreach ($processors as $processor) {
+      $processorId = (int) ($processor['id'] ?? 0);
+      if ($processorId && !empty($processor['is_default']) && $processorAuthConfig->shouldUsePluginPublic($processorId, $processor)) {
+        return $processor;
+      }
+    }
+
+    foreach ($processors as $processor) {
+      $processorId = (int) ($processor['id'] ?? 0);
+      if ($processorId && $processorAuthConfig->shouldUsePluginPublic($processorId, $processor)) {
+        return $processor;
+      }
+    }
+
+    throw new PaymentProcessorException(E::ts('No active HelloAsso authorization-screen processor is linked for mode %1.', [
+      1 => $isTest ? 'test' : 'live',
+    ]));
   }
 
   private function getPreferredProcessorConfig(bool $isTest): array {

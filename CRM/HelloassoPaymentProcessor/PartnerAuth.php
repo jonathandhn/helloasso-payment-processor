@@ -106,11 +106,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       }
     }
     else {
-      $encodedLink = json_encode($link);
-      if (!is_string($encodedLink)) {
-        throw new PaymentProcessorException(E::ts('HelloAsso partner authorization could not be stored locally.'));
-      }
-      Civi::settings()->set('helloasso_partner_link_json', $encodedLink);
+      throw new PaymentProcessorException(E::ts('HelloAsso partner authorization requires a payment processor.'));
     }
 
     return $link;
@@ -140,7 +136,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       return;
     }
 
-    Civi::settings()->set('helloasso_partner_link_json', '');
+    throw new PaymentProcessorException(E::ts('HelloAsso partner authorization requires a payment processor.'));
   }
 
   public function listOrganizationPayments(array $query = []): array {
@@ -334,11 +330,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
         $this->getProcessorAuthConfig()->storeLink($this->paymentProcessorId, $refreshed);
       }
       else {
-        $encodedLink = json_encode($refreshed);
-        if (!is_string($encodedLink)) {
-          throw new PaymentProcessorException(E::ts('HelloAsso partner authorization could not be refreshed locally.'));
-        }
-        Civi::settings()->set('helloasso_partner_link_json', $encodedLink);
+        throw new PaymentProcessorException(E::ts('HelloAsso partner authorization requires a payment processor.'));
       }
 
       return $refreshed;
@@ -409,13 +401,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       return $this->getProcessorAuthConfig()->getStoredLink($this->paymentProcessorId);
     }
 
-    $json = Civi::settings()->get('helloasso_partner_link_json');
-    if (!$json) {
-      return NULL;
-    }
-
-    $link = json_decode((string) $json, TRUE);
-    return is_array($link) ? $link : NULL;
+    return NULL;
   }
 
   private function recordRefreshFailure(string $message, int $statusCode, bool $reconnectRequired = FALSE): void {
@@ -446,10 +432,6 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
         return;
       }
 
-      $encodedLink = json_encode($link);
-      if (is_string($encodedLink)) {
-        Civi::settings()->set('helloasso_partner_link_json', $encodedLink);
-      }
     }
     catch (Exception $e) {
       Civi::log()->error($failureMessage . ': ' . $e->getMessage());
@@ -523,19 +505,19 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   }
 
   private function getClientId(): string {
-    if ($this->isTestProcessor()) {
-      return trim((string) Civi::settings()->get('helloasso_partner_client_id_test'));
-    }
-
-    return trim((string) Civi::settings()->get('helloasso_partner_client_id_live'));
+    return (string) ($this->getCredentialResolver()->resolve($this->isTestProcessor())['clientId'] ?? '');
   }
 
   private function getClientSecret(): string {
-    if ($this->isTestProcessor()) {
-      return trim((string) Civi::settings()->get('helloasso_partner_client_secret_test'));
-    }
+    return (string) ($this->getCredentialResolver()->resolve($this->isTestProcessor())['clientSecret'] ?? '');
+  }
 
-    return trim((string) Civi::settings()->get('helloasso_partner_client_secret_live'));
+  public function getResolvedCredentials(): array {
+    return $this->getCredentialResolver()->resolve($this->isTestProcessor());
+  }
+
+  private function getCredentialResolver(): CRM_HelloassoPaymentProcessor_PartnerCredentials {
+    return new CRM_HelloassoPaymentProcessor_PartnerCredentials();
   }
 
   private function getAuthorizeUrl(): string {

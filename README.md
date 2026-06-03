@@ -251,26 +251,20 @@ de désactiver accidentellement des protections de base.
 | `helloasso_v2_queue_webhooks` | Activé | Oui, page globale | Place les webhooks dans la file `PaymentprocessorWebhook` au lieu de les traiter immédiatement. |
 | `helloasso_v2_followup_enabled` | Activé | Oui, page globale | Programme les contrôles courts `T+5` / `T+15` après création d'un checkout. |
 | `helloasso_v2_afform_checkout` | Activé | Oui, page globale | Expose la Checkout Option HelloAsso pour Afform / Form Builder. |
-| `helloasso_enable_refunds` | Désactivé | Oui, page globale | Autorise les remboursements complets HelloAsso depuis l'écran de remboursement CiviCRM. |
+| `helloasso_enable_refunds` | Désactivé | Oui, page globale | Autorise les remboursements complets HelloAsso depuis l'écran de remboursement CiviCRM. Nécessite le mode mire HelloAsso. |
 | `helloasso_v2_cron_limit` | `15` | Oui, page globale | Limite le nombre de contributions traitées par processeur lors des jobs de maintenance. |
 | `helloasso_v2_require_webhook_signature` | Désactivé | Oui, page globale | Rejette les webhooks legacy dont la signature `invoiceID` / `sig` est absente ou invalide. |
 | `helloasso_v2_require_partner_webhook_signature` | Activé | Oui, page globale | Rejette les webhooks mire dont `x-ha-signature` est absent ou invalide lorsqu'une clé de signature est stockée. Peut être désactivé pour les architectures multi-instances ou avec relais webhook. |
 | `helloasso_partner_auth_enabled` | Désactivé | Oui, page globale | Affiche et autorise les pages de connexion par mire HelloAsso. |
-| `helloasso_partner_client_id` | Vide | Non | Ancien réglage partagé de client ID mire, conservé pour compatibilité. |
-| `helloasso_partner_client_secret` | Vide | Non | Ancien réglage partagé de client secret mire, conservé pour compatibilité. |
 | `helloasso_partner_client_id_test` | Vide | Oui, page mire sandbox | Client ID partenaire pour la mire sandbox. |
 | `helloasso_partner_client_secret_test` | Vide | Oui, page mire sandbox | Client secret partenaire pour la mire sandbox. |
 | `helloasso_partner_client_id_live` | Vide | Oui, page mire production | Client ID partenaire pour la mire production. |
 | `helloasso_partner_client_secret_live` | Vide | Oui, page mire production | Client secret partenaire pour la mire production. |
 | `helloasso_partner_authorize_url` | `https://auth.helloasso.com/authorize` | Oui, pages mire | URL d'autorisation OAuth HelloAsso. |
 | `helloasso_partner_token_url` | `https://api.helloasso.com/oauth2/token` | Oui, pages mire | URL d'échange et de renouvellement des tokens OAuth. |
-| `helloasso_partner_link_json` | Vide | Non, interne | Stockage legacy interne de liaison mire. Ne pas modifier manuellement. |
-| `helloasso_processor_auth_json` | Vide | Non, interne | Stockage legacy interne de l'état mire par processeur. Ne pas modifier manuellement. |
 
 Les données opérationnelles par processeur de la mire sont stockées dans la
-table dédiée de l'extension lorsque le schéma est à jour. Les deux réglages
-JSON internes ne sont conservés que comme stockage historique ou fallback de
-migration.
+table dédiée de l'extension lorsque le schéma est à jour.
 
 ## Contributions Et Intégrations Spécifiques
 
@@ -291,6 +285,52 @@ Deux formes d'intégration sont déjà utilisées sur le terrain :
   CiviCRM / HelloAsso, par exemple pour porter un parcours Webform métier tout
   en laissant ce processeur gérer le checkout, les webhooks et la
   réconciliation.
+
+### Accès Service En Lecture Seule
+
+Une extension complémentaire peut instancier directement la façade :
+
+```php
+$service = new CRM_HelloassoPaymentProcessor_Service();
+```
+
+Les méthodes classiques utilisent le processeur HelloAsso actif préféré du
+mode demandé. Elles fonctionnent avec le mode clé API classique ou avec la
+mire, selon la configuration du processeur :
+
+```php
+$isTest = FALSE; // FALSE = production, TRUE = sandbox.
+
+$processors = $service->getProcessors($isTest);
+$processor = $service->getPreferredProcessor($isTest);
+$payments = $service->listOrganizationPayments($isTest, [
+  'from' => '2026-01-01',
+  'pageSize' => 100,
+]);
+$payment = $service->getPayment($isTest, 123456789);
+$checkoutIntent = $service->getCheckoutIntent($isTest, 987654321);
+```
+
+Les méthodes `Partner*` utilisent obligatoirement un processeur actif connecté
+par la mire HelloAsso. Elles choisissent le processeur par environnement :
+d'abord le processeur par défaut du mode demandé s'il est lié par mire, sinon
+le premier processeur actif lié par mire. Si aucun processeur mire n'est lié,
+une `PaymentProcessorException` est levée.
+
+```php
+$isTest = TRUE; // Sandbox.
+
+$organization = $service->getPartnerLinkedOrganization($isTest);
+$payments = $service->listPartnerOrganizationPayments($isTest, [
+  'pageSize' => 100,
+]);
+$payment = $service->getPartnerPayment(123456789, [], $isTest);
+$checkoutIntent = $service->getPartnerCheckoutIntent(987654321, [], $isTest);
+```
+
+Pour compatibilité, `listPartnerOrganizationPayments($query)` reste accepté et
+utilise la production par défaut. Les nouveaux développements doivent préférer
+`listPartnerOrganizationPayments($isTest, $query)` pour éviter toute ambiguïté.
 
 Les propositions de fonctions helper ou de points d'extension facilitant ce
 type d'intégration sont bienvenues, notamment pour Webform, Services ou

@@ -5,12 +5,9 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 /**
  * Store HelloAsso per-processor authorization state in a dedicated table.
  *
- * A legacy JSON setting is still read as a fallback until the schema upgrade
- * has run, so the code remains safe during deployment windows.
  */
 class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
 
-  private const SETTING_NAME = 'helloasso_processor_auth_json';
   private const TABLE_NAME = 'civicrm_hello_asso_processor_auth';
 
   public function getAll(): array {
@@ -18,7 +15,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
       return $this->getAllFromTable();
     }
 
-    return $this->getAllFromLegacySetting();
+    return [];
   }
 
   public function get(int $paymentProcessorId): array {
@@ -33,13 +30,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
       return;
     }
 
-    $all = $this->getAllFromLegacySetting();
-    $all[(string) $paymentProcessorId] = $config;
-    $encoded = json_encode($all);
-    if (!is_string($encoded)) {
-      throw new InvalidArgumentException(E::ts('HelloAsso processor authorization state could not be encoded.'));
-    }
-    Civi::settings()->set(self::SETTING_NAME, $encoded);
+    throw new RuntimeException(E::ts('HelloAsso processor authorization table is missing.'));
   }
 
   public function remove(int $paymentProcessorId): void {
@@ -51,13 +42,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
       return;
     }
 
-    $all = $this->getAllFromLegacySetting();
-    unset($all[(string) $paymentProcessorId]);
-    $encoded = json_encode($all);
-    if (!is_string($encoded)) {
-      throw new InvalidArgumentException(E::ts('HelloAsso processor authorization state could not be encoded.'));
-    }
-    Civi::settings()->set(self::SETTING_NAME, $encoded);
+    throw new RuntimeException(E::ts('HelloAsso processor authorization table is missing.'));
   }
 
   public function getConnectionMode(int $paymentProcessorId, array $paymentProcessor = []): string {
@@ -229,16 +214,6 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     }
 
     return (bool) $this->getLinkedOrganization($paymentProcessorId);
-  }
-
-  private function getAllFromLegacySetting(): array {
-    $json = (string) (Civi::settings()->get(self::SETTING_NAME) ?? '');
-    if ($json === '') {
-      return [];
-    }
-
-    $decoded = json_decode($json, TRUE);
-    return is_array($decoded) ? $decoded : [];
   }
 
   /**
