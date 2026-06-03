@@ -127,8 +127,19 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
   $modeOptions[] = '<option value="community"' . ($currentMode === 'community' ? ' selected="selected"' : '') . '>' . htmlspecialchars(E::ts('Classic API key'), ENT_QUOTES, 'UTF-8') . '</option>';
   $modeOptions[] = '<option value="plugin_public"' . ($currentMode === 'plugin_public' ? ' selected="selected"' : '') . ($sandboxPluginPublicConfigured ? '' : ' disabled="disabled"') . '>' . htmlspecialchars(E::ts('HelloAsso sandbox authorization screen'), ENT_QUOTES, 'UTF-8') . '</option>';
   $liveModeOptions = [];
+  $livePluginPublicDisabled = !$livePluginPublicConfigured || $hasClassicLiveCredentials;
+  $livePluginPublicDisabledReason = '';
+  if ($hasClassicLiveCredentials) {
+    $livePluginPublicDisabledReason = E::ts('Production authorization-screen mode is locked while classic live API credentials are still stored on this payment processor.');
+  }
+  elseif (!$livePluginPublicConfigured) {
+    $livePluginPublicDisabledReason = E::ts('Production authorization-screen mode is locked until the production client ID and client secret are configured.');
+  }
   $liveModeOptions[] = '<option value="community"' . ($liveCurrentMode === 'community' ? ' selected="selected"' : '') . '>' . htmlspecialchars(E::ts('Classic API key'), ENT_QUOTES, 'UTF-8') . '</option>';
-  $liveModeOptions[] = '<option value="plugin_public"' . ($liveCurrentMode === 'plugin_public' ? ' selected="selected"' : '') . (($livePluginPublicConfigured && !$hasClassicLiveCredentials) ? '' : ' disabled="disabled"') . '>' . htmlspecialchars(E::ts('HelloAsso production authorization screen'), ENT_QUOTES, 'UTF-8') . '</option>';
+  $liveModeOptions[] = '<option value="plugin_public"'
+    . ($liveCurrentMode === 'plugin_public' ? ' selected="selected"' : '')
+    . ($livePluginPublicDisabled ? ' disabled="disabled" title="' . htmlspecialchars($livePluginPublicDisabledReason, ENT_QUOTES, 'UTF-8') . '"' : '')
+    . '>' . htmlspecialchars(E::ts('HelloAsso production authorization screen'), ENT_QUOTES, 'UTF-8') . '</option>';
   $liveConnectButton = helloasso_payment_processor_get_authorize_button_html(
     $liveConnectUrl . '&ha_action=connect',
     E::ts('Connect production to HelloAsso')
@@ -146,12 +157,15 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
   $help[] = '<tr><td><label for="helloasso_live_webhook_auto_manage">' . E::ts('Automatically enable the webhook') . '</label></td><td><input type="checkbox" id="helloasso_live_webhook_auto_manage" name="helloasso_live_webhook_auto_manage" value="1"' . ($liveWebhookAutoManaged ? ' checked="checked"' : '') . '> <span class="description">' . E::ts("Enable automatic registration of the live HelloAsso webhook for this CiviCRM instance by default. Uncheck only if another instance retains control of the webhook URL.") . '</span></td></tr>';
   $help[] = '</table>';
   $help[] = '<p class="description">' . helloasso_payment_processor_get_partner_required_notice() . '</p>';
-  $help[] = '<p class="description">' . E::ts("This block connects the production HelloAsso authorization screen on this live processor: OAuth link, linked organization, webhook and signature key. The live payment rail can switch to the authorization screen only when this processor no longer uses classic API keys.") . '</p>';
+  $help[] = '<p class="description">' . E::ts("This block connects the production HelloAsso authorization screen on this live processor: OAuth link, linked organization and webhook registration. The live payment rail can switch to the authorization screen only when this processor no longer uses classic API keys.") . '</p>';
   if ($hasClassicLiveCredentials) {
-    $help[] = '<p class="description">' . E::ts('Live API credentials are still present on this processor. The production authorization screen can be linked and tested, but the live payment mode remains locked to the classic API key until these credentials are removed.') . '</p>';
+    $help[] = '<p class="status warning">' . E::ts('The production authorization-screen option is greyed out because this live processor still contains classic API credentials. You can connect and test the authorization screen first, then remove the live API key fields from this processor and save the processor. The authorization-screen option will become selectable once those fields are empty.') . '</p>';
   }
   else {
     $help[] = '<p class="description">' . E::ts("No live API key is stored on this processor. You can therefore enable production authorization-screen mode on this processor once the OAuth link has been validated.") . '</p>';
+  }
+  if (!$livePluginPublicConfigured) {
+    $help[] = '<p class="status warning">' . E::ts('The production authorization-screen option is also greyed out because the production client ID and client secret are not configured yet.') . '</p>';
   }
   if ($liveLink) {
     $help[] = '<p class="status success">' . E::ts('Production organization linked: %1', [1 => htmlspecialchars((string) $liveLink['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
@@ -168,9 +182,6 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
       $help[] = '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($liveWebhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
       if (!empty($liveWebhookRegistration['url'])) {
         $help[] = '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
-      }
-      if (!empty($liveWebhookRegistration['signatureKey'])) {
-        $help[] = helloasso_payment_processor_render_webhook_signature_key((string) $liveWebhookRegistration['signatureKey']);
       }
     }
   }
@@ -215,9 +226,6 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
       $help[] = '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
       if (!empty($webhookRegistration['url'])) {
         $help[] = '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
-      }
-      if (!empty($webhookRegistration['signatureKey'])) {
-        $help[] = helloasso_payment_processor_render_webhook_signature_key((string) $webhookRegistration['signatureKey']);
       }
     }
   }
@@ -371,25 +379,6 @@ function helloasso_payment_processor_get_authorize_button_html(string $href, str
 
   return '<a class="helloasso-authorize-button" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '">'
     . '<img src="' . $imageUrl . '" alt="' . $escapedLabel . '" style="max-width: 280px; height: auto;"></a>';
-}
-
-function helloasso_payment_processor_render_webhook_signature_key(string $signatureKey): string {
-  static $counter = 0;
-  $counter++;
-
-  $inputId = 'helloasso-webhook-signature-key-' . $counter;
-  $buttonId = $inputId . '-toggle';
-  $escapedKey = htmlspecialchars($signatureKey, ENT_QUOTES, 'UTF-8');
-  $label = htmlspecialchars(E::ts('Stored webhook signature key'), ENT_QUOTES, 'UTF-8');
-  $showLabel = htmlspecialchars(E::ts('Show'), ENT_QUOTES, 'UTF-8');
-  $hideLabel = htmlspecialchars(E::ts('Hide'), ENT_QUOTES, 'UTF-8');
-
-  return '<p class="description helloasso-webhook-signature-key">'
-    . '<label for="' . $inputId . '">' . $label . '</label><br>'
-    . '<input id="' . $inputId . '" class="huge crm-form-password" type="password" readonly="readonly" value="' . $escapedKey . '" autocomplete="off">'
-    . ' <button id="' . $buttonId . '" type="button" class="button" aria-controls="' . $inputId . '" data-show-label="' . $showLabel . '" data-hide-label="' . $hideLabel . '">' . $showLabel . '</button>'
-    . '</p>'
-    . '<script>(function($){$(function(){var $input=$("#' . $inputId . '"),$button=$("#' . $buttonId . '");$button.on("click",function(){var hidden=$input.attr("type")==="password";$input.attr("type",hidden?"text":"password");$button.text(hidden?$button.data("hide-label"):$button.data("show-label"));});});})(CRM.$);</script>';
 }
 
 function helloasso_payment_processor_get_partner_required_notice(): string {
@@ -567,9 +556,6 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
   $html .= '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
   if (!empty($webhookRegistration['url'])) {
     $html .= '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
-  }
-  if (!empty($webhookRegistration['signatureKey'])) {
-    $html .= helloasso_payment_processor_render_webhook_signature_key((string) $webhookRegistration['signatureKey']);
   }
 
   $html .= '<p><a class="button" href="' . htmlspecialchars($settingsUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open this authorization-screen settings page') . '</a></p>';

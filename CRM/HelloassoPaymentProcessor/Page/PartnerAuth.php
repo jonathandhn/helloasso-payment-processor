@@ -174,9 +174,6 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
       if (!empty($webhookRegistration['url'])) {
         $html .= '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
-      if (!empty($webhookRegistration['signatureKey'])) {
-        $html .= helloasso_payment_processor_render_webhook_signature_key((string) $webhookRegistration['signatureKey']);
-      }
     }
 
     if (!$partnerAuth->isEnabled()) {
