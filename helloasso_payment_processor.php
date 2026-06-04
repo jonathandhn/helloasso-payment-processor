@@ -1032,7 +1032,7 @@ function helloasso_payment_processor_get_payment_processor_admin_link(int $payme
   $adminProcessorId = helloasso_payment_processor_get_admin_edit_payment_processor_id($paymentProcessorId);
   $url = CRM_Utils_System::url(
     'civicrm/admin/paymentProcessor/edit',
-    'reset=1&action=update&id=' . $adminProcessorId
+    'action=update&id=' . $adminProcessorId . '&reset=1'
   );
 
   return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">'
