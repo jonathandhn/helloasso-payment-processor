@@ -95,18 +95,58 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         if (!empty($error)) {
-            $processorTitle = trim((string) ($this->_paymentProcessor['title'] ?? $this->_paymentProcessor['name'] ?? 'HelloAsso'));
-            $processorTitle = $processorTitle !== '' ? $processorTitle : 'HelloAsso';
-            $processorReference = $paymentProcessorId
-                ? E::ts('%1 (#%2)', [1 => $processorTitle, 2 => $paymentProcessorId])
-                : $processorTitle;
-            $processorMode = $this->_is_test ? E::ts('sandbox') : E::ts('production');
+            $processorReference = $this->getProcessorReference($paymentProcessorId);
 
             return E::ts(
-                'Invalid HelloAsso processor configuration for %1 (%2):',
-                [1 => htmlspecialchars($processorReference, ENT_QUOTES, 'UTF-8'), 2 => $processorMode]
+                'Invalid HelloAsso processor configuration for %1:',
+                [1 => htmlspecialchars($processorReference, ENT_QUOTES, 'UTF-8')]
             ) . '<p>' . implode('<p>', $error);
         } else {
+            return NULL;
+        }
+    }
+
+    private function getProcessorReference(?int $paymentProcessorId): string
+    {
+        $processorTitle = trim((string) ($this->_paymentProcessor['title'] ?? $this->_paymentProcessor['name'] ?? 'HelloAsso'));
+        $processorTitle = $processorTitle !== '' ? $processorTitle : 'HelloAsso';
+        if (!$paymentProcessorId) {
+            return $processorTitle;
+        }
+
+        $mode = $this->_is_test ? E::ts('sandbox') : E::ts('production');
+        $pairedProcessorId = $this->getPairedProcessorId($paymentProcessorId);
+        if ($pairedProcessorId && $this->_is_test) {
+            return E::ts('%1 (#%2, sandbox linked to live processor #%3)', [
+                1 => $processorTitle,
+                2 => $paymentProcessorId,
+                3 => $pairedProcessorId,
+            ]);
+        }
+
+        return E::ts('%1 (#%2, %3)', [
+            1 => $processorTitle,
+            2 => $paymentProcessorId,
+            3 => $mode,
+        ]);
+    }
+
+    private function getPairedProcessorId(int $paymentProcessorId): ?int
+    {
+        $processorName = trim((string) ($this->_paymentProcessor['name'] ?? ''));
+        if ($processorName === '') {
+            return NULL;
+        }
+
+        try {
+            $pairedProcessor = civicrm_api3('PaymentProcessor', 'getsingle', [
+                'name' => $processorName,
+                'is_test' => $this->_is_test ? 0 : 1,
+            ]);
+            $pairedProcessorId = (int) ($pairedProcessor['id'] ?? 0);
+            return $pairedProcessorId && $pairedProcessorId !== $paymentProcessorId ? $pairedProcessorId : NULL;
+        }
+        catch (Exception $e) {
             return NULL;
         }
     }
