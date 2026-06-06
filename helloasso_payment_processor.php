@@ -1264,7 +1264,7 @@ function helloasso_payment_processor_civicrm_cron($job = NULL): void {
       ]);
 
       if (!empty($result['checked'])) {
-        Civi::log()->info(sprintf(
+        CRM_HelloassoPaymentProcessor_Logger::debug(sprintf(
           'HelloAsso short cron sync checked %d contribution(s), updated %d, errors %d.',
           $result['checked'],
           $result['updated'],
@@ -1282,7 +1282,7 @@ function helloasso_payment_processor_civicrm_cron($job = NULL): void {
       ]);
 
       if (!empty($longResult['checked'])) {
-        Civi::log()->info(sprintf(
+        CRM_HelloassoPaymentProcessor_Logger::debug(sprintf(
           'HelloAsso long cron sync checked %d contribution(s), updated %d, errors %d.',
           $longResult['checked'],
           $longResult['updated'],

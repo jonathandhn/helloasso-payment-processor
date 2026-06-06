@@ -96,7 +96,6 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         if (!empty($error)) {
             $processorReference = $this->getProcessorReference($paymentProcessorId);
-
             return E::ts(
                 'Invalid HelloAsso processor configuration for %1:',
                 [1 => htmlspecialchars($processorReference, ENT_QUOTES, 'UTF-8')]
@@ -139,16 +138,24 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         try {
-            $pairedProcessor = civicrm_api3('PaymentProcessor', 'getsingle', [
-                'name' => $processorName,
-                'is_test' => $this->_is_test ? 0 : 1,
-            ]);
-            $pairedProcessorId = (int) ($pairedProcessor['id'] ?? 0);
-            return $pairedProcessorId && $pairedProcessorId !== $paymentProcessorId ? $pairedProcessorId : NULL;
+            // Remplacement de l'APIv3 getsingle par l'APIv4 get() pour retrouver 
+            // le processeur de manière silencieuse sans générer d'exceptions/logs.
+            $pairedProcessors = \Civi\Api4\PaymentProcessor::get(FALSE)
+                ->addWhere('name', '=', $processorName)
+                ->addWhere('is_test', '=', $this->_is_test ? 0 : 1)
+                ->addSelect('id')
+                ->setLimit(1)
+                ->execute();
+                
+            if (count($pairedProcessors) > 0) {
+                $pairedProcessorId = (int) $pairedProcessors[0]['id'];
+                return $pairedProcessorId && $pairedProcessorId !== $paymentProcessorId ? $pairedProcessorId : NULL;
+            }
         }
         catch (Exception $e) {
-            return NULL;
+            // Ignoré silencieusement
         }
+        return NULL;
     }
 
     private function isBlankRailDuringProcessorSave(): bool
@@ -768,7 +775,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         $eventType = $params['eventType'] ?? NULL;
         if ($eventType !== 'Payment' || empty($params['data']) || !is_array($params['data'])) {
-            Civi::log()->debug('HelloAsso webhook ignored: unsupported event type or missing data.');
+            CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook ignored: unsupported event type or missing data.');
             CRM_Utils_System::civiExit();
         }
 
@@ -780,7 +787,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             $contribution = $this->findContributionFromWebhookPayload($params);
 
             if (!$contribution) {
-                Civi::log()->debug('HelloAsso webhook not matched to a contribution. Ignored.');
+                CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook not matched to a contribution. Ignored.');
                 CRM_Utils_System::civiExit();
             }
 
@@ -1026,13 +1033,25 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 if ($this->isHelloAssoNotFoundException($e)) {
                     $this->stopContributionFollowUps((int) $dao->contribution_id);
                     $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("HelloAsso object not found (404). Short and long follow-up checks have been disabled to avoid repeated calls.");
-                    Civi::log()->warning('HelloAsso cron sync stopped after 404 for contribution ' . $dao->contribution_id . ': ' . $e->getMessage());
+                    CRM_HelloassoPaymentProcessor_Logger::debug(
+                        'HelloAsso short cron sync stopped after a 404 response.',
+                        [
+                            'contribution_id' => (int) $dao->contribution_id,
+                            'error' => $e->getMessage(),
+                        ]
+                    );
                     continue;
                 }
 
                 $this->deferTechnicalFollowUpError((int) $dao->contribution_id, 'short', $e);
                 $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . $e->getMessage();
-                Civi::log()->error('HelloAsso cron sync failed: ' . $e->getMessage());
+                CRM_HelloassoPaymentProcessor_Logger::debug(
+                    'HelloAsso short cron sync attempt failed.',
+                    [
+                        'contribution_id' => (int) $dao->contribution_id,
+                        'error' => $e->getMessage(),
+                    ]
+                );
             }
         }
 
@@ -1082,7 +1101,13 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             }
             catch (Exception $e) {
                 $results['errors'][] = 'Contribution ' . $contribution->id . ': ' . $e->getMessage();
-                Civi::log()->error('HelloAsso organization payment sync failed: ' . $e->getMessage());
+                CRM_HelloassoPaymentProcessor_Logger::debug(
+                    'HelloAsso organization payment sync attempt failed.',
+                    [
+                        'contribution_id' => (int) $contribution->id,
+                        'error' => $e->getMessage(),
+                    ]
+                );
             }
         }
 
@@ -1238,13 +1263,25 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 if ($this->isHelloAssoNotFoundException($e)) {
                     $this->stopContributionFollowUps((int) $dao->contribution_id);
                     $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("HelloAsso object not found (404). Short and long follow-up checks have been disabled to avoid repeated calls.");
-                    Civi::log()->warning('HelloAsso long cron sync stopped after 404 for contribution ' . $dao->contribution_id . ': ' . $e->getMessage());
+                    CRM_HelloassoPaymentProcessor_Logger::debug(
+                        'HelloAsso long cron sync stopped after a 404 response.',
+                        [
+                            'contribution_id' => (int) $dao->contribution_id,
+                            'error' => $e->getMessage(),
+                        ]
+                    );
                     continue;
                 }
 
                 $this->deferTechnicalFollowUpError((int) $dao->contribution_id, 'long', $e);
                 $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . $e->getMessage();
-                Civi::log()->error('HelloAsso long cron sync failed: ' . $e->getMessage());
+                CRM_HelloassoPaymentProcessor_Logger::debug(
+                    'HelloAsso long cron sync attempt failed.',
+                    [
+                        'contribution_id' => (int) $dao->contribution_id,
+                        'error' => $e->getMessage(),
+                    ]
+                );
             }
         }
 
@@ -1613,7 +1650,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 throw new PaymentProcessorException(E::ts('HelloAsso partner webhook signature cannot be verified because the local signature key is missing.'));
             }
 
-            Civi::log()->warning('HelloAsso partner webhook signature received but no local signature key is configured for processor ' . $this->getPaymentProcessorId() . '.');
+            CRM_HelloassoPaymentProcessor_Logger::debug(
+                'HelloAsso partner webhook signature received without a configured local signature key.',
+                ['payment_processor_id' => $this->getPaymentProcessorId()]
+            );
             return FALSE;
         }
 
@@ -1740,7 +1780,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 return NULL;
             }
 
-            Civi::log()->warning('HelloAsso webhook has no locally verifiable signature. Confirming known payment state with the HelloAsso API before applying it.');
+            CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook has no locally verifiable signature. Confirming known payment state with the HelloAsso API before applying it.');
             $payment = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getPayment(
                 $this->getPaymentProcessorConfig(),
                 $this->_is_test,
@@ -1761,7 +1801,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 return NULL;
             }
 
-            Civi::log()->warning('HelloAsso webhook has no locally verifiable signature. Confirming known checkout intent state with the HelloAsso API before applying it.');
+            CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook has no locally verifiable signature. Confirming known checkout intent state with the HelloAsso API before applying it.');
             $checkoutIntent = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getCheckoutIntent(
                 $this->getPaymentProcessorConfig(),
                 $this->_is_test,
@@ -1792,7 +1832,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             ->count();
 
         if ($existing) {
-            Civi::log()->debug('HelloAsso webhook already queued: ' . $eventId);
+            CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook already queued: ' . $eventId);
             return;
         }
 
@@ -2060,7 +2100,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
     private function logFollowUpMetadataSnapshot(string $rail, int $contributionId, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata): void
     {
-        Civi::log()->debug('HelloAsso follow-up metadata before save', [
+        CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso follow-up metadata before save', [
             'rail' => $rail,
             'contribution_id' => $contributionId,
             'metadata_id' => $metadata->id ?? NULL,
