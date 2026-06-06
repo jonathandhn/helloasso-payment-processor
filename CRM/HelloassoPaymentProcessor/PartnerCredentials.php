@@ -26,7 +26,8 @@ class CRM_HelloassoPaymentProcessor_PartnerCredentials {
       'e546a1343456a691e010a7bc1f7b2b996252a639cd5c717f495fcb58ea91fe20', // v2.0.13 community live key
     ],
     'sandbox' => [
-      '14f495022fd510aa124be68fde882de477189c4fd1c85cba8a47fc7aa434ec97', // v2.0.13 community sandbox key
+      '538fa2d226ee68bf0c48275e2cfd988a10fc529dc8efc3079b2ecdd29130ff20', // v2.0.21 community sandbox key (correct)
+      '14f495022fd510aa124be68fde882de477189c4fd1c85cba8a47fc7aa434ec97', // v2.0.13 community sandbox key (legacy typo)
     ],
   ];
 
