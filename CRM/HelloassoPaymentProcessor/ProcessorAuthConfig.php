@@ -207,13 +207,18 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     $link = $this->getStoredLink($paymentProcessorId);
     if (!empty($link['redirect_uri']) && empty($paymentProcessor['is_test'])) {
       $authorizedHost = parse_url($link['redirect_uri'], PHP_URL_HOST);
-      $currentHost = parse_url(CRM_Utils_System::url(), PHP_URL_HOST);
+      $currentHost = $this->getCurrentHost();
       if ($authorizedHost && $currentHost && strcasecmp($authorizedHost, $currentHost) !== 0) {
         return FALSE;
       }
     }
 
     return (bool) $this->getLinkedOrganization($paymentProcessorId);
+  }
+
+  protected function getCurrentHost(): ?string {
+    $host = parse_url(CRM_Utils_System::url(), PHP_URL_HOST);
+    return is_string($host) && $host !== '' ? $host : NULL;
   }
 
   /**
