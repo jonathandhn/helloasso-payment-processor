@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-06-06 19:11+0000\n"
+"PO-Revision-Date: 2026-06-07 15:30+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: es_ES\n"
 "Language: es_ES\n"

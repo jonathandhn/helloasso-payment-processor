@@ -18,8 +18,8 @@
     <url desc="Support">https://lab.civicrm.org/extensions/helloasso-payment-processor/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2026-06-06</releaseDate>
-  <version>2.0.21</version>
+  <releaseDate>2026-06-07</releaseDate>
+  <version>2.0.22</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>6.14</ver>

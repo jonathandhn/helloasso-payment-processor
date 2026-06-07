@@ -12,13 +12,7 @@
 <script type="text/javascript">
   CRM.$(function($) {
     $(document).ready(function() {
-      CRM.vars.helloassoPayment = {
-{/literal}
-        {foreach from=$helloassoJSVars key=arrayKey item=arrayValue}
-        {$arrayKey}: '{$arrayValue|escape:"javascript"}',
-        {/foreach}
-{literal}
-      };
+      CRM.vars.helloassoPayment = {/literal}{$helloassoJSVars|@json_encode nofilter}{literal};
     });
   });
 </script>
