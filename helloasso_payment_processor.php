@@ -14,12 +14,22 @@ function helloasso_payment_processor_civicrm_config(&$config): void {
 }
 
 /**
+ * Implements hook_civicrm_angularModules().
+ */
+function helloasso_payment_processor_civicrm_angularModules(&$angularModules): void {
+  $module = include __DIR__ . '/ang/crmHelloassoPaymentProcessor.ang.php';
+  $module['ext'] = E::LONG_NAME;
+  $angularModules['crmHelloassoPaymentProcessor'] = $module;
+}
+
+/**
  * Implements hook_civicrm_install().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
  */
 function helloasso_payment_processor_civicrm_install(): void {
   _helloasso_payment_processor_civix_civicrm_install();
+  helloasso_payment_processor_register_civirules_conditions();
 }
 
 /**
@@ -29,6 +39,28 @@ function helloasso_payment_processor_civicrm_install(): void {
  */
 function helloasso_payment_processor_civicrm_enable(): void {
   _helloasso_payment_processor_civix_civicrm_enable();
+  helloasso_payment_processor_register_civirules_conditions();
+}
+
+/**
+ * Register optional CiviRules conditions without making CiviRules a dependency.
+ */
+function helloasso_payment_processor_register_civirules_conditions(): void {
+  if (!class_exists('CRM_Civirules_Utils_Upgrader')) {
+    return;
+  }
+
+  $jsonFile = __DIR__ . DIRECTORY_SEPARATOR . 'civirules_conditions.json';
+  if (!is_readable($jsonFile)) {
+    return;
+  }
+
+  try {
+    CRM_Civirules_Utils_Upgrader::insertConditionsFromJson($jsonFile);
+  }
+  catch (Throwable $e) {
+    Civi::log()->warning('HelloAsso optional CiviRules conditions could not be registered: ' . $e->getMessage());
+  }
 }
 
 /**
@@ -61,6 +93,13 @@ function helloasso_payment_processor_civicrm_alterMenu(&$items): void {
  * Implements hook_civicrm_buildForm().
  */
 function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void {
+  if (in_array($formName, [
+    'CRM_Contribute_Form_Contribution_Main',
+    'CRM_Event_Form_Registration_Register',
+  ], TRUE)) {
+    helloasso_payment_processor_add_quickform_checkout_controls($formName, $form);
+  }
+
   if ($formName === 'CRM_Mjwshared_Form_PaymentRefund') {
     helloasso_payment_processor_lock_mjwshared_refund_amount($form);
     return;
@@ -282,6 +321,69 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
       });
     });
   ");
+}
+
+function helloasso_payment_processor_add_quickform_checkout_controls(
+  string $formName,
+  CRM_Core_Form $form
+): void {
+  try {
+    $processors = civicrm_api3('PaymentProcessor', 'get', [
+      'class_name' => 'Payment_HelloAsso',
+      'is_active' => 1,
+      'options' => ['limit' => 0],
+    ]);
+  }
+  catch (Exception $e) {
+    return;
+  }
+
+  $processorIds = [];
+  foreach ($processors['values'] ?? [] as $processor) {
+    if (!empty($processor['id'])) {
+      $processorIds[] = (int) $processor['id'];
+    }
+  }
+  if (!$processorIds) {
+    return;
+  }
+
+  $supportsInstallments = $formName === 'CRM_Contribute_Form_Contribution_Main'
+    && (bool) Civi::settings()->get('helloasso_enable_installments');
+  if ($supportsInstallments) {
+    $form->add('text', 'helloasso_installments', E::ts('Number of installments'), [
+      'min' => 2,
+      'max' => 12,
+      'inputmode' => 'numeric',
+      'pattern' => '[0-9]*',
+      'size' => 3,
+      'class' => 'three',
+    ]);
+  }
+
+  $configuredMessage = trim((string) Civi::settings()->get('helloasso_quickform_redirect_message'));
+  $defaultMessage = 'You will be redirected to HelloAsso to complete your payment.';
+  $message = $configuredMessage !== '' && $configuredMessage !== $defaultMessage
+    ? $configuredMessage
+    : E::ts($defaultMessage);
+  $submittedInstallments = CRM_Utils_Request::retrieveValue(
+    'helloasso_installments',
+    'Positive',
+    NULL,
+    FALSE,
+    'POST'
+  );
+
+  Civi::resources()->addVars('helloassoQuickForm', [
+    'processorIds' => $processorIds,
+    'supportsInstallments' => $supportsInstallments,
+    'message' => $message,
+    'installmentsValue' => $submittedInstallments ?: '',
+    'installmentsLabel' => E::ts('Number of installments'),
+    'oneTimeLabel' => E::ts('One-time payment'),
+    'installmentsDescription' => E::ts('Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments.'),
+  ]);
+  Civi::resources()->addScriptFile(E::LONG_NAME, 'js/quickform-checkout.js');
 }
 
 function helloasso_payment_processor_replace_payment_processor_form_rule(CRM_Core_Form $form): void {
@@ -1370,6 +1472,43 @@ function helloasso_payment_processor_civicrm_validateForm($formName, &$fields, &
 
   if (!$is_helloasso) {
       return;
+  }
+
+  if (
+    $formName === 'CRM_Contribute_Form_Contribution_Main'
+    && array_key_exists('helloasso_installments', $fields)
+  ) {
+    try {
+      $fields = CRM_HelloassoPaymentProcessor_QuickFormInstallments::apply($fields);
+    }
+    catch (InvalidArgumentException $e) {
+      $errors['helloasso_installments'] = E::ts('HelloAsso requires between 2 and 12 installments.');
+    }
+  }
+
+  if (
+    $formName === 'CRM_Contribute_Form_Contribution_Main'
+    && !empty($fields['is_recur'])
+  ) {
+    $installments = filter_var(
+      $fields['installments'] ?? NULL,
+      FILTER_VALIDATE_INT
+    );
+    if ($installments === FALSE || $installments < 2 || $installments > 12) {
+      $errors['installments'] = E::ts('HelloAsso requires between 2 and 12 installments.');
+    }
+
+    if (($fields['frequency_unit'] ?? '') !== 'month') {
+      $errors['frequency_unit'] = E::ts('HelloAsso installments must be monthly.');
+    }
+
+    $frequencyInterval = filter_var(
+      $fields['frequency_interval'] ?? NULL,
+      FILTER_VALIDATE_INT
+    );
+    if ($frequencyInterval !== 1) {
+      $errors['frequency_interval'] = E::ts('HelloAsso installments must be collected every month.');
+    }
   }
 
   // Find the names in the fields (could be first_name/last_name or billing_first_name/billing_last_name)

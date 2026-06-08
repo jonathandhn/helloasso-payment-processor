@@ -211,7 +211,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     $this->addColumnIfMissing('sync_error_count', "ALTER TABLE civicrm_hello_asso_metadata ADD COLUMN sync_error_count int unsigned NULL DEFAULT 0");
     $this->addColumnIfMissing('long_sync_error_count', "ALTER TABLE civicrm_hello_asso_metadata ADD COLUMN long_sync_error_count int unsigned NULL DEFAULT 0");
 
-    $shortResolvedStatusIds = $this->getContributionStatusIds(['Completed', 'Failed', 'Refunded']);
+    $shortResolvedStatusIds = $this->getContributionStatusIds(['Completed', 'Failed', 'Refunded', 'Chargeback']);
     $shortResolvedStatusSql = $shortResolvedStatusIds ? ' OR c.contribution_status_id IN (' . implode(', ', $shortResolvedStatusIds) . ')' : '';
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_hello_asso_metadata m
@@ -219,13 +219,13 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
       SET m.sync_next_date = NULL
       WHERE m.sync_next_date IS NOT NULL
         AND (
-          m.state IN ('Authorized', 'Registered', 'Refused', 'Error', 'Canceled', 'Abandoned', 'Refunded')
+          m.state IN ('Authorized', 'Registered', 'AuthorizedPreprod', 'Corrected', 'Refused', 'Error', 'Canceled', 'Abandoned', 'Deleted', 'Inconsistent', 'NoDonation', 'Refunded', 'Contested')
           OR COALESCE(m.sync_attempt_count, 0) >= 2
           {$shortResolvedStatusSql}
         )
     ");
 
-    $longResolvedStatusIds = $this->getContributionStatusIds(['Failed', 'Refunded']);
+    $longResolvedStatusIds = $this->getContributionStatusIds(['Failed', 'Refunded', 'Chargeback']);
     $longResolvedStatusSql = $longResolvedStatusIds ? ' OR c.contribution_status_id IN (' . implode(', ', $longResolvedStatusIds) . ')' : '';
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_hello_asso_metadata m
@@ -233,7 +233,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
       SET m.long_sync_next_date = NULL
       WHERE m.long_sync_next_date IS NOT NULL
         AND (
-          m.state IN ('Refused', 'Error', 'Canceled', 'Abandoned', 'Refunded')
+          m.state IN ('Refused', 'Error', 'Canceled', 'Abandoned', 'Deleted', 'Inconsistent', 'NoDonation', 'Refunded', 'Contested')
           OR COALESCE(m.long_sync_attempt_count, 0) >= 3
           {$longResolvedStatusSql}
         )
@@ -316,6 +316,137 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
       1 => [$paymentInstrumentId, 'Integer'],
     ]);
 
+    return TRUE;
+  }
+
+  public function upgrade_4215(): bool {
+    $this->ctx->log->info('Applying update 4215: add idempotent HelloAsso installment mapping.');
+
+    CRM_Core_DAO::executeQuery("
+      CREATE TABLE IF NOT EXISTS civicrm_hello_asso_installment (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        payment_processor_id int unsigned NOT NULL,
+        contribution_recur_id int unsigned NOT NULL,
+        contribution_id int unsigned NULL DEFAULT NULL,
+        checkout_intent_id bigint unsigned NULL DEFAULT NULL,
+        order_id bigint unsigned NOT NULL,
+        installment_number int unsigned NOT NULL,
+        helloasso_payment_id bigint unsigned NOT NULL,
+        amount int unsigned NULL DEFAULT NULL,
+        payment_date datetime NULL DEFAULT NULL,
+        state varchar(64) NULL DEFAULT NULL,
+        created_at datetime NOT NULL,
+        updated_at datetime NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uniq_processor_payment (payment_processor_id, helloasso_payment_id),
+        UNIQUE KEY uniq_processor_order_installment (payment_processor_id, order_id, installment_number),
+        KEY index_contribution_recur_id (contribution_recur_id),
+        KEY index_contribution_id (contribution_id),
+        KEY index_checkout_intent_id (checkout_intent_id),
+        CONSTRAINT FK_hello_asso_installment_recur
+          FOREIGN KEY (contribution_recur_id) REFERENCES civicrm_contribution_recur(id) ON DELETE CASCADE,
+        CONSTRAINT FK_hello_asso_installment_contribution
+          FOREIGN KEY (contribution_id) REFERENCES civicrm_contribution(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB
+    ");
+
+    return TRUE;
+  }
+
+  public function upgrade_4216(): bool {
+    $this->ctx->log->info('Applying update 4216: defer reconciliation of future HelloAsso installments.');
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_hello_asso_metadata m
+      INNER JOIN civicrm_hello_asso_installment i ON i.contribution_id = m.contribution_id
+      SET m.sync_origin_date = NULL,
+          m.sync_next_date = NULL,
+          m.sync_last_date = NULL,
+          m.sync_attempt_count = 0,
+          m.sync_error_count = 0,
+          m.long_sync_origin_date = i.payment_date,
+          m.long_sync_next_date = DATE_ADD(
+            i.payment_date,
+            INTERVAL IF(m.long_sync_scheme = 'sepa', 30, 14) DAY
+          ),
+          m.long_sync_last_date = NULL,
+          m.long_sync_attempt_count = 0,
+          m.long_sync_error_count = 0
+      WHERE i.state = 'Pending'
+        AND i.installment_number > 1
+    ");
+
+    return TRUE;
+  }
+
+  public function upgrade_4217(): bool {
+    $this->ctx->log->info('Applying update 4217: register optional CiviRules reminder guard.');
+
+    if (function_exists('helloasso_payment_processor_register_civirules_conditions')) {
+      helloasso_payment_processor_register_civirules_conditions();
+    }
+
+    return TRUE;
+  }
+
+  public function upgrade_4218(): bool {
+    $this->ctx->log->info('Applying update 4218: schedule timely card and SEPA installment reconciliation.');
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_hello_asso_metadata m
+      INNER JOIN civicrm_hello_asso_installment i ON i.contribution_id = m.contribution_id
+      SET m.long_sync_origin_date = i.payment_date,
+          m.long_sync_next_date = DATE_ADD(
+            i.payment_date,
+            INTERVAL IF(
+              m.long_sync_scheme IN ('sepa', 'installment-sepa'),
+              9,
+              1
+            ) DAY
+          ),
+          m.long_sync_last_date = NULL,
+          m.long_sync_attempt_count = 0,
+          m.long_sync_error_count = 0,
+          m.long_sync_scheme = IF(
+            m.long_sync_scheme IN ('sepa', 'installment-sepa'),
+            'installment-sepa',
+            'installment-card'
+          )
+      WHERE i.state = 'Pending'
+        AND i.installment_number > 1
+    ");
+
+    $shortResolvedStatusIds = $this->getContributionStatusIds(['Completed', 'Failed', 'Refunded', 'Chargeback']);
+    $shortResolvedStatusSql = $shortResolvedStatusIds ? ' OR c.contribution_status_id IN (' . implode(', ', $shortResolvedStatusIds) . ')' : '';
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_hello_asso_metadata m
+      INNER JOIN civicrm_contribution c ON c.id = m.contribution_id
+      SET m.sync_next_date = NULL
+      WHERE m.sync_next_date IS NOT NULL
+        AND (
+          m.state IN ('Authorized', 'Registered', 'AuthorizedPreprod', 'Corrected', 'Refused', 'Error', 'Canceled', 'Abandoned', 'Deleted', 'Inconsistent', 'NoDonation', 'Refunded', 'Contested')
+          {$shortResolvedStatusSql}
+        )
+    ");
+
+    $longResolvedStatusIds = $this->getContributionStatusIds(['Failed', 'Refunded', 'Chargeback']);
+    $longResolvedStatusSql = $longResolvedStatusIds ? ' OR c.contribution_status_id IN (' . implode(', ', $longResolvedStatusIds) . ')' : '';
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_hello_asso_metadata m
+      INNER JOIN civicrm_contribution c ON c.id = m.contribution_id
+      SET m.long_sync_next_date = NULL
+      WHERE m.long_sync_next_date IS NOT NULL
+        AND (
+          m.state IN ('Refused', 'Error', 'Canceled', 'Abandoned', 'Deleted', 'Inconsistent', 'NoDonation', 'Refunded', 'Contested')
+          {$longResolvedStatusSql}
+        )
+    ");
+
+    return TRUE;
+  }
+
+  public function upgrade_4219(): bool {
+    $this->ctx->log->info('Applying update 4219: enable finite recurring contribution lifecycle tracking.');
     return TRUE;
   }
 

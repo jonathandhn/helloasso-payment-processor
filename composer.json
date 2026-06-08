@@ -16,6 +16,12 @@
   "require": {
     "php": ">=8.0 <8.5"
   },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
+  },
+  "scripts": {
+    "test": "phpunit -c phpunit.xml.dist"
+  },
   "suggest": {
     "civicrm/civicrm-core": "CiviCRM 6.14 or later is required.",
     "civicrm/mjwshared": "Payment Shared is required by this extension."

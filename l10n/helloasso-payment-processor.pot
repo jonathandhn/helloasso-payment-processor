@@ -2,9 +2,9 @@
 
 msgid ""
 msgstr ""
-"Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"POT-Creation-Date: 2026-06-07 15:30+0000\n"
-"PO-Revision-Date: 2026-06-07 15:30+0000\n"
+"Project-Id-Version: helloasso-payment-processor 2.1.0-alpha1\n"
+"POT-Creation-Date: 2026-06-08 10:43+0000\n"
+"PO-Revision-Date: 2026-06-08 10:43+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -18,7 +18,13 @@ msgstr ""
 msgid "%1 (#%2, sandbox linked to live processor #%3)"
 msgstr ""
 
+msgid "%1 monthly installments"
+msgstr ""
+
 msgid "A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1"
+msgstr ""
+
+msgid "A recurring HelloAsso payment is missing its order or installment identity."
 msgstr ""
 
 msgid "Access token valid until: %1"
@@ -28,6 +34,9 @@ msgid "Afform / Form Builder integration"
 msgstr ""
 
 msgid "Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. Refunds require the HelloAsso authorization-screen mode. HelloAsso partial refunds remain unsupported by this integration."
+msgstr ""
+
+msgid "Allow finite monthly installment checkout payloads for HelloAsso payment processors."
 msgstr ""
 
 msgid "Authorization URL"
@@ -52,6 +61,15 @@ msgid "Base HelloAsso API URL for sandbox payments. Keep the sandbox default unl
 msgstr ""
 
 msgid "Callback URL to declare at HelloAsso:"
+msgstr ""
+
+msgid "Checkout intent ID"
+msgstr ""
+
+msgid "Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments."
+msgstr ""
+
+msgid "CiviCRM could not create the contribution for HelloAsso installment %1."
 msgstr ""
 
 msgid "Classic API key"
@@ -99,10 +117,19 @@ msgstr ""
 msgid "Connect to HelloAsso"
 msgstr ""
 
+msgid "Contribution"
+msgstr ""
+
 msgid "Contribution %1 is locked by DonRec. The status used for the tax receipt differs from the current HelloAsso payment gateway status (%2). Metadata has been synchronized, but the contribution status has not been changed."
 msgstr ""
 
 msgid "Contribution ID"
+msgstr ""
+
+msgid "Contribution is not a future HelloAsso installment"
+msgstr ""
+
+msgid "Contribution is not a future scheduled HelloAsso installment."
 msgstr ""
 
 msgid "Contribution statuses"
@@ -120,10 +147,16 @@ msgstr ""
 msgid "Duplicate webhook ignored."
 msgstr ""
 
+msgid "Enable HelloAsso SEPA direct debit"
+msgstr ""
+
+msgid "Enable HelloAsso installment payments"
+msgstr ""
+
 msgid "Enable HelloAsso refunds"
 msgstr ""
 
-msgid "Enable automatic checks at T+5 and T+15 after creation of a HelloAsso checkout. Long-term monitoring of later changes, including refunds, remains independent."
+msgid "Enable automatic checks at T+5, T+15 and T+45 after creation of a HelloAsso checkout. The final check expires an unpaid installment plan or marks a classic checkout as abandoned while keeping its contribution pending for cart reminders. Long-term monitoring of later changes, including refunds, remains independent."
 msgstr ""
 
 msgid "Enable automatic registration of the HelloAsso webhook for this CiviCRM instance by default. Uncheck only if multiple CiviCRM instances share the same HelloAsso organization and you want to manage the webhook manually."
@@ -153,13 +186,40 @@ msgstr ""
 msgid "Enter the shared client ID and client secret on the authorization-screen settings page first, then return to start the connection."
 msgstr ""
 
+msgid "FK to Contribution"
+msgstr ""
+
 msgid "First name and last name must not be identical (HelloAsso rule)."
+msgstr ""
+
+msgid "First/last name contains unauthorized special characters (HelloAsso rule)."
+msgstr ""
+
+msgid "First/last name must contain at least 3 characters (HelloAsso rule)."
+msgstr ""
+
+msgid "First/last name must contain at least one vowel (HelloAsso rule)."
+msgstr ""
+
+msgid "First/last name must not contain 3 repeated characters (HelloAsso rule)."
+msgstr ""
+
+msgid "First/last name must not contain numbers (HelloAsso rule)."
 msgstr ""
 
 msgid "For an initial configuration: enable the authorization screen here, save the page, then open the sandbox or production rail to enter the client ID and client secret before starting the connection."
 msgstr ""
 
 msgid "Force processing for a specific contribution."
+msgstr ""
+
+msgid "Future HelloAsso installments were cancelled successfully. Payments already collected were not refunded."
+msgstr ""
+
+msgid "Hello Asso Metadata"
+msgstr ""
+
+msgid "Hello Asso Metadatas"
 msgstr ""
 
 msgid "HelloAsso"
@@ -171,7 +231,13 @@ msgstr ""
 msgid "HelloAsso Organization Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
 msgstr ""
 
+msgid "HelloAsso Payment ID"
+msgstr ""
+
 msgid "HelloAsso Payments Processor"
+msgstr ""
+
+msgid "HelloAsso Reference command ID "
 msgstr ""
 
 msgid "HelloAsso accepted the refund request but did not return a refund operation ID."
@@ -226,6 +292,21 @@ msgid "HelloAsso has accepted the refund request for payment %1. Refund operatio
 msgstr ""
 
 msgid "HelloAsso helps associations collect online payments and provides its services free of charge. It covers all transaction fees so that you can receive the full amount paid by your supporters, without fees. Voluntary contributions left by them are its only source of revenue."
+msgstr ""
+
+msgid "HelloAsso installment cancellation is available only for processors connected through the authorization screen."
+msgstr ""
+
+msgid "HelloAsso installment cancellation requires an authorization-screen connection."
+msgstr ""
+
+msgid "HelloAsso installment payments are disabled."
+msgstr ""
+
+msgid "HelloAsso installments must be collected every month."
+msgstr ""
+
+msgid "HelloAsso installments must be monthly."
 msgstr ""
 
 msgid "HelloAsso linked organization has been disconnected."
@@ -336,6 +417,9 @@ msgstr ""
 msgid "HelloAsso production connection"
 msgstr ""
 
+msgid "HelloAsso redirect message on standard forms"
+msgstr ""
+
 msgid "HelloAsso refund cannot be requested because the original CiviCRM payment could not be found."
 msgstr ""
 
@@ -346,6 +430,15 @@ msgid "HelloAsso refund requested"
 msgstr ""
 
 msgid "HelloAsso refunds are disabled by this extension."
+msgstr ""
+
+msgid "HelloAsso refused the cancellation. Reconnect the organization through the authorization screen and grant the OrganizationAdmin or FormAdmin role; the client must also include the RefundManagement privilege."
+msgstr ""
+
+msgid "HelloAsso requires between %1 and %2 installments for this form."
+msgstr ""
+
+msgid "HelloAsso requires between 2 and 12 installments."
 msgstr ""
 
 msgid "HelloAsso sandbox authorization screen"
@@ -426,10 +519,31 @@ msgstr ""
 msgid "HelloAsso: unable to authenticate with the payment processor API keys."
 msgstr ""
 
+msgid "ID"
+msgstr ""
+
+msgid "Invalid HelloAsso installment schedule: %1"
+msgstr ""
+
 msgid "Invalid HelloAsso processor configuration for %1:"
 msgstr ""
 
 msgid "Invalid HelloAsso webhook payload in the queue."
+msgstr ""
+
+msgid "Key used to sign contribution"
+msgstr ""
+
+msgid "Last event type"
+msgstr ""
+
+msgid "Last known state"
+msgstr ""
+
+msgid "Last long sync date"
+msgstr ""
+
+msgid "Last sync date"
 msgstr ""
 
 msgid "Leave blank to keep the current secret."
@@ -450,6 +564,21 @@ msgstr ""
 msgid "Local HelloAsso authorization-screen credentials are currently used for this rail."
 msgstr ""
 
+msgid "Long follow-up scheme"
+msgstr ""
+
+msgid "Long sync attempt count"
+msgstr ""
+
+msgid "Long sync origin date"
+msgstr ""
+
+msgid "Long sync technical error count"
+msgstr ""
+
+msgid "Maximum installments"
+msgstr ""
+
 msgid "Maximum number of HelloAsso contributions processed per payment processor during a normal cron execution."
 msgstr ""
 
@@ -457,6 +586,12 @@ msgid "Maximum number of contributions to process per payment processor."
 msgstr ""
 
 msgid "Maximum processing batch size (Cron)"
+msgstr ""
+
+msgid "Message displayed on standard contribution and event forms when the selected payment processor is HelloAsso."
+msgstr ""
+
+msgid "Minimum installments"
 msgstr ""
 
 msgid "Missing authorization columns: %1"
@@ -469,6 +604,12 @@ msgid "Missing metadata columns: %1"
 msgstr ""
 
 msgid "Missing site URL"
+msgstr ""
+
+msgid "Next scheduled long sync date"
+msgstr ""
+
+msgid "Next scheduled sync date"
 msgstr ""
 
 msgid "No HelloAsso organization is linked yet."
@@ -507,7 +648,16 @@ msgstr ""
 msgid "No sandbox API key is stored on this processor. The HelloAsso sandbox authorization screen is therefore offered by default."
 msgstr ""
 
+msgid "Number of installments"
+msgstr ""
+
 msgid "OK"
+msgstr ""
+
+msgid "Offer HelloAsso installment payments"
+msgstr ""
+
+msgid "Offer SEPA direct debit on HelloAsso Checkout, including installment checkouts. HelloAsso only displays it for eligible organizations and may keep card payment available."
 msgstr ""
 
 msgid "One or more HelloAsso authorization links have expired and must be reconnected: %1"
@@ -529,6 +679,9 @@ msgid "One or more HelloAsso payment processors still rely on API keys that coul
 msgstr ""
 
 msgid "One or more HelloAsso payment processors use Check as their payment method: %1. Review the processor configuration and select Credit Card or your existing HelloAsso online payment method."
+msgstr ""
+
+msgid "One-time payment"
 msgstr ""
 
 msgid "Online contribution"
@@ -582,13 +735,22 @@ msgstr ""
 msgid "Partner notification URLs returned by HelloAsso: %1"
 msgstr ""
 
+msgid "Pay in full"
+msgstr ""
+
+msgid "Payment details will be shown here depending on the selected Checkout Option. For payment to be taken you must either set a Checkout Option value on the Contribution or add a user input to select one."
+msgstr ""
+
 msgid "Payment processor ID"
 msgstr ""
 
 msgid "Payment processor ID: %1"
 msgstr ""
 
-msgid "Payment status reliability for automations (T+5 / T+15 min)"
+msgid "Payment schedule"
+msgstr ""
+
+msgid "Payment status reliability for automations (T+5 / T+15 / T+45 min)"
 msgstr ""
 
 msgid "Place HelloAsso webhooks in the PaymentprocessorWebhook queue instead of processing them immediately."
@@ -684,6 +846,9 @@ msgstr ""
 msgid "Shared client secret"
 msgstr ""
 
+msgid "Signing Key"
+msgstr ""
+
 msgid "Standard frontend bridge (mjwshared)"
 msgstr ""
 
@@ -691,6 +856,15 @@ msgid "Strict legacy signature verification"
 msgstr ""
 
 msgid "Strict partner signature verification"
+msgstr ""
+
+msgid "Sync attempt count"
+msgstr ""
+
+msgid "Sync origin date"
+msgstr ""
+
+msgid "Sync technical error count"
 msgstr ""
 
 msgid "Target processor:"
@@ -717,10 +891,25 @@ msgstr ""
 msgid "The HelloAsso authorization check could not be completed: %1"
 msgstr ""
 
+msgid "The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments."
+msgstr ""
+
+msgid "The HelloAsso installment mapping table is missing. Apply the extension database upgrades before processing installments."
+msgstr ""
+
 msgid "The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen."
 msgstr ""
 
+msgid "The HelloAsso order ID is missing from this recurring contribution."
+msgstr ""
+
+msgid "The HelloAsso order ID stored on this recurring contribution is invalid."
+msgstr ""
+
 msgid "The HelloAsso partner settings form token is invalid. Please reload the page and try again."
+msgstr ""
+
+msgid "The HelloAsso plan was cancelled, but its local CiviCRM records could not be synchronized: %1"
 msgstr ""
 
 msgid "The HelloAsso schema check could not be completed: %1"
@@ -733,6 +922,9 @@ msgid "The HelloAsso webhook registered for %1 points to a different domain. Inb
 msgstr ""
 
 msgid "The authorization screen is disabled globally. Enable it in HelloAsso settings, then return to this page to connect an organization."
+msgstr ""
+
+msgid "The contribution mapped to this HelloAsso installment no longer exists."
 msgstr ""
 
 msgid "The last HelloAsso authorization renewal failed for: %1. The maintenance job will retry; reconnect if the failure continues."
@@ -771,6 +963,9 @@ msgstr ""
 msgid "This page is used to enter the shared client, display the link status and start the HelloAsso connection. The general authorization-screen activation switch is configured in the HelloAsso settings."
 msgstr ""
 
+msgid "This value is not allowed by HelloAsso."
+msgstr ""
+
 msgid "Token URL"
 msgstr ""
 
@@ -781,6 +976,9 @@ msgid "Unable to reload contribution %1."
 msgstr ""
 
 msgid "Unable to update contribution %1."
+msgstr ""
+
+msgid "Unique HelloassoMetaData ID"
 msgstr ""
 
 msgid "Unknown authentication failure"
