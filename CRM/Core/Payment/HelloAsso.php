@@ -31,7 +31,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     /**
      * is this the testing processor?
      */
-    protected $_is_test = false;
+    protected bool $_is_test = false;
 
     /**
      * Constructor
@@ -40,11 +40,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
      *
      * @return void
      */
-    function __construct($mode, &$paymentProcessor)
+    function __construct(string $mode, mixed &$paymentProcessor)
     {
         $this->_mode = $mode;
         $this->_paymentProcessor = $paymentProcessor;
-        $this->_is_test = ($this->_mode == 'test' ? 1 : 0);
+        $this->_is_test = ($this->_mode === 'test');
     }
 
     /**
@@ -58,7 +58,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     /**
      * @param \GuzzleHttp\Client $guzzleClient
      */
-    public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient)
+    public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient): void
     {
         $this->guzzleClient = $guzzleClient;
     }
@@ -907,9 +907,20 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     }
 
 
-    public function handlePaymentNotification()
+    public function handlePaymentNotification(): void
     {
         http_response_code(200);
+        if (!CRM_HelloassoPaymentProcessor_Webhook::acceptsJsonPayload($_SERVER['REQUEST_METHOD'] ?? NULL)) {
+            CRM_HelloassoPaymentProcessor_Logger::debug(
+                'HelloAsso non-POST payment endpoint request ignored.',
+                [
+                    'payment_processor_id' => $this->getPaymentProcessorId(),
+                    'request_method' => $_SERVER['REQUEST_METHOD'] ?? NULL,
+                ]
+            );
+            CRM_Utils_System::civiExit();
+        }
+
         $rawData = file_get_contents('php://input');
         $params = json_decode($rawData, true);
 

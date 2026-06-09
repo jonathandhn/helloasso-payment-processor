@@ -7,7 +7,7 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
 
   private const FORM_TOKEN_SESSION_KEY = 'helloasso_partner_auth_form_token';
 
-  public function run() {
+  public function run(): void {
     $action = CRM_Utils_Request::retrieve('ha_action', 'String', $this, FALSE, 'status');
     $paymentProcessorId = (int) CRM_Utils_Request::retrieve('processor_id', 'Positive', $this, FALSE, 0);
     if ($action === 'status' && CRM_Utils_System::currentPath() === 'civicrm/helloasso/partner/callback') {

@@ -155,7 +155,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentLifecycle
         );
     }
 
-    private static function normalizeDate($value): ?string
+    private static function normalizeDate(mixed $value): ?string
     {
         if (empty($value)) {
             return NULL;

@@ -65,7 +65,7 @@ function civicrm_api3_job_process_helloasso_long_followup($params) {
  *
  * @param array $params
  */
-function _civicrm_api3_job_process_helloasso_long_followup_spec(&$params) {
+function _civicrm_api3_job_process_helloasso_long_followup_spec(mixed &$params): void {
   $params['payment_processor_id'] = [
     'type' => CRM_Utils_Type::T_INT,
     'title' => E::ts('Payment processor ID'),

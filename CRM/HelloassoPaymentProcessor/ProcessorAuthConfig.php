@@ -364,7 +364,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     return $config;
   }
 
-  private function normalizeNullableInt($value): ?int {
+  private function normalizeNullableInt(mixed $value): ?int {
     if ($value === NULL || $value === '') {
       return NULL;
     }
@@ -372,7 +372,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     return (int) $value;
   }
 
-  private function normalizeNullableString($value): string {
+  private function normalizeNullableString(mixed $value): string {
     if ($value === NULL) {
       return '';
     }
@@ -380,7 +380,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     return (string) $value;
   }
 
-  private function normalizeNullableDateTime($value): ?string {
+  private function normalizeNullableDateTime(mixed $value): ?string {
     if ($value === NULL || $value === '') {
       return NULL;
     }
@@ -403,7 +403,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     }
   }
 
-  private function buildNullableIntegerParam($value): array {
+  private function buildNullableIntegerParam(mixed $value): array {
     $value = $this->normalizeNullableInt($value);
     if ($value === NULL) {
       return ['null', 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
@@ -412,7 +412,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     return [$value, 'Integer'];
   }
 
-  private function buildNullableTimestampParam($value): array {
+  private function buildNullableTimestampParam(mixed $value): array {
     $value = $this->normalizeNullableDateTime($value);
     if ($value === NULL || $value === '') {
       return ['null', 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];

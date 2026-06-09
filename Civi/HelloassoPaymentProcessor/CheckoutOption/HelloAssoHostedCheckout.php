@@ -247,7 +247,7 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
     }
   }
 
-  private function normalizeInstallmentBound($value, int $fallback): int {
+  private function normalizeInstallmentBound(mixed $value, int $fallback): int {
     $value = filter_var($value, FILTER_VALIDATE_INT);
     if ($value === FALSE) {
       return $fallback;

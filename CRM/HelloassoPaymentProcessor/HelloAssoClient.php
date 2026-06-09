@@ -9,7 +9,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
     // Refresh token will be valid only for 30 days.
     // https://dev.helloasso.com/docs/getting-started
     private const REFRESH_TOKEN_EXP = '30 days';
-    private static $instance = null;
+    private static ?self $instance = NULL;
 
     /**
      * @var GuzzleHttp\Client
@@ -329,7 +329,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return (new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId))->requestApi($method, $path, $options);
     }
 
-    private function buildApiErrorMessage($decoded, int $statusCode): string
+    private function buildApiErrorMessage(mixed $decoded, int $statusCode): string
     {
         if (is_array($decoded) && !empty($decoded['errors']) && is_array($decoded['errors'])) {
             $messages = [];

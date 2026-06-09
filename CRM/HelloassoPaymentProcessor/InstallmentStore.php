@@ -164,7 +164,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentStore
     protected function nullableParameter(
         array &$params,
         int $index,
-        $value,
+        mixed $value,
         string $type
     ): string {
         if ($value === NULL) {

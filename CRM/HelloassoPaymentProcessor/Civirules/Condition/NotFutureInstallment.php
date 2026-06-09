@@ -24,7 +24,7 @@ class CRM_HelloassoPaymentProcessor_Civirules_Condition_NotFutureInstallment ext
         }
     }
 
-    public function getExtraDataInputUrl($ruleConditionId)
+    public function getExtraDataInputUrl(int $ruleConditionId)
     {
         return FALSE;
     }
