@@ -28,7 +28,7 @@ class CRM_HelloassoPaymentProcessor_QuickFormInstallmentsTest extends \PHPUnit\F
     /**
      * @dataProvider invalidInstallmentsProvider
      */
-    public function testRejectsValuesOutsideSupportedRange($value): void
+    public function testRejectsValuesOutsideSupportedRange(mixed $value): void
     {
         $this->expectException(InvalidArgumentException::class);
         CRM_HelloassoPaymentProcessor_QuickFormInstallments::apply([

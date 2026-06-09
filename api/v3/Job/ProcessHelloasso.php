@@ -10,6 +10,30 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
  * @return array
  */
 function civicrm_api3_job_process_helloasso($params) {
+  return _civicrm_api3_job_process_helloasso_run(
+    $params,
+    'civicrm_api3',
+    static fn(string $mode, array $processor): CRM_Core_Payment_HelloAsso => new CRM_Core_Payment_HelloAsso($mode, $processor),
+    'civicrm_api3_create_success'
+  );
+}
+
+/**
+ * Execute Job.process_helloasso with injectable CiviCRM dependencies.
+ *
+ * @param array $params
+ * @param callable(string, string, array): array $api3
+ * @param callable(string, array): object $processorFactory
+ * @param callable(array, array, string, string): array $createSuccess
+ *
+ * @return array
+ */
+function _civicrm_api3_job_process_helloasso_run(
+  array $params,
+  callable $api3,
+  callable $processorFactory,
+  callable $createSuccess
+): array {
   $processorParams = [
     'class_name' => 'Payment_HelloAsso',
     'options' => ['limit' => 0],
@@ -22,7 +46,7 @@ function civicrm_api3_job_process_helloasso($params) {
     $processorParams['is_active'] = 1;
   }
 
-  $processors = civicrm_api3('PaymentProcessor', 'get', $processorParams);
+  $processors = $api3('PaymentProcessor', 'get', $processorParams);
   $statusNames = [];
   if (!empty($params['status_names'])) {
     $statusNames = array_values(array_filter(array_map('trim', explode(',', (string) $params['status_names']))));
@@ -47,7 +71,7 @@ function civicrm_api3_job_process_helloasso($params) {
 
   foreach ($processors['values'] ?? [] as $processor) {
     $mode = !empty($processor['is_test']) ? 'test' : 'live';
-    $paymentProcessor = new CRM_Core_Payment_HelloAsso($mode, $processor);
+    $paymentProcessor = $processorFactory($mode, $processor);
     $processorResult = $paymentProcessor->processScheduledSynchronization($options);
 
     $results['processors']++;
@@ -58,7 +82,7 @@ function civicrm_api3_job_process_helloasso($params) {
     }
   }
 
-  return civicrm_api3_create_success($results, $params, 'Job', 'process_helloasso');
+  return $createSuccess($results, $params, 'Job', 'process_helloasso');
 }
 
 /**

@@ -1,6 +1,6 @@
 includes:
-    # PHPStan baseline — décommenter après la première run propre pour figer les erreurs restantes :
-    # - phpstan/baseline.neon
+    # Existing array-shape documentation debt, pinned by exact message and file.
+    - phpstan/baseline.neon
 
 parameters:
     level: 6
@@ -12,6 +12,9 @@ parameters:
         - CRM
         - Civi
         - api
+        - scripts/ReleaseCredentialInjector.php
+        - scripts/inject_release_credentials.php
+        - tests/phpunit/CRM
         - helloasso_payment_processor.php
         - helloasso_payment_processor.civix.php
 
@@ -22,8 +25,6 @@ parameters:
         analyse:
             - scripts/make-dao.php
             - scripts/test_partner_webhook.php
-            - scripts/inject_release_credentials.php
-            - scripts/ReleaseCredentialInjector.php
             - tests/phpunit/bootstrap.php
             - phpstan/
 
@@ -152,10 +153,6 @@ parameters:
         - message: '#Access to an undefined property CRM_Core_Form::\$_paymentProcessor#'
           identifier: property.notFound
 
-        # Niveau 6 : On ignore les missingType.iterableValue car CiviCRM utilise énormément
-        # de tableaux associatifs dynamiques sans typage PHPDoc strict.
-        - identifier: missingType.iterableValue
-
         # Les fichiers .civix.php sont générés automatiquement, on ne doit pas les modifier
         - message: '#has (parameter|no return type)#'
           identifier: missingType.parameter
@@ -164,15 +161,9 @@ parameters:
           identifier: missingType.return
           path: helloasso_payment_processor.civix.php
 
-        # Ignorer les types manquants mineurs dans les classes internes (API Client, etc.)
-        - message: '#has parameter \$(isTest|is_test|clientSecret|clientId|oauthUrl|decoded|value)#'
-          identifier: missingType.parameter
-        - message: '#has no return type specified#'
-          identifier: missingType.return
-          path: CRM/HelloassoPaymentProcessor/HelloAssoClient.php
-
-    # Ne pas échouer si un pattern ignoreErrors ne matche aucune erreur
-    reportUnmatchedIgnoredErrors: false
+    # Keep suppressions honest: stale or overly speculative patterns must fail CI.
+    reportUnmatchedIgnoredErrors: true
+    reportIgnoresWithoutComments: true
 
     # -------------------------------------------------------------------
     # Analyse parallèle
