@@ -88,8 +88,14 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
         Civi::settings()->set('helloasso_partner_client_secret_live', $submittedSecret);
       }
     }
-    Civi::settings()->set('helloasso_partner_authorize_url', trim((string) ($_POST['helloasso_partner_authorize_url'] ?? $partnerAuth->getEffectiveAuthorizeUrl())));
-    Civi::settings()->set('helloasso_partner_token_url', trim((string) ($_POST['helloasso_partner_token_url'] ?? $partnerAuth->getEffectiveTokenUrl())));
+    Civi::settings()->set(
+      $partnerAuth->isTestProcessor() ? 'helloasso_partner_authorize_url_test' : 'helloasso_partner_authorize_url_live',
+      trim((string) ($_POST['helloasso_partner_authorize_url'] ?? $partnerAuth->getEffectiveAuthorizeUrl()))
+    );
+    Civi::settings()->set(
+      $partnerAuth->isTestProcessor() ? 'helloasso_partner_token_url_test' : 'helloasso_partner_token_url_live',
+      trim((string) ($_POST['helloasso_partner_token_url'] ?? $partnerAuth->getEffectiveTokenUrl()))
+    );
 
     CRM_Core_Session::setStatus(
       E::ts('HelloAsso partner settings have been saved on this page.'),

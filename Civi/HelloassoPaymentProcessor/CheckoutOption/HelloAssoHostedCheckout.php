@@ -100,6 +100,11 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
     }
 
     $installments = $session->getCheckoutParam('helloasso_installments');
+    $isRecur = $this->normalizeBooleanCheckoutParam($session->getCheckoutParam('is_recur'))
+      || !in_array($installments, [NULL, ''], TRUE);
+    if (!$isRecur) {
+      return $this->preparedRecurResult();
+    }
     if ($installments === NULL || $installments === '') {
       return $this->preparedRecurResult();
     }
@@ -187,6 +192,10 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
       'schedule_total_amount' => $scheduleTotalAmount,
       'created_recur_id' => $createdRecurId,
     ];
+  }
+
+  private function normalizeBooleanCheckoutParam($value): bool {
+    return in_array($value, [TRUE, 1, '1', 'true', 'on', 'yes'], TRUE);
   }
 
   private function rollbackPreparedContributionRecur(int $contributionId, int $recurId): void {

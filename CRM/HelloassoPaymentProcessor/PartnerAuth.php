@@ -525,7 +525,12 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   }
 
   private function getAuthorizeUrl(): string {
-    $configured = trim((string) Civi::settings()->get('helloasso_partner_authorize_url'));
+    $configured = trim((string) Civi::settings()->get($this->isTestProcessor()
+      ? 'helloasso_partner_authorize_url_test'
+      : 'helloasso_partner_authorize_url_live'));
+    if ($configured === '') {
+      $configured = trim((string) Civi::settings()->get('helloasso_partner_authorize_url'));
+    }
     if ($configured === '') {
       return $this->isTestProcessor() ? self::SANDBOX_AUTHORIZE_URL : self::PROD_AUTHORIZE_URL;
     }
@@ -538,7 +543,12 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   }
 
   private function getTokenUrl(): string {
-    $configured = trim((string) Civi::settings()->get('helloasso_partner_token_url'));
+    $configured = trim((string) Civi::settings()->get($this->isTestProcessor()
+      ? 'helloasso_partner_token_url_test'
+      : 'helloasso_partner_token_url_live'));
+    if ($configured === '') {
+      $configured = trim((string) Civi::settings()->get('helloasso_partner_token_url'));
+    }
     if ($configured === '') {
       return $this->isTestProcessor() ? self::SANDBOX_TOKEN_URL : self::PROD_TOKEN_URL;
     }
