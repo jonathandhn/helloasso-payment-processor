@@ -85,7 +85,7 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
           $prepared['created_recur_id']
         );
       }
-      throw $e;
+      throw new \CRM_Core_Exception(E::ts("HelloAsso is currently unavailable. Please try again later."));
     }
 
     $session->setResponseItem('redirect', $redirectUrl);

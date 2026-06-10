@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.1.0-alpha1\n"
-"PO-Revision-Date: 2026-06-08 10:43+0000\n"
+"PO-Revision-Date: 2026-06-10 18:11+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: CRM/Core/Payment/HelloAsso.php:166
+#. Maintained French translation
 msgid "%1 (#%2, %3)"
-msgstr ""
+msgstr "%1 (#%2, %3)"
 
 #. Maintained French translation
 msgid "%1 (#%2, sandbox linked to live processor #%3)"
@@ -32,6 +32,10 @@ msgid "A recurring HelloAsso payment is missing its order or installment identit
 msgstr "Un paiement récurrent HelloAsso ne contient pas l'identifiant de sa commande ou de son échéance."
 
 #. Maintained French translation
+msgid "Access Token"
+msgstr "Jeton d'accès"
+
+#. Maintained French translation
 msgid "Access token valid until: %1"
 msgstr "Jeton d'accès valable jusqu'au : %1"
 
@@ -46,6 +50,10 @@ msgstr "Autorise les utilisateurs CiviCRM disposant des droits de remboursement 
 #. Maintained French translation
 msgid "Allow finite monthly installment checkout payloads for HelloAsso payment processors."
 msgstr "Autorise les échéanciers mensuels limités pour les processeurs de paiement HelloAsso."
+
+#. Maintained French translation
+msgid "Amount"
+msgstr "Montant"
 
 #. Maintained French translation
 msgid "Authorization URL"
@@ -79,9 +87,13 @@ msgstr "URL de base de l'API HelloAsso pour les paiements bac à sable. Conserve
 msgid "Callback URL to declare at HelloAsso:"
 msgstr "URL de callback à déclarer chez HelloAsso :"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:294
+#. Maintained French translation
+msgid "Checkout Intent ID"
+msgstr "ID de l'intention de paiement"
+
+#. Maintained French translation
 msgid "Checkout intent ID"
-msgstr ""
+msgstr "ID de l'intention de paiement"
 
 #. Maintained French translation
 msgid "Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments."
@@ -127,13 +139,13 @@ msgstr "Client secret dédié à la mire HelloAsso production."
 msgid "Client secret dedicated to the HelloAsso sandbox authorization screen."
 msgstr "Client secret dédié à la mire HelloAsso bac à sable."
 
-#: api/v3/Job/ProcessHelloassoLongFollowup.php:82
+#. Maintained French translation
 msgid "Comma-separated contribution status names to include, for example \"Completed,Pending\"."
-msgstr ""
+msgstr "Noms de statuts de contribution séparés par des virgules à inclure, par exemple \"Completed,Pending\"."
 
-#: api/v3/Job/ProcessHelloasso.php:83
+#. Maintained French translation
 msgid "Comma-separated contribution status names to include, for example \"Pending,Failed\"."
-msgstr ""
+msgstr "Noms de statuts de contribution séparés par des virgules à inclure, par exemple \"Pending,Failed\"."
 
 #. Maintained French translation
 msgid "Community HelloAsso authorization-screen credentials are currently used for this rail. Enter a local client ID and client secret here only if you want to override the community credentials."
@@ -151,6 +163,10 @@ msgstr "Connecter le bac à sable à HelloAsso"
 msgid "Connect to HelloAsso"
 msgstr "Connecter à HelloAsso"
 
+#. Maintained French translation
+msgid "Connection Mode"
+msgstr "Mode de connexion"
+
 #: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:246
 #, fuzzy
 msgid "Contribution"
@@ -167,6 +183,10 @@ msgid "Contribution ID"
 msgstr "ID de la contribution"
 
 #. Maintained French translation
+msgid "Contribution Recur ID"
+msgstr "ID de contribution périodique"
+
+#. Maintained French translation
 msgid "Contribution is not a future HelloAsso installment"
 msgstr "La contribution n'est pas une échéance future HelloAsso"
 
@@ -178,6 +198,10 @@ msgstr "La contribution n'est pas une échéance future planifiée HelloAsso."
 #: api/v3/Job/ProcessHelloassoLongFollowup.php:81
 msgid "Contribution statuses"
 msgstr "Statuts de contribution"
+
+#. Maintained French translation
+msgid "Created At"
+msgstr "Créé le"
 
 #. Maintained French translation
 msgid "Disconnect the linked organization"
@@ -231,21 +255,25 @@ msgstr "Active la mire OAuth HelloAsso partagée. Quand ce réglage est désacti
 msgid "Enable the standard HelloAsso frontend integration based on CRM.payment and mjwshared."
 msgstr "Active l'intégration frontend standard HelloAsso basée sur CRM.payment et mjwshared."
 
-#: helloasso_payment_processor.php:294
+#. Maintained French translation
 msgid "Enter the HelloAsso client ID used by this payment processor for the selected environment. Keep the live and test values aligned with the matching HelloAsso application."
-msgstr ""
+msgstr "Saisissez le client ID HelloAsso utilisé par ce processeur de paiement pour l'environnement sélectionné. Gardez les valeurs live et test alignées avec l'application HelloAsso correspondante."
 
 #. Maintained French translation
 msgid "Enter the HelloAsso client secret paired with the client ID above. Store the live and sandbox secrets separately."
 msgstr "Saisissez le client secret HelloAsso associé au client ID ci-dessus. Conservez les secrets production et bac à sable séparément."
 
-#: helloasso_payment_processor.php:296
+#. Maintained French translation
 msgid "Enter the HelloAsso organization slug or organization name expected by this processor when building API calls and payment links."
-msgstr ""
+msgstr "Saisissez le slug ou le nom de l'organisation HelloAsso attendu par ce processeur lors de la construction des appels API et des liens de paiement."
 
 #. Maintained French translation
 msgid "Enter the shared client ID and client secret on the authorization-screen settings page first, then return to start the connection."
 msgstr "Renseignez d'abord le client ID et le client secret partagés sur la page de réglages de la mire, puis revenez lancer la connexion."
+
+#. Maintained French translation
+msgid "Expires At"
+msgstr "Expire le"
 
 #: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:232
 #, fuzzy
@@ -289,6 +317,14 @@ msgstr "Forcer le traitement pour une contribution spécifique."
 msgid "Future HelloAsso installments were cancelled successfully. Payments already collected were not refunded."
 msgstr "Les échéances futures HelloAsso ont été annulées. Les paiements déjà encaissés n'ont pas été remboursés."
 
+#. Maintained French translation
+msgid "Hello Asso Installment"
+msgstr "Échéance HelloAsso"
+
+#. Maintained French translation
+msgid "Hello Asso Installments"
+msgstr "Échéances HelloAsso"
+
 #: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:194
 #, fuzzy
 msgid "Hello Asso Metadata"
@@ -298,6 +334,14 @@ msgstr "Paramètres HelloAsso"
 #, fuzzy
 msgid "Hello Asso Metadatas"
 msgstr "Paramètres HelloAsso"
+
+#. Maintained French translation
+msgid "Hello Asso Processor Auth"
+msgstr "Autorisation processeur HelloAsso"
+
+#. Maintained French translation
+msgid "Hello Asso Processor Auths"
+msgstr "Autorisations processeurs HelloAsso"
 
 #: CRM/Core/Payment/HelloAsso.mgd.php:15
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:53
@@ -326,17 +370,17 @@ msgstr "Processeur de paiement HelloAsso"
 msgid "HelloAsso Payments Processor"
 msgstr "Processeur de paiement HelloAsso"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:272
-msgid "HelloAsso Reference command ID "
-msgstr ""
+#. Maintained French translation
+msgid "HelloAsso Reference command ID"
+msgstr "ID de commande de référence HelloAsso"
 
 #. Maintained French translation
 msgid "HelloAsso accepted the refund request but did not return a refund operation ID."
 msgstr "HelloAsso a accepté la demande de remboursement mais n'a pas retourné d'identifiant d'opération de remboursement."
 
-#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:62
+#. Maintained French translation
 msgid "HelloAsso authentication is currently being refreshed. Please retry the payment."
-msgstr ""
+msgstr "L'authentification HelloAsso est en cours d'actualisation. Veuillez réessayer le paiement."
 
 #. Maintained French translation
 msgid "HelloAsso authorization screen"
@@ -346,9 +390,9 @@ msgstr "Mire HelloAsso"
 msgid "HelloAsso authorization screen URL. In production, the default value is https://auth.helloasso.com/authorize."
 msgstr "URL de l'écran d'autorisation HelloAsso. En production, la valeur par défaut est https://auth.helloasso.com/authorize."
 
-#: CRM/Core/Payment/HelloAsso.php:94
+#. Maintained French translation
 msgid "HelloAsso authorization screen is selected for this processor, but no linked HelloAsso organization is stored yet."
-msgstr ""
+msgstr "La mire HelloAsso est sélectionnée pour ce processeur, mais aucune organisation HelloAsso liée n'est encore enregistrée."
 
 #. Maintained French translation
 msgid "HelloAsso authorization screen: authorization URL"
@@ -422,17 +466,21 @@ msgstr "Les échéances HelloAsso doivent être prélevées chaque mois."
 msgid "HelloAsso installments must be monthly."
 msgstr "Les échéances HelloAsso doivent être mensuelles."
 
+#. Maintained French translation
+msgid "HelloAsso is currently unavailable. Please try again later."
+msgstr "HelloAsso est temporairement indisponible. Veuillez réessayer ultérieurement."
+
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:69
 msgid "HelloAsso linked organization has been disconnected."
 msgstr "L'organisation liée HelloAsso a été déconnectée."
 
-#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:364
+#. Maintained French translation
 msgid "HelloAsso live API calls require SSL verification to be enabled."
-msgstr ""
+msgstr "Les appels à l'API live HelloAsso nécessitent que la vérification SSL soit activée."
 
-#: CRM/Core/Payment/HelloAsso.php:1838
+#. Maintained French translation
 msgid "HelloAsso notification signature cannot be verified because the local signing key is missing."
-msgstr ""
+msgstr "La signature de la notification HelloAsso ne peut pas être vérifiée car la clé de signature locale est absente."
 
 #: CRM/Core/Payment/HelloAsso.php:1830
 msgid "HelloAsso notification signature is required but missing."
@@ -470,9 +518,9 @@ msgstr "Autorisation partenaire HelloAsso"
 msgid "HelloAsso partner authorization cannot be refreshed."
 msgstr "L'autorisation partenaire HelloAsso ne peut pas être rafraîchie."
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:88
+#. Maintained French translation
 msgid "HelloAsso partner authorization did not return an organization slug."
-msgstr ""
+msgstr "L'autorisation partenaire HelloAsso n'a pas retourné de slug d'organisation."
 
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:43
 msgid "HelloAsso partner authorization failed: %1"
@@ -482,9 +530,9 @@ msgstr "L'autorisation partenaire HelloAsso a échoué : %1"
 msgid "HelloAsso partner authorization failed: %1 (%2)"
 msgstr "L'autorisation partenaire HelloAsso a échoué : %1 (%2)"
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:298
+#. Maintained French translation
 msgid "HelloAsso partner authorization is currently being refreshed. Please retry the payment."
-msgstr ""
+msgstr "L'autorisation partenaire HelloAsso est en cours de rafraîchissement. Veuillez réessayer le paiement."
 
 #: CRM/HelloassoPaymentProcessor/PartnerAuth.php:495
 msgid "HelloAsso partner authorization is disabled."
@@ -494,45 +542,45 @@ msgstr "L'autorisation partenaire HelloAsso est désactivée."
 msgid "HelloAsso partner authorization is not linked to an organization."
 msgstr "L'autorisation partenaire HelloAsso n'est pas liée à une organisation."
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:321
+#. Maintained French translation
 msgid "HelloAsso partner authorization refresh token has expired."
-msgstr ""
+msgstr "Le jeton de rafraîchissement de l'autorisation partenaire HelloAsso a expiré."
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:505
+#. Maintained French translation
 msgid "HelloAsso partner authorization requires SSL verification to be enabled."
-msgstr ""
+msgstr "L'autorisation partenaire HelloAsso nécessite que la vérification SSL soit activée."
 
 #. Maintained French translation
 msgid "HelloAsso partner authorization requires a payment processor."
 msgstr "L'autorisation partenaire HelloAsso nécessite un processeur de paiement."
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:386
+#. Maintained French translation
 msgid "HelloAsso partner authorization response is missing OAuth tokens."
-msgstr ""
+msgstr "La réponse de l'autorisation partenaire HelloAsso ne contient pas les jetons OAuth."
 
 #: CRM/HelloassoPaymentProcessor/PartnerAuth.php:63
 msgid "HelloAsso partner authorization state is invalid or expired."
 msgstr "L'état d'autorisation partenaire HelloAsso est invalide ou expiré."
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:498
+#. Maintained French translation
 msgid "HelloAsso partner client ID and secret must be configured before connecting an organization."
-msgstr ""
+msgstr "Le client ID et le secret partenaire HelloAsso doivent être configurés avant de connecter une organisation."
 
 #. Maintained French translation
 msgid "HelloAsso partner information could not be retrieved: %1"
 msgstr "Les informations partenaire HelloAsso n'ont pas pu être récupérées : %1"
 
-#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:95
+#. Maintained French translation
 msgid "HelloAsso partner settings have been saved on this page."
-msgstr ""
+msgstr "Les paramètres partenaire HelloAsso ont été enregistrés sur cette page."
 
-#: CRM/Core/Payment/HelloAsso.php:1867
+#. Maintained French translation
 msgid "HelloAsso partner webhook signature cannot be verified because the local signature key is missing."
-msgstr ""
+msgstr "La signature du webhook partenaire HelloAsso ne peut pas être vérifiée car la clé de signature locale est absente."
 
-#: CRM/Core/Payment/HelloAsso.php:1860
+#. Maintained French translation
 msgid "HelloAsso partner webhook signature is required but missing."
-msgstr ""
+msgstr "La signature du webhook partenaire HelloAsso est requise mais manquante."
 
 #: CRM/Core/Payment/HelloAsso.php:1879
 msgid "HelloAsso partner webhook signature mismatch."
@@ -550,14 +598,21 @@ msgstr "Le paiement HelloAsso est temporairement indisponible : l'organisation l
 msgid "HelloAsso payment processor not found: %1"
 msgstr "Processeur de paiement HelloAsso introuvable : %1"
 
-#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:327
-msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
-msgstr ""
+#. Maintained French translation
+msgid "HelloAsso payment reconciliation metadata"
+msgstr "Métadonnées de rapprochement des paiements HelloAsso"
 
-#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:33
-#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:45
+#. Maintained French translation
+msgid "HelloAsso per-processor OAuth and webhook state"
+msgstr "État OAuth et webhook par processeur HelloAsso"
+
+#. Maintained French translation
+msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
+msgstr "Le mode plugin-public de HelloAsso requiert un ID de processeur de paiement enregistré."
+
+#. Maintained French translation
 msgid "HelloAsso processor authorization table is missing."
-msgstr ""
+msgstr "La table des autorisations de processeurs HelloAsso est manquante."
 
 #. Maintained French translation
 msgid "HelloAsso production authorization screen"
@@ -612,17 +667,17 @@ msgstr "Connexion HelloAsso bac à sable"
 msgid "HelloAsso settings"
 msgstr "Paramètres HelloAsso"
 
-#: CRM/Core/Payment/HelloAsso.php:2052
+#. Maintained French translation
 msgid "HelloAsso webhook checkout intent could not be confirmed with a payment by the API."
-msgstr ""
+msgstr "L'intention de paiement du webhook HelloAsso n'a pas pu être confirmée par un paiement via l'API."
 
-#: CRM/Core/Payment/HelloAsso.php:2079
+#. Maintained French translation
 msgid "HelloAsso webhook payload could not be stored in the queue."
-msgstr ""
+msgstr "Le contenu du webhook HelloAsso n'a pas pu être stocké dans la file d'attente."
 
-#: CRM/Core/Payment/HelloAsso.php:2028
+#. Maintained French translation
 msgid "HelloAsso webhook payment ID could not be confirmed by the API."
-msgstr ""
+msgstr "L'ID de paiement du webhook HelloAsso n'a pas pu être confirmé via l'API."
 
 #: helloasso_payment_processor.php:1024
 msgid "HelloAsso: API Key Authentication Failed"
@@ -632,21 +687,21 @@ msgstr "HelloAsso : Échec de l'authentification par clé API"
 msgid "HelloAsso: API Key Check Failed"
 msgstr "HelloAsso : Échec de la vérification de la clé API"
 
-#: helloasso_payment_processor.php:952
+#. Maintained French translation
 msgid "HelloAsso: Authorization Check Failed"
-msgstr ""
+msgstr "HelloAsso : Échec de la vérification de l'autorisation"
 
-#: helloasso_payment_processor.php:892
+#. Maintained French translation
 msgid "HelloAsso: Authorization Expired"
-msgstr ""
+msgstr "HelloAsso : Autorisation expirée"
 
-#: helloasso_payment_processor.php:932
+#. Maintained French translation
 msgid "HelloAsso: Authorization Expiring Soon"
-msgstr ""
+msgstr "HelloAsso : Autorisation expirant bientôt"
 
-#: helloasso_payment_processor.php:922
+#. Maintained French translation
 msgid "HelloAsso: Authorization Renewal Failed"
-msgstr ""
+msgstr "HelloAsso : Échec du renouvellement de l'autorisation"
 
 #. Maintained French translation
 msgid "HelloAsso: Domain Mismatch (Staging/Dev Instance)"
@@ -660,13 +715,13 @@ msgstr "HelloAsso : Mise à niveau V2 incomplète"
 msgid "HelloAsso: Organization Cannot Receive Payments"
 msgstr "HelloAsso : organisation non autorisée à recevoir des paiements"
 
-#: helloasso_payment_processor.php:1004
+#. Maintained French translation
 msgid "HelloAsso: Payment Method Missing"
-msgstr ""
+msgstr "HelloAsso : Méthode de paiement manquante"
 
-#: helloasso_payment_processor.php:1014
+#. Maintained French translation
 msgid "HelloAsso: Payment Method Requires Review"
-msgstr ""
+msgstr "HelloAsso : Méthode de paiement nécessitant une révision"
 
 #. Maintained French translation
 msgid "HelloAsso: Reconnection Required"
@@ -680,9 +735,9 @@ msgstr "HelloAsso : Échec de la vérification du schéma"
 msgid "HelloAsso: Webhook Domain Mismatch"
 msgstr "HelloAsso : Décalage de domaine du Webhook"
 
-#: helloasso_payment_processor.php:942
+#. Maintained French translation
 msgid "HelloAsso: Webhook Not Configured"
-msgstr ""
+msgstr "HelloAsso : Webhook non configuré"
 
 #. Maintained French translation
 msgid "HelloAsso: analyze concatenated legacy trxn_id values (%1 cases)"
@@ -704,9 +759,23 @@ msgstr "HelloAsso: trop de cas (%1) pour la réparation GUI. Utiliser le mode te
 msgid "HelloAsso: unable to authenticate with the payment processor API keys."
 msgstr "HelloAsso : impossible de s'authentifier avec les clés API du processeur de paiement."
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:208
+#. Corrected from old msgid: HelloAsso Payment ID
+#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:316
+#, fuzzy
+msgid "Helloasso Payment ID"
+msgstr "Processeur de paiement HelloAsso"
+
+#. Maintained French translation
 msgid "ID"
-msgstr ""
+msgstr "ID"
+
+#. Maintained French translation
+msgid "Idempotent mapping of HelloAsso installments to CiviCRM contributions"
+msgstr "Mappage idempotent des échéances HelloAsso vers les contributions CiviCRM"
+
+#. Maintained French translation
+msgid "Installment Number"
+msgstr "Numéro de l'échéance"
 
 #. Maintained French translation
 msgid "Invalid HelloAsso installment schedule: %1"
@@ -725,17 +794,29 @@ msgstr "Payload webhook HelloAsso invalide dans la file."
 msgid "Key used to sign contribution"
 msgstr "Contribution en ligne"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:338
+#. Maintained French translation
+msgid "Last Refresh Error"
+msgstr "Dernière erreur de rafraîchissement"
+
+#. Maintained French translation
+msgid "Last Refresh Error Date"
+msgstr "Date de la dernière erreur de rafraîchissement"
+
+#. Maintained French translation
+msgid "Last Refresh Http Status"
+msgstr "Dernier statut HTTP de rafraîchissement"
+
+#. Maintained French translation
 msgid "Last event type"
-msgstr ""
+msgstr "Dernier type d'événement"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:359
+#. Maintained French translation
 msgid "Last known state"
-msgstr ""
+msgstr "Dernier état connu"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:562
+#. Maintained French translation
 msgid "Last long sync date"
-msgstr ""
+msgstr "Date de la dernière synchronisation longue"
 
 #: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:440
 #, fuzzy
@@ -750,6 +831,10 @@ msgstr "Laisser vide pour conserver le secret actuel."
 #: api/v3/Job/ProcessHelloassoLongFollowup.php:101
 msgid "Limit"
 msgstr "Limite"
+
+#. Maintained French translation
+msgid "Linked At"
+msgstr "Lié le"
 
 #. Maintained French translation
 msgid "Linked on: %1"
@@ -771,17 +856,17 @@ msgstr "Les identifiants locaux de mire HelloAsso sont actuellement utilisés po
 msgid "Long follow-up scheme"
 msgstr "Schéma de suivi à long terme"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:581
+#. Maintained French translation
 msgid "Long sync attempt count"
-msgstr ""
+msgstr "Nombre de tentatives de synchronisation longue"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:524
+#. Maintained French translation
 msgid "Long sync origin date"
-msgstr ""
+msgstr "Date d'origine de la synchronisation longue"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:603
+#. Maintained French translation
 msgid "Long sync technical error count"
-msgstr ""
+msgstr "Nombre d'erreurs techniques de la synchronisation longue"
 
 #. Maintained French translation
 msgid "Maximum installments"
@@ -791,10 +876,9 @@ msgstr "Nombre maximal d'échéances"
 msgid "Maximum number of HelloAsso contributions processed per payment processor during a normal cron execution."
 msgstr "Nombre maximum de contributions HelloAsso traitées par processeur pendant une exécution normale du cron."
 
-#: api/v3/Job/ProcessHelloasso.php:109
-#: api/v3/Job/ProcessHelloassoLongFollowup.php:102
+#. Maintained French translation
 msgid "Maximum number of contributions to process per payment processor."
-msgstr ""
+msgstr "Nombre maximum de contributions à traiter par processeur de paiement."
 
 #. Maintained French translation
 msgid "Maximum processing batch size (Cron)"
@@ -808,17 +892,17 @@ msgstr "Message affiché sur les formulaires classiques de contribution et d'ins
 msgid "Minimum installments"
 msgstr "Nombre minimal d'échéances"
 
-#: helloasso_payment_processor.php:770
+#. Maintained French translation
 msgid "Missing authorization columns: %1"
-msgstr ""
+msgstr "Colonnes d'autorisation manquantes : %1"
 
 #: helloasso_payment_processor.php:773
 msgid "Missing indexes: %1"
 msgstr "Index manquants : %1"
 
-#: helloasso_payment_processor.php:767
+#. Maintained French translation
 msgid "Missing metadata columns: %1"
-msgstr ""
+msgstr "Colonnes de métadonnées manquantes : %1"
 
 #: helloasso_payment_processor.php:1132
 msgid "Missing site URL"
@@ -897,33 +981,33 @@ msgstr "Proposer le paiement HelloAsso en plusieurs fois"
 msgid "Offer SEPA direct debit on HelloAsso Checkout, including installment checkouts. HelloAsso only displays it for eligible organizations and may keep card payment available."
 msgstr "Propose le prélèvement SEPA sur le Checkout HelloAsso, y compris pour les paiements en plusieurs fois. HelloAsso l'affiche uniquement pour les associations éligibles et peut maintenir le paiement par carte."
 
-#: helloasso_payment_processor.php:891
+#. Maintained French translation
 msgid "One or more HelloAsso authorization links have expired and must be reconnected: %1"
-msgstr ""
+msgstr "Une ou plusieurs liaisons d'autorisation HelloAsso ont expiré et doivent être reconnectées : %1"
 
-#: helloasso_payment_processor.php:931
+#. Maintained French translation
 msgid "One or more HelloAsso authorization links will expire soon: %1"
-msgstr ""
+msgstr "Une ou plusieurs liaisons d'autorisation HelloAsso expireront bientôt : %1"
 
 #. Maintained French translation
 msgid "One or more HelloAsso linked organizations are not currently allowed by HelloAsso to receive online payments. Check their administrative status before accepting new payments through the authorization screen: %1"
 msgstr "Une ou plusieurs organisations HelloAsso liées ne sont actuellement pas autorisées par HelloAsso à recevoir des paiements en ligne. Vérifiez leur état administratif avant d'accepter de nouveaux paiements via la mire : %1"
 
-#: helloasso_payment_processor.php:941
+#. Maintained French translation
 msgid "One or more HelloAsso links expect automatic webhook registration, but no webhook is stored yet: %1. Reconnect the authorization screen to push the webhook, or disable automatic webhook registration on that processor if another CiviCRM instance must keep manual control of the HelloAsso webhook URL."
-msgstr ""
+msgstr "Une ou plusieurs liaisons HelloAsso attendent l'enregistrement automatique du webhook, mais aucun webhook n'est encore enregistré : %1. Reconnectez la mire pour pousser le webhook, ou désactivez l'enregistrement automatique sur ce processeur si une autre instance CiviCRM doit conserver le contrôle manuel."
 
-#: helloasso_payment_processor.php:1003
+#. Maintained French translation
 msgid "One or more HelloAsso payment processors have no payment method configured: %1. Configure a payment method on the processor; new processors use Credit Card by default."
-msgstr ""
+msgstr "Un ou plusieurs processeurs de paiement HelloAsso n'ont aucune méthode de paiement configurée : %1. Configurez une méthode de paiement sur le processeur ; les nouveaux processeurs utilisent Carte de crédit par défaut."
 
-#: helloasso_payment_processor.php:1023
+#. Maintained French translation
 msgid "One or more HelloAsso payment processors still rely on API keys that could not authenticate: %1"
-msgstr ""
+msgstr "Un ou plusieurs processeurs de paiement HelloAsso s'appuient encore sur des clés API qui n'ont pas pu s'authentifier : %1"
 
-#: helloasso_payment_processor.php:1013
+#. Maintained French translation
 msgid "One or more HelloAsso payment processors use Check as their payment method: %1. Review the processor configuration and select Credit Card or your existing HelloAsso online payment method."
-msgstr ""
+msgstr "Un ou plusieurs processeurs de paiement HelloAsso utilisent Chèque comme méthode de paiement : %1. Révisez la configuration du processeur et sélectionnez Carte de crédit ou votre méthode de paiement en ligne HelloAsso existante."
 
 #. Maintained French translation
 msgid "One-time payment"
@@ -937,15 +1021,13 @@ msgstr "Contribution en ligne"
 msgid "Online contribution: %1"
 msgstr "Contribution en ligne : %1"
 
-#: api/v3/Job/ProcessHelloasso.php:88
-#: api/v3/Job/ProcessHelloassoLongFollowup.php:87
+#. Maintained French translation
 msgid "Only process contributions received on or after this date/time."
-msgstr ""
+msgstr "Ne traiter que les contributions reçues à partir de cette date/heure."
 
-#: api/v3/Job/ProcessHelloasso.php:93
-#: api/v3/Job/ProcessHelloassoLongFollowup.php:92
+#. Maintained French translation
 msgid "Only process contributions received on or before this date/time."
-msgstr ""
+msgstr "Ne traiter que les contributions reçues jusqu'à cette date/heure."
 
 #. Maintained French translation
 msgid "Only process follow-ups due on or before this date/time. Leave empty to disable this filter."
@@ -979,9 +1061,17 @@ msgstr "Ouvrir les réglages de cette mire"
 msgid "Open this authorization-screen settings page first to enter the shared client ID and client secret, then return to start the connection."
 msgstr "Ouvrez d'abord les réglages de cette mire pour saisir le client ID et le client secret partagés, puis revenez lancer la connexion."
 
+#. Maintained French translation
+msgid "Order ID"
+msgstr "ID de commande"
+
 #: CRM/Core/Payment/HelloAsso.mgd.php:22
 msgid "Organization Name"
 msgstr "Nom de l'organisation"
+
+#. Maintained French translation
+msgid "Organization Slug"
+msgstr "Slug de l'organisation"
 
 #. Maintained French translation
 msgid "Organization linked: %1"
@@ -1003,9 +1093,21 @@ msgstr "URL de notification partenaire retournées par HelloAsso : %1"
 msgid "Pay in full"
 msgstr "Payer en une fois"
 
-#: /tmp/tmp.ucxMeqWeXu/templates.js:2
+#. Maintained French translation
+msgid "Payment Date"
+msgstr "Date de paiement"
+
+#. Corrected from old msgid: Payment processor ID
+#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:380
+#: api/v3/Job/ProcessHelloasso.php:72
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:71
+#: api/v3/Job/RefreshHelloassoPartnerLinks.php:53
+msgid "Payment Processor ID"
+msgstr "ID du processeur de paiement"
+
+#. Maintained French translation
 msgid "Payment details will be shown here depending on the selected Checkout Option. For payment to be taken you must either set a Checkout Option value on the Contribution or add a user input to select one."
-msgstr ""
+msgstr "Les détails du paiement seront affichés ici selon la Checkout Option sélectionnée. Pour qu'un paiement soit encaissé, vous devez soit définir une valeur de Checkout Option sur la contribution, soit ajouter un champ utilisateur pour en sélectionner une."
 
 #: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:380
 #: api/v3/Job/ProcessHelloasso.php:72
@@ -1029,8 +1131,9 @@ msgstr "Fiabilité du statut de paiement pour les automatisations (T+5 / T+15 / 
 msgid "Place HelloAsso webhooks in the PaymentprocessorWebhook queue instead of processing them immediately."
 msgstr "Place les webhooks HelloAsso dans la file PaymentprocessorWebhook au lieu de les traiter immédiatement."
 
+#. Maintained French translation
 msgid "Process first step"
-msgstr ""
+msgstr "Traiter la première étape"
 
 #. Maintained French translation
 msgid "Process scheduled HelloAsso payment follow-ups and targeted synchronisations."
@@ -1040,8 +1143,9 @@ msgstr "Traite les suivis planifiés des paiements HelloAsso et les synchronisat
 msgid "Process scheduled long-window HelloAsso consistency checks."
 msgstr "Traite les contrôles de cohérence HelloAsso planifiés à long terme."
 
+#. Maintained French translation
 msgid "Process second step"
-msgstr ""
+msgstr "Traiter la deuxième étape"
 
 #. Maintained French translation
 msgid "Production authorization-screen mode is locked until the production client ID and client secret are configured."
@@ -1069,8 +1173,29 @@ msgstr "Date de réception à partir de"
 msgid "Receive date to"
 msgstr "Date de réception jusqu'à"
 
+#. Maintained French translation
+msgid "Redirect Uri"
+msgstr "URI de redirection"
+
+#. Maintained French translation
+msgid "Refresh Expires At"
+msgstr "Rafraîchissement expire le"
+
+#. Maintained French translation
+msgid "Refresh Issued At"
+msgstr "Rafraîchissement émis le"
+
+#. Maintained French translation
+msgid "Refresh Status"
+msgstr "Statut du rafraîchissement"
+
+#. Maintained French translation
+msgid "Refresh Token"
+msgstr "Jeton de rafraîchissement"
+
+#. Maintained French translation
 msgid "Refresh linked HelloAsso authorizations once their current refresh tokens reach mid-life."
-msgstr ""
+msgstr "Rafraîchir les autorisations HelloAsso liées lorsque leurs jetons de rafraîchissement actuels atteignent la mi-vie."
 
 #. Maintained French translation
 msgid "Refresh this HelloAsso settings page"
@@ -1088,9 +1213,9 @@ msgstr "Refuse les webhooks partenaire HelloAsso dont le header x-ha-signature e
 msgid "Reject HelloAsso webhooks whose legacy invoiceID/sig signature is missing or invalid."
 msgstr "Refuse les webhooks HelloAsso dont la signature legacy invoiceID/sig est absente ou invalide."
 
-#: api/v3/Job/RefreshHelloassoPartnerLinks.php:54
+#. Maintained French translation
 msgid "Restrict maintenance to one linked HelloAsso payment processor."
-msgstr ""
+msgstr "Restreindre la maintenance à un processeur de paiement HelloAsso lié."
 
 #: api/v3/Job/ProcessHelloasso.php:73
 #: api/v3/Job/ProcessHelloassoLongFollowup.php:72
@@ -1117,9 +1242,9 @@ msgstr "Mode de connexion bac à sable"
 msgid "Sandbox organization linked: %1"
 msgstr "Organisation bac à sable liée : %1"
 
-#: helloasso_payment_processor.php:300
+#. Maintained French translation
 msgid "Sandbox organization slug or name used for test API calls."
-msgstr ""
+msgstr "Slug ou nom de l'organisation bac à sable utilisé pour les appels API de test."
 
 #. Maintained French translation
 msgid "Sandbox payment processor ID"
@@ -1149,13 +1274,17 @@ msgstr "Client ID partagé"
 msgid "Shared client secret"
 msgstr "Client secret partagé"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:253
+#. Maintained French translation
 msgid "Signing Key"
-msgstr ""
+msgstr "Clé de signature"
 
 #. Maintained French translation
 msgid "Standard frontend bridge (mjwshared)"
 msgstr "Pont d'intégration standard (mjwshared)"
+
+#. Maintained French translation
+msgid "State"
+msgstr "État"
 
 #. Maintained French translation
 msgid "Strict legacy signature verification"
@@ -1165,17 +1294,17 @@ msgstr "Vérification stricte de la signature historique"
 msgid "Strict partner signature verification"
 msgstr "Vérification stricte de la signature partenaire"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:459
+#. Maintained French translation
 msgid "Sync attempt count"
-msgstr ""
+msgstr "Nombre de tentatives de synchronisation"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:402
+#. Maintained French translation
 msgid "Sync origin date"
-msgstr ""
+msgstr "Date d'origine de la synchronisation"
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:481
+#. Maintained French translation
 msgid "Sync technical error count"
-msgstr ""
+msgstr "Nombre d'erreurs techniques de la synchronisation"
 
 #. Maintained French translation
 msgid "Target processor:"
@@ -1201,13 +1330,13 @@ msgstr "Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso)
 msgid "The %1 must not contain numbers (HelloAsso rule)."
 msgstr "Le %1 ne doit pas contenir de chiffres (règle HelloAsso)."
 
-#: helloasso_payment_processor.php:1033
+#. Maintained French translation
 msgid "The HelloAsso API key health check could not be completed: %1"
-msgstr ""
+msgstr "La vérification de l'état de la clé API HelloAsso n'a pas pu aboutir : %1"
 
-#: helloasso_payment_processor.php:951
+#. Maintained French translation
 msgid "The HelloAsso authorization check could not be completed: %1"
-msgstr ""
+msgstr "La vérification de l'autorisation HelloAsso n'a pas pu aboutir : %1"
 
 #. Maintained French translation
 msgid "The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments."
@@ -1229,9 +1358,13 @@ msgstr "L'identifiant de commande HelloAsso est absent de cette contribution pé
 msgid "The HelloAsso order ID stored on this recurring contribution is invalid."
 msgstr "L'identifiant de commande HelloAsso enregistré sur cette contribution périodique est invalide."
 
-#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:262
+#. Maintained French translation
 msgid "The HelloAsso partner settings form token is invalid. Please reload the page and try again."
-msgstr ""
+msgstr "Le jeton du formulaire de paramètres partenaire HelloAsso est invalide. Veuillez recharger la page et réessayer."
+
+#. Maintained French translation
+msgid "The HelloAsso payment processor is currently unavailable. Please try again later."
+msgstr "Le processeur de paiement HelloAsso est temporairement indisponible. Veuillez réessayer ultérieurement."
 
 msgid "The HelloAsso plan was cancelled, but its local CiviCRM records could not be synchronized: %1"
 msgstr "Le plan HelloAsso a été annulé, mais ses enregistrements CiviCRM locaux n'ont pas pu être synchronisés : %1"
@@ -1256,9 +1389,9 @@ msgstr "La mire est désactivée globalement. Activez-la dans les paramètres He
 msgid "The contribution mapped to this HelloAsso installment no longer exists."
 msgstr "La contribution associée à cette échéance HelloAsso n'existe plus."
 
-#: helloasso_payment_processor.php:921
+#. Maintained French translation
 msgid "The last HelloAsso authorization renewal failed for: %1. The maintenance job will retry; reconnect if the failure continues."
-msgstr ""
+msgstr "Le dernier renouvellement de l'autorisation HelloAsso a échoué pour : %1. La tâche de maintenance réessaiera ; reconnectez-vous si l'échec persiste."
 
 #. Maintained French translation
 msgid "The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists."
@@ -1324,9 +1457,9 @@ msgstr "Impossible de recharger la contribution %1."
 msgid "Unable to update contribution %1."
 msgstr "Impossible de mettre à jour la contribution %1."
 
-#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:209
+#. Maintained French translation
 msgid "Unique HelloassoMetaData ID"
-msgstr ""
+msgstr "ID unique HelloassoMetaData"
 
 #: helloasso_payment_processor.php:1124
 msgid "Unknown authentication failure"
@@ -1344,12 +1477,33 @@ msgstr "Mode de connexion HelloAsso non supporté."
 msgid "Unsupported HelloAsso webhook ownership mode."
 msgstr "Mode de propriété de webhook HelloAsso non supporté."
 
-#: CRM/Core/Payment/HelloAsso.php:977
+#. Maintained French translation
 msgid "Untrusted webhook ignored; no locally expected HelloAsso object identifier."
-msgstr ""
+msgstr "Webhook non approuvé ignoré ; aucun identifiant d'objet HelloAsso localement attendu."
 
+#. Maintained French translation
+msgid "Updated At"
+msgstr "Mis à jour le"
+
+#. Maintained French translation
 msgid "Upgrade Batch (%1 => %2)"
-msgstr ""
+msgstr "Mise à niveau par lot (%1 => %2)"
+
+#. Maintained French translation
+msgid "Webhook Ownership"
+msgstr "Propriété du webhook"
+
+#. Maintained French translation
+msgid "Webhook Signature Key"
+msgstr "Clé de signature du webhook"
+
+#. Maintained French translation
+msgid "Webhook Updated At"
+msgstr "Webhook mis à jour le"
+
+#. Maintained French translation
+msgid "Webhook Url"
+msgstr "URL du webhook"
 
 #. Maintained French translation
 msgid "Webhook management: %1"
@@ -1399,9 +1553,9 @@ msgstr "aucune"
 msgid "payment refused"
 msgstr "paiement refusé"
 
-#: CRM/Core/Payment/HelloAsso.php:156 helloasso_payment_processor.php:1046
+#. Maintained French translation
 msgid "production"
-msgstr ""
+msgstr "production"
 
 #. Maintained French translation
 msgid "refresh refused"
