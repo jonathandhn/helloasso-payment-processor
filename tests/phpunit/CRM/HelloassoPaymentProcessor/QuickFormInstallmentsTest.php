@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_QuickFormInstallmentsTest extends \PHPUnit\Framework\TestCase
 {
     public function testBlankValueKeepsOneTimePaymentFieldsUntouched(): void
@@ -26,8 +28,8 @@ class CRM_HelloassoPaymentProcessor_QuickFormInstallmentsTest extends \PHPUnit\F
     }
 
     /**
-     * @dataProvider invalidInstallmentsProvider
      */
+    #[DataProvider("invalidInstallmentsProvider")]
     public function testRejectsValuesOutsideSupportedRange(mixed $value): void
     {
         $this->expectException(InvalidArgumentException::class);

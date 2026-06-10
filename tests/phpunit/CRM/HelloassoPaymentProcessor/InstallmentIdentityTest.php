@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_InstallmentIdentityTest extends \PHPUnit\Framework\TestCase
 {
     public function testExtractsStableIdentityFromWebhookPayment(): void
@@ -43,8 +45,8 @@ class CRM_HelloassoPaymentProcessor_InstallmentIdentityTest extends \PHPUnit\Fra
     }
 
     /**
-     * @dataProvider incompleteIdentityProvider
      */
+    #[DataProvider("incompleteIdentityProvider")]
     public function testRejectsIncompleteIdentity(array $payment, array $order): void
     {
         $this->assertNull(

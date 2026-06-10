@@ -1,10 +1,12 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_FollowUpScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider scheduleProvider
      */
+    #[DataProvider("scheduleProvider")]
     public function testUsesExpectedSchedule(string $scheme, array $expected): void
     {
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))

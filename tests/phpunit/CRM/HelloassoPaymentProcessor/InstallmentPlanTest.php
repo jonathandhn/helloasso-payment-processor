@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_InstallmentPlanTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildsCheckoutAmountsFromCiviInstallmentAmount(): void
@@ -36,8 +38,8 @@ class CRM_HelloassoPaymentProcessor_InstallmentPlanTest extends \PHPUnit\Framewo
     }
 
     /**
-     * @dataProvider invalidPlanProvider
      */
+    #[DataProvider("invalidPlanProvider")]
     public function testRejectsUnsupportedCiviRecurringProperties(
         int $amount,
         int $installments,

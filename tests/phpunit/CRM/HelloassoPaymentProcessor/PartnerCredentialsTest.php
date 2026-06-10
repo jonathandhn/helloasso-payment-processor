@@ -1,10 +1,12 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_PartnerCredentialsTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider credentialPairProvider
      */
+    #[DataProvider("credentialPairProvider")]
     public function testBuildPlaceholdersAreNotCompleteCredentials(array $credentials, bool $expected): void
     {
         $resolver = new CRM_HelloassoPaymentProcessor_PartnerCredentials();

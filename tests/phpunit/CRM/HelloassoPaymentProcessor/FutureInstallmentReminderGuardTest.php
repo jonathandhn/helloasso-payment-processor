@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuardTest extends \PHPUnit\Framework\TestCase
 {
     public function testRecognizesFuturePendingInstallment(): void
@@ -17,8 +19,8 @@ class CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuardTest extends \
     }
 
     /**
-     * @dataProvider reminderCandidateProvider
      */
+    #[DataProvider("reminderCandidateProvider")]
     public function testAllowsNormalReminderCandidates(array $installment): void
     {
         $this->assertFalse(
