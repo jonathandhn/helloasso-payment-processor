@@ -272,7 +272,18 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
 
     /** @var \CRM_Core_Payment_HelloAsso $processor */
     $processor = $this->getQuickformProcessor($session->isTestMode());
-    $state = $processor->synchronizeContributionForHostedCheckout($session->getContributionId());
+    try {
+      $state = $processor->synchronizeContributionForHostedCheckout($session->getContributionId());
+    }
+    catch (\Throwable $e) {
+      \Civi::log()->warning(sprintf(
+        'HelloAsso hosted checkout return fell back to pending for contribution %d: %s',
+        $session->getContributionId(),
+        $e->getMessage()
+      ));
+      $session->pending();
+      return;
+    }
 
     switch ($state['checkout_status']) {
       case 'success':
