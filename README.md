@@ -370,6 +370,22 @@ type d'intégration sont bienvenues, notamment pour Webform, Services ou
 d'autres parcours métier. Elles doivent rester isolées et documentées, afin
 de ne pas imposer un comportement spécifique aux parcours CiviCRM standards.
 
+## Développement et Tests
+
+L'extension inclut des tests unitaires rapides et des tests d'intégration complets nécessitant une base de données CiviCRM amorcée (boot complet).
+
+**Exécuter les tests unitaires :**
+```bash
+phpunit -c phpunit.xml.dist
+```
+
+**Exécuter les tests d'intégration :**
+```bash
+phpunit -c phpunit-integration.xml
+```
+
+Les tests d'intégration manipulent la base de données réelle (transactions isolées par `CRM_Core_Transaction`). N'utilisez pas l'environnement de production pour lancer ces tests.
+
 ## Crédits
 
 L'extension originale a été initiée par civiuser (Sidney) et Pierre Morvan :
