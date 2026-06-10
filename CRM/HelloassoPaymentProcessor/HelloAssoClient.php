@@ -251,7 +251,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         $baseUrl = rtrim($paymentProcessor['url_site'], '/');
         $oauthUrl = $baseUrl . '/oauth2/token';
-        $token = $this->getToken($is_test, $paymentProcessor, $oauthUrl, $paymentProcessor['user_name'], $paymentProcessor['password']);
+        $token = $this->getToken($is_test, $paymentProcessor, $oauthUrl, (string) ($paymentProcessor['user_name'] ?? ''), (string) ($paymentProcessor['password'] ?? ''));
 
         $requestOptions = $options + [
             'headers' => [],
