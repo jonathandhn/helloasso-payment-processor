@@ -53,10 +53,15 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
   }
 
   public function getAfformSettings(bool $testMode): array {
-    return [
+    $settings = [
       'description' => E::ts('You will be redirected to HelloAsso to complete your payment.'),
-      'template' => '~/crmHelloassoPaymentProcessor/installments.html',
     ];
+
+    if (\helloasso_payment_processor_supports_afform_installments()) {
+      $settings['template'] = '~/crmHelloassoPaymentProcessor/installments.html';
+    }
+
+    return $settings;
   }
 
   public function getAfformModule(): ?string {
@@ -78,6 +83,15 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
         'schedule_total_amount' => $prepared['schedule_total_amount'],
       ]);
     }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      if ($prepared['created_recur_id']) {
+        $this->rollbackPreparedContributionRecur(
+          $session->getContributionId(),
+          $prepared['created_recur_id']
+        );
+      }
+      throw new \CRM_Core_Exception($e->getMessage());
+    }
     catch (\Throwable $e) {
       if ($prepared['created_recur_id']) {
         $this->rollbackPreparedContributionRecur(
@@ -85,7 +99,7 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
           $prepared['created_recur_id']
         );
       }
-      throw new \CRM_Core_Exception(E::ts("HelloAsso is currently unavailable. Please try again later."));
+      throw new \CRM_Core_Exception(E::ts("The HelloAsso payment processor is currently unavailable. Please try again later."));
     }
 
     $session->setResponseItem('redirect', $redirectUrl);
@@ -95,6 +109,10 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
    * @return array{schedule_total_amount:?float, created_recur_id:?int}
    */
   private function prepareContributionRecur(CheckoutSession $session): array {
+    if (!\helloasso_payment_processor_supports_afform_installments()) {
+      return $this->preparedRecurResult();
+    }
+
     if ($session->getCheckoutParam('helloasso_installments_enabled') !== TRUE) {
       return $this->preparedRecurResult();
     }

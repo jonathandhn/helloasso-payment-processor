@@ -223,14 +223,9 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   private function request(string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array {
     $link = $this->getUsableLink();
 
-    $requestOptions = $options + [
+    $requestOptions = CRM_HelloassoPaymentProcessor_RequestOptions::defaults($options + [
       'headers' => [],
-      'http_errors' => FALSE,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
-    ];
+    ]);
     $requestOptions['headers']['Authorization'] = 'Bearer ' . $link['access_token'];
 
     $response = $this->getGuzzleClient()->request($method, $this->getApiBaseUrl() . $path, $requestOptions);
@@ -352,17 +347,12 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   private function requestToken(array $formParams, bool $isRefreshRequest = FALSE): array {
     $this->assertSslVerificationEnabled();
 
-    $response = $this->getGuzzleClient()->request('POST', $this->getTokenUrl(), [
+    $response = $this->getGuzzleClient()->request('POST', $this->getTokenUrl(), CRM_HelloassoPaymentProcessor_RequestOptions::defaults([
       'form_params' => $formParams,
       'headers' => [
         'content-type' => 'application/x-www-form-urlencoded',
       ],
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
-      'http_errors' => FALSE,
-    ]);
+    ]));
 
     $statusCode = $response->getStatusCode();
     $body = (string) $response->getBody();

@@ -7,12 +7,17 @@
     templateUrl: '~/crmHelloassoPaymentProcessor/installmentsField.html',
     controller: function($scope) {
       const ts = $scope.ts = CRM.ts('helloasso-payment-processor');
+      const config = CRM.vars.helloassoAfform || {};
 
       this.$onInit = () => {
+        this.supportsInstallments = config.supportsInstallments !== false;
         const defn = this.field.defn || {};
         this.enabled = defn.helloasso_installments_enabled === true
           || defn.helloasso_installments_enabled === 1
           || defn.helloasso_installments_enabled === '1';
+        if (!this.supportsInstallments) {
+          this.enabled = false;
+        }
         this.minimum = clamp(defn.helloasso_installments_min, 2, 12, 2);
         this.maximum = clamp(defn.helloasso_installments_max, this.minimum, 12, 12);
         this.options = [
@@ -80,6 +85,7 @@
     templateUrl: '~/crmHelloassoPaymentProcessor/checkoutBlockAdminSettings.html',
     controller: function($scope) {
       $scope.ts = CRM.ts('helloasso-payment-processor');
+      this.supportsInstallments = (CRM.vars.helloassoAfform || {}).supportsInstallments !== false;
     }
   });
 })(angular);
