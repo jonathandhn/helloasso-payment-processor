@@ -194,15 +194,15 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
       if (($link['refresh_status'] ?? '') === 'reconnect_required') {
         $httpStatus = !empty($link['last_refresh_http_status']) ? ' HTTP ' . (int) $link['last_refresh_http_status'] : '';
         $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
-        $html .= '<p class="status warning">' . E::ts("The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+        $html .= '<p class="status warning">' . E::ts("The HelloAsso authorization link on this rail can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
       }
       elseif (($link['refresh_status'] ?? '') === 'organization_blocked') {
         $httpStatus = !empty($link['last_refresh_http_status']) ? ' HTTP ' . (int) $link['last_refresh_http_status'] : '';
         $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
-        $html .= '<p class="status warning">' . E::ts("The linked HelloAsso organization is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+        $html .= '<p class="status warning">' . E::ts("The HelloAsso organization linked on this rail is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
       }
       elseif (($link['refresh_status'] ?? '') === 'refresh_failed') {
-        $html .= '<p class="status warning">' . E::ts("The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
+        $html .= '<p class="status warning">' . E::ts("The latest HelloAsso authorization-link renewal failed on this rail. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
       }
       if ($linkedAtLabel !== '') {
         $html .= '<p>' . E::ts('Linked on: %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
