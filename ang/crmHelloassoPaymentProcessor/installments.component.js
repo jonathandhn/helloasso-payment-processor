@@ -49,19 +49,8 @@
           this.checkout.checkout_params.helloasso_installments = '';
         }
 
-        this.checkout.checkout_params.is_recur = Boolean(this.checkout.checkout_params.is_recur)
-          || this.checkout.checkout_params.helloasso_installments !== '';
-      };
-
-      this.onRecurChange = () => {
-        if (this.checkout.checkout_params.is_recur) {
-          if (!this.checkout.checkout_params.helloasso_installments) {
-            this.checkout.checkout_params.helloasso_installments = String(this.minimum);
-          }
-          return;
-        }
-
-        this.checkout.checkout_params.helloasso_installments = '';
+        this.checkout.checkout_params.is_recur =
+          this.checkout.checkout_params.helloasso_installments !== '';
       };
 
       this.onInstallmentsChange = () => {
