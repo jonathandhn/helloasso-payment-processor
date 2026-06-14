@@ -45,7 +45,14 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return self::$instance;
     }
 
-    public function getToken(bool $is_test, array $paymentProcessor, string $oauthUrl, string $clientId, string $clientSecret): object
+    public function getToken(
+        bool $is_test,
+        array $paymentProcessor,
+        string $oauthUrl,
+        string $clientId,
+        string $clientSecret,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): object
     {
         if (Civi::cache('long')->has($this->getCacheKey($is_test, $paymentProcessor))
             && !$this->isAccessTokenExpired($is_test, $paymentProcessor)) {
@@ -63,15 +70,15 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         try {
             if (!Civi::cache('long')->has($this->getCacheKey($is_test, $paymentProcessor))) {
-                $this->accessToken($is_test, $paymentProcessor, $oauthUrl, $clientId, $clientSecret);
+                $this->accessToken($is_test, $paymentProcessor, $oauthUrl, $clientId, $clientSecret, $requestProfile);
             }
             elseif ($this->isAccessTokenExpired($is_test, $paymentProcessor)) {
                 $cachedToken = Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
                 if (!empty($cachedToken->refresh_token)) {
-                    $this->refreshToken($is_test, $paymentProcessor, $oauthUrl);
+                    $this->refreshToken($is_test, $paymentProcessor, $oauthUrl, $requestProfile);
                 }
                 else {
-                    $this->accessToken($is_test, $paymentProcessor, $oauthUrl, $clientId, $clientSecret);
+                    $this->accessToken($is_test, $paymentProcessor, $oauthUrl, $clientId, $clientSecret, $requestProfile);
                 }
             }
         }
@@ -101,7 +108,14 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    private function accessToken(bool $is_test, array $paymentProcessor, string $oauthUrl, string $clientId, string $clientSecret): void
+    private function accessToken(
+        bool $is_test,
+        array $paymentProcessor,
+        string $oauthUrl,
+        string $clientId,
+        string $clientSecret,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): void
     {
         $this->assertSslVerificationEnabled($is_test);
 
@@ -111,7 +125,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret
             ],
-        ]));
+        ], $requestProfile));
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
@@ -122,7 +136,12 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         Civi::cache('long')->set($this->getCacheKey($is_test, $paymentProcessor), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
     }
 
-    private function refreshToken(bool $is_test, array $paymentProcessor, string $oauthUrl): void
+    private function refreshToken(
+        bool $is_test,
+        array $paymentProcessor,
+        string $oauthUrl,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): void
     {
         $this->assertSslVerificationEnabled($is_test);
 
@@ -131,7 +150,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
                 'grant_type' => 'refresh_token',
                 'refresh_token' => Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor))->refresh_token
             ],
-        ]));
+        ], $requestProfile));
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
@@ -142,51 +161,86 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         Civi::cache('long')->set($this->getCacheKey($is_test, $paymentProcessor), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
     }
 
-    public function createCheckoutIntent(array $paymentProcessor, bool $isTest, array $request): array
+    public function createCheckoutIntent(
+        array $paymentProcessor,
+        bool $isTest,
+        array $request,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
             $isTest,
             'POST',
             '/v5/organizations/' . $this->getOrganizationSlug($paymentProcessor, $isTest) . '/checkout-intents',
-            ['json' => $request]
+            ['json' => $request],
+            TRUE,
+            $requestProfile
         );
     }
 
-    public function getCheckoutIntent(array $paymentProcessor, bool $isTest, int $checkoutIntentId, array $query = []): array
+    public function getCheckoutIntent(
+        array $paymentProcessor,
+        bool $isTest,
+        int $checkoutIntentId,
+        array $query = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
             $isTest,
             'GET',
             '/v5/organizations/' . $this->getOrganizationSlug($paymentProcessor, $isTest) . '/checkout-intents/' . $checkoutIntentId,
-            ['query' => $query]
+            ['query' => $query],
+            TRUE,
+            $requestProfile
         );
     }
 
-    public function getPayment(array $paymentProcessor, bool $isTest, int $paymentId, array $query = []): array
+    public function getPayment(
+        array $paymentProcessor,
+        bool $isTest,
+        int $paymentId,
+        array $query = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
             $isTest,
             'GET',
             '/v5/payments/' . $paymentId,
-            ['query' => $query]
+            ['query' => $query],
+            TRUE,
+            $requestProfile
         );
     }
 
-    public function listOrganizationPayments(array $paymentProcessor, bool $isTest, array $query = []): array
+    public function listOrganizationPayments(
+        array $paymentProcessor,
+        bool $isTest,
+        array $query = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
             $isTest,
             'GET',
             '/v5/organizations/' . $this->getOrganizationSlug($paymentProcessor, $isTest) . '/payments',
-            ['query' => $query]
+            ['query' => $query],
+            TRUE,
+            $requestProfile
         );
     }
 
-    public function refundPayment(array $paymentProcessor, bool $isTest, int $paymentId): array
+    public function refundPayment(
+        array $paymentProcessor,
+        bool $isTest,
+        int $paymentId,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         if (!(bool) Civi::settings()->get('helloasso_enable_refunds')) {
             throw new PaymentProcessorException(E::ts('HelloAsso refunds are disabled by this extension.'));
@@ -196,11 +250,19 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             $paymentProcessor,
             $isTest,
             'POST',
-            '/v5/payments/' . $paymentId . '/refund'
+            '/v5/payments/' . $paymentId . '/refund',
+            [],
+            TRUE,
+            $requestProfile
         );
     }
 
-    public function cancelOrder(array $paymentProcessor, bool $isTest, int $orderId): array
+    public function cancelOrder(
+        array $paymentProcessor,
+        bool $isTest,
+        int $orderId,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
         $authConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
@@ -227,25 +289,43 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             $paymentProcessor,
             $isTest,
             'POST',
-            '/v5/orders/' . $orderId . '/cancel'
+            '/v5/orders/' . $orderId . '/cancel',
+            [],
+            TRUE,
+            $requestProfile
         );
     }
 
-    private function requestHelloAsso(array $paymentProcessor, bool $is_test, string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array
+    private function requestHelloAsso(
+        array $paymentProcessor,
+        bool $is_test,
+        string $method,
+        string $path,
+        array $options = [],
+        bool $retryOnUnauthorized = TRUE,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         $this->assertSslVerificationEnabled($is_test);
 
         if ($this->shouldUsePluginPublic($paymentProcessor, $is_test)) {
-            return $this->requestHelloAssoViaPluginPublic($paymentProcessor, $method, $path, $options);
+            return $this->requestHelloAssoViaPluginPublic($paymentProcessor, $method, $path, $options, $requestProfile);
         }
 
         $baseUrl = rtrim($paymentProcessor['url_site'], '/');
         $oauthUrl = $baseUrl . '/oauth2/token';
-        $token = $this->getToken($is_test, $paymentProcessor, $oauthUrl, (string) ($paymentProcessor['user_name'] ?? ''), (string) ($paymentProcessor['password'] ?? ''));
+        $token = $this->getToken(
+            $is_test,
+            $paymentProcessor,
+            $oauthUrl,
+            (string) ($paymentProcessor['user_name'] ?? ''),
+            (string) ($paymentProcessor['password'] ?? ''),
+            $requestProfile
+        );
 
         $requestOptions = CRM_HelloassoPaymentProcessor_RequestOptions::defaults($options + [
             'headers' => [],
-        ]);
+        ], $requestProfile);
         $requestOptions['headers']['Authorization'] = 'Bearer ' . $token->access_token;
 
         $response = $this->getGuzzleClient()->request($method, $baseUrl . $path, $requestOptions);
@@ -255,7 +335,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         if ($statusCode === 401 && $retryOnUnauthorized) {
             $this->invalidateToken($is_test, $paymentProcessor);
-            return $this->requestHelloAsso($paymentProcessor, $is_test, $method, $path, $options, FALSE);
+            return $this->requestHelloAsso($paymentProcessor, $is_test, $method, $path, $options, FALSE, $requestProfile);
         }
 
         if ($statusCode < 200 || $statusCode >= 300) {
@@ -304,14 +384,21 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return E::ts('HelloAsso payment is temporarily unavailable: the linked organization is not currently allowed by HelloAsso to receive online payments.');
     }
 
-    private function requestHelloAssoViaPluginPublic(array $paymentProcessor, string $method, string $path, array $options = []): array
+    private function requestHelloAssoViaPluginPublic(
+        array $paymentProcessor,
+        string $method,
+        string $path,
+        array $options = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
         if (!$paymentProcessorId) {
             throw new PaymentProcessorException(E::ts('HelloAsso plugin-public mode requires a saved payment processor ID.'));
         }
 
-        return (new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId))->requestApi($method, $path, $options);
+        return (new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId))
+            ->requestApi($method, $path, $options, $requestProfile);
     }
 
     private function buildApiErrorMessage(mixed $decoded, int $statusCode): string

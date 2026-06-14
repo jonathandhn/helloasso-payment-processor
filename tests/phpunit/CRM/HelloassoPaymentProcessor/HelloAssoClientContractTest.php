@@ -3,6 +3,7 @@
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Civi\Payment\Exception\PaymentProcessorException;
 
@@ -15,6 +16,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_Hell
 {
     private CRM_HelloassoPaymentProcessor_HelloAssoClient $client;
     private MockHandler $mockHandler;
+    private array $history = [];
 
     public function setUp(): void
     {
@@ -24,6 +26,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_Hell
 
         $this->mockHandler = new MockHandler();
         $handlerStack = HandlerStack::create($this->mockHandler);
+        $handlerStack->push(Middleware::history($this->history));
         $guzzleClient = new Client(['handler' => $handlerStack]);
 
         $this->client = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance();
@@ -119,5 +122,45 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_Hell
         $request = $this->mockHandler->getLastRequest();
         $this->assertNotNull($request);
         $this->assertSame('pageIndex=2&pageSize=50', $request->getUri()->getQuery());
+    }
+
+    public function testBrowserReturnProfileUsesShortTimeoutBudget(): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['access_token' => 'token123', 'expires_in' => 3600]))
+        );
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['id' => 12345]))
+        );
+
+        $this->client->getCheckoutIntent(
+            $this->getDummyProcessor(),
+            true,
+            12345,
+            [],
+            CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_BROWSER_RETURN
+        );
+
+        $this->assertCount(2, $this->history);
+        $apiRequestOptions = $this->history[1]['options'];
+        $this->assertSame(2.0, $apiRequestOptions['connect_timeout']);
+        $this->assertSame(5.0, $apiRequestOptions['timeout']);
+    }
+
+    public function testDefaultProfileKeepsStandardTimeoutBudget(): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['access_token' => 'token123', 'expires_in' => 3600]))
+        );
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['id' => 12345]))
+        );
+
+        $this->client->getCheckoutIntent($this->getDummyProcessor(), true, 12345);
+
+        $this->assertCount(2, $this->history);
+        $apiRequestOptions = $this->history[1]['options'];
+        $this->assertSame(5.0, $apiRequestOptions['connect_timeout']);
+        $this->assertSame(20.0, $apiRequestOptions['timeout']);
     }
 }

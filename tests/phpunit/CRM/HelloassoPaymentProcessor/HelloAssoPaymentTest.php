@@ -31,7 +31,11 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
 
             public array $capturedFilters = [];
 
-            public function synchronizePendingContributions(int $limit = 30, array $filters = []): array
+            public function synchronizePendingContributions(
+                int $limit = 30,
+                array $filters = [],
+                string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+            ): array
             {
                 $this->capturedLimit = $limit;
                 $this->capturedFilters = $filters;
@@ -54,5 +58,30 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
         $this->assertFalse($processor->capturedFilters['only_scheduled']);
         $this->assertTrue($processor->capturedFilters['allow_recent_scan']);
         $this->assertSame(['checked' => 1, 'updated' => 0, 'errors' => []], $result);
+    }
+
+    public function testAllocateAmountCentsByWeightPreservesTargetAmount(): void
+    {
+        $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
+            ->newInstanceWithoutConstructor();
+        $method = new ReflectionMethod($processor, 'allocateAmountCentsByWeight');
+        $method->setAccessible(TRUE);
+
+        $allocated = $method->invoke($processor, 500, [700, 300]);
+
+        $this->assertSame([350, 150], $allocated);
+        $this->assertSame(500, array_sum($allocated));
+    }
+
+    public function testAllocateAmountCentsByWeightFallsBackToFirstSlotWhenWeightsAreZero(): void
+    {
+        $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
+            ->newInstanceWithoutConstructor();
+        $method = new ReflectionMethod($processor, 'allocateAmountCentsByWeight');
+        $method->setAccessible(TRUE);
+
+        $allocated = $method->invoke($processor, 500, [0, 0, 0]);
+
+        $this->assertSame([500, 0, 0], $allocated);
     }
 }
