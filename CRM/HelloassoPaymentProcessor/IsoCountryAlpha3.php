@@ -254,13 +254,13 @@ class CRM_HelloassoPaymentProcessor_IsoCountryAlpha3
         'AX' => 'ALA'
     ];
 
-    private static $instance = null;
+    private static ?CRM_HelloassoPaymentProcessor_IsoCountryAlpha3 $instance = null;
 
     private function __construct()
     {
     }
 
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();
@@ -273,7 +273,7 @@ class CRM_HelloassoPaymentProcessor_IsoCountryAlpha3
         return isset(self::COUNTRY_ALPHA2_TO_ALPHA3[$type]);
     }
 
-    public function get(string $type): string
+    public function get(string $type): ?string
     {
         return $this->support($type) ? self::COUNTRY_ALPHA2_TO_ALPHA3[$type] : NULL;
     }
