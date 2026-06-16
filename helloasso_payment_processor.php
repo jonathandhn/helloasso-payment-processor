@@ -485,9 +485,9 @@ function helloasso_payment_processor_get_authorize_button_html(string $href, str
   $visibleLabel = htmlspecialchars(E::ts('Connect to HelloAsso'), ENT_QUOTES, 'UTF-8');
 
   return helloasso_payment_processor_get_authorize_button_css()
-    . '<a class="helloasso-authorize-button" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '" title="' . $escapedLabel . '">'
-    . '<span class="helloasso-authorize-button-logo-wrap"><img src="' . $imageUrl . '" alt="" class="helloasso-authorize-button-image"></span>'
-    . '<span class="helloasso-authorize-button-label" aria-hidden="true">' . $visibleLabel . '</span>'
+    . '<a class="helloasso-authorize-button HaAuthorizeButton" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '" title="' . $escapedLabel . '">'
+    . '<span class="HaAuthorizeButtonLogoWrap" aria-hidden="true"><img src="' . $imageUrl . '" alt="" class="HaAuthorizeButtonLogo"></span>'
+    . '<span class="HaAuthorizeButtonTitle" aria-hidden="true">' . $visibleLabel . '</span>'
     . '<span class="helloasso-authorize-button-sr">' . $escapedLabel . '</span></a>';
 }
 
@@ -500,13 +500,6 @@ function helloasso_payment_processor_get_authorize_button_css(): string {
 
   return '<style>
 .helloasso-authorize-button {
-align-items: stretch;
-background: #fff;
-border: 1px solid #4B3FCF;
-border-radius: 2px;
-display: inline-flex;
-line-height: 1;
-max-width: 100%;
 text-decoration: none;
 }
 .helloasso-authorize-button:hover,
@@ -514,32 +507,38 @@ text-decoration: none;
 .helloasso-authorize-button:active {
 text-decoration: none;
 }
-.helloasso-authorize-button:focus {
+.HaAuthorizeButton {
+align-items: center;
+background-color: #FFFFFF;
+border: 0.0625rem solid #4B3FCF;
+border-radius: 0.125rem;
+display: inline-flex;
+padding: 0;
+}
+.HaAuthorizeButton:focus {
 box-shadow: 0 0 0 0.25rem rgba(73, 211, 138, 0.25);
 outline: none;
 }
-.helloasso-authorize-button-logo-wrap {
+.HaAuthorizeButtonLogoWrap {
 align-items: center;
-background: #fff;
+background-color: #FFFFFF;
 display: inline-flex;
 justify-content: center;
-min-height: 46px;
-padding: 0 12px;
+padding: 0 0.8rem;
 }
-.helloasso-authorize-button-image {
+.HaAuthorizeButtonLogo {
 display: block;
-height: auto;
-width: 12px;
+width: 2.25rem;
 }
-.helloasso-authorize-button-label {
+.HaAuthorizeButtonTitle {
 align-items: center;
-background: #4B3FCF;
-color: #fff;
+background-color: #4B3FCF;
+color: #FFFFFF;
 display: inline-flex;
-font-size: 16px;
+font-size: 1rem;
 font-weight: 700;
-min-height: 46px;
-padding: 0 18px;
+line-height: 1;
+padding: 0.78125rem 1.5rem;
 white-space: nowrap;
 }
 .helloasso-authorize-button-sr {
