@@ -474,21 +474,60 @@ function helloasso_payment_processor_get_helloasso_settings_url(): string {
   );
 }
 
-function helloasso_payment_processor_get_authorize_button_image_url(): string {
-  return CRM_Core_Resources::singleton()->getUrl(
-    'helloasso-payment-processor',
-    'img/helloasso-authorize-button.png',
-    TRUE
-  );
-}
-
 function helloasso_payment_processor_get_authorize_button_html(string $href, string $label): string {
-  $imageUrl = htmlspecialchars(helloasso_payment_processor_get_authorize_button_image_url(), ENT_QUOTES, 'UTF-8');
   $escapedHref = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
   $escapedLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+  $logoUrl = htmlspecialchars('https://api.helloasso.com/v5/img/logo-ha.svg', ENT_QUOTES, 'UTF-8');
 
-  return '<a class="helloasso-authorize-button" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '">'
-    . '<img src="' . $imageUrl . '" alt="' . $escapedLabel . '" style="max-width: 280px; height: auto;"></a>';
+  return helloasso_payment_processor_get_authorize_button_css()
+    . '<a class="helloasso-authorize-button HaAuthorizeButton" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '">'
+    . '<img src="' . $logoUrl . '" alt="" class="HaAuthorizeButtonLogo">'
+    . '<span class="HaAuthorizeButtonTitle">' . $escapedLabel . '</span></a>';
+}
+
+function helloasso_payment_processor_get_authorize_button_css(): string {
+  static $printed = FALSE;
+  if ($printed) {
+    return '';
+  }
+  $printed = TRUE;
+
+  return '<style>
+.HaAuthorizeButton {
+align-items: center;
+background-color: #FFFFFF;
+border: 0.0625rem solid #4B3FCF;
+border-radius: 0.125rem;
+box-sizing: border-box;
+display: inline-flex;
+max-width: 280px;
+padding: 0;
+text-decoration: none;
+}
+.HaAuthorizeButton:hover,
+.HaAuthorizeButton:focus,
+.HaAuthorizeButton:active {
+text-decoration: none;
+}
+.HaAuthorizeButton:focus {
+box-shadow: 0 0 0 0.25rem rgba(73, 211, 138, 0.25);
+outline: none;
+}
+.HaAuthorizeButtonLogo {
+display: block;
+padding: 0 0.8rem;
+width: 2.25rem;
+}
+.HaAuthorizeButtonTitle {
+background-color: #4B3FCF;
+color: #FFFFFF;
+font-size: 1rem;
+font-weight: 700;
+line-height: 1.2;
+padding: 0.78125rem 1.5rem;
+white-space: nowrap;
+}
+</style>';
 }
 
 function helloasso_payment_processor_get_partner_required_notice(): string {

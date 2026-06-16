@@ -31,6 +31,8 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
 
             public array $capturedFilters = [];
 
+            public string $capturedRequestProfile = '';
+
             public function synchronizePendingContributions(
                 int $limit = 30,
                 array $filters = [],
@@ -39,6 +41,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
             {
                 $this->capturedLimit = $limit;
                 $this->capturedFilters = $filters;
+                $this->capturedRequestProfile = $requestProfile;
 
                 return ['checked' => 1, 'updated' => 0, 'errors' => []];
             }
@@ -50,6 +53,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
             'status_names' => 'Pending',
             'only_scheduled' => FALSE,
             'allow_recent_scan' => TRUE,
+            'request_profile' => CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_BROWSER_RETURN,
         ]);
 
         $this->assertSame(7, $processor->capturedLimit);
@@ -57,6 +61,10 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
         $this->assertSame(['Pending'], $processor->capturedFilters['status_names']);
         $this->assertFalse($processor->capturedFilters['only_scheduled']);
         $this->assertTrue($processor->capturedFilters['allow_recent_scan']);
+        $this->assertSame(
+            CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_BROWSER_RETURN,
+            $processor->capturedRequestProfile
+        );
         $this->assertSame(['checked' => 1, 'updated' => 0, 'errors' => []], $result);
     }
 
