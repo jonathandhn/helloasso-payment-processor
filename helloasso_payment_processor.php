@@ -482,10 +482,12 @@ function helloasso_payment_processor_get_authorize_button_html(string $href, str
   $escapedHref = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
   $escapedLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
   $imageUrl = htmlspecialchars(helloasso_payment_processor_get_authorize_button_image_url(), ENT_QUOTES, 'UTF-8');
+  $visibleLabel = htmlspecialchars(E::ts('Connect to HelloAsso'), ENT_QUOTES, 'UTF-8');
 
   return helloasso_payment_processor_get_authorize_button_css()
     . '<a class="helloasso-authorize-button" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '" title="' . $escapedLabel . '">'
-    . '<img src="' . $imageUrl . '" alt="" class="helloasso-authorize-button-image">'
+    . '<span class="helloasso-authorize-button-logo-wrap"><img src="' . $imageUrl . '" alt="" class="helloasso-authorize-button-image"></span>'
+    . '<span class="helloasso-authorize-button-label" aria-hidden="true">' . $visibleLabel . '</span>'
     . '<span class="helloasso-authorize-button-sr">' . $escapedLabel . '</span></a>';
 }
 
@@ -498,8 +500,13 @@ function helloasso_payment_processor_get_authorize_button_css(): string {
 
   return '<style>
 .helloasso-authorize-button {
-display: inline-block;
-line-height: 0;
+align-items: stretch;
+background: #fff;
+border: 1px solid #4B3FCF;
+border-radius: 2px;
+display: inline-flex;
+line-height: 1;
+max-width: 100%;
 text-decoration: none;
 }
 .helloasso-authorize-button:hover,
@@ -511,10 +518,29 @@ text-decoration: none;
 box-shadow: 0 0 0 0.25rem rgba(73, 211, 138, 0.25);
 outline: none;
 }
+.helloasso-authorize-button-logo-wrap {
+align-items: center;
+background: #fff;
+display: inline-flex;
+justify-content: center;
+min-height: 46px;
+padding: 0 12px;
+}
 .helloasso-authorize-button-image {
 display: block;
 height: auto;
-max-width: 280px;
+width: 12px;
+}
+.helloasso-authorize-button-label {
+align-items: center;
+background: #4B3FCF;
+color: #fff;
+display: inline-flex;
+font-size: 16px;
+font-weight: 700;
+min-height: 46px;
+padding: 0 18px;
+white-space: nowrap;
 }
 .helloasso-authorize-button-sr {
 border: 0;
