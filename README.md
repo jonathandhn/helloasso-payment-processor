@@ -57,6 +57,9 @@ ligne dédié à HelloAsso peut le sélectionner ; les configurations existantes
 sont pas remplacées automatiquement lorsqu'un autre moyen de paiement est déjà
 configuré.
 
+Un moyen de paiement `HelloAsso` est aussi créé lors de la mise à niveau afin
+de faciliter les rapprochements comptables.
+
 ## Connexion Par Clé API
 
 La clé API classique est le mode conservateur pour une passerelle déjà en
@@ -99,12 +102,18 @@ Pour utiliser la mire :
 6. Vérifier l'organisation liée, l'URL webhook enregistrée et la présence de
    la clé de signature webhook.
 
+Après une connexion mire réussie, le processeur concerné bascule sur ce mode,
+en sandbox comme en production. Les identifiants classiques stockés sur ce
+processeur sont alors vidés automatiquement afin que le rail connecté utilise
+bien la mire comme source de vérité.
+
 Les identifiants mire sandbox et production sont distincts. Ils ne doivent ni
 être intervertis, ni être versionnés dans un dépôt public.
 
-La connexion d'une organisation par la mire ne bascule pas silencieusement un
-processeur live configuré par clé API. Le mode de connexion du processeur doit
-être sélectionné explicitement.
+La connexion d'une organisation par la mire bascule automatiquement le
+processeur concerné sur ce mode, en live comme en sandbox. Les identifiants
+classiques présents sur ce processeur sont supprimés au moment de la
+connexion réussie.
 
 Une même organisation sandbox peut légitimement diffuser ses webhooks vers
 plusieurs instances CiviCRM, par exemple via un relais de test. En revanche,
@@ -261,6 +270,12 @@ Certains réglages techniques restent déclarés pour permettre une surcharge pa
 configuration ou API, mais ne sont pas exposés dans l'interface afin d'éviter
 de désactiver accidentellement des protections de base.
 
+Quand un changement de réglage ou de feature flag ne semble pas se refléter
+dans l'interface, commencer par vider les caches CiviCRM avec `cv flush`. Selon
+les instances, `cv` peut ne pas reconstruire immédiatement toute l'interface ;
+si une entrée de menu ou un écran de configuration manque encore, utiliser aussi
+**Administrer > Paramètres système > Vider les caches**.
+
 | Setting | Défaut | Exposé dans l'UI | Rôle |
 | --- | ---: | --- | --- |
 | `helloasso_v2_standard_frontend_bridge` | Activé | Non | Active le pont frontend `CRM.payment` / `mjwshared` utilisé par les formulaires classiques et Webform. |
@@ -270,7 +285,7 @@ de désactiver accidentellement des protections de base.
 | `helloasso_v2_afform_checkout` | Activé | Oui, page globale | Expose la Checkout Option HelloAsso pour Afform / Form Builder. |
 | `helloasso_enable_refunds` | Désactivé | Oui, page globale | Autorise les remboursements complets HelloAsso depuis l'écran de remboursement CiviCRM. Nécessite le mode mire HelloAsso. |
 | `helloasso_enable_installments` | Désactivé | Oui, page globale | Autorise les échéanciers mensuels finis de 2 à 12 paiements dans Afform, Webform et les formulaires de contribution classiques. Dans QuickForm, laisser le champ vide conserve un paiement unique. |
-| `helloasso_quickform_redirect_message` | « Vous serez redirigé… » | Oui, page globale | Message affiché sur les formulaires classiques de contribution et d'inscription à un événement, uniquement lorsque HelloAsso est sélectionné. |
+| `helloasso_quickform_redirect_message` | « Vous serez redirigé… » | Oui, page globale | Message affiché sur les formulaires classiques de contribution et d'inscription à un événement, uniquement lorsque HelloAsso est sélectionné. Ce réglage apparaît dans l'interface en français comme `Message de redirection HelloAsso sur les formulaires standards`. |
 | `helloasso_enable_sepa` | Activé | Oui, page globale | Demande à HelloAsso de proposer le prélèvement SEPA sur les checkouts simples et avec échéances. L'affichage dépend de l'éligibilité et du réglage de l'association chez HelloAsso. |
 | `helloasso_v2_cron_limit` | `15` | Oui, page globale | Limite le nombre de contributions traitées par processeur lors des jobs de maintenance. |
 | `helloasso_v2_require_webhook_signature` | Désactivé | Oui, page globale | Rejette les webhooks legacy dont la signature `invoiceID` / `sig` est absente ou invalide. |
@@ -316,6 +331,36 @@ API publique. Une régularisation réussie réactive le cycle du plan. À J+30,
 une échéance toujours refusée est marquée localement `RecoveryExpired` et le
 plan passe en échec.
 
+## Notes Pratiques D'Utilisation
+
+- HelloAsso attend des paiements en euro. Les formulaires et contributions
+  envoyés au checkout doivent donc être en `EUR`.
+- Si un menu, un écran ou un réglage HelloAsso n'apparaît pas après activation
+  de l'extension ou modification d'un feature flag, vider d'abord les caches
+  CiviCRM avec `cv flush`, puis au besoin via **Administrer > Paramètres
+  système > Vider les caches**.
+- Dans Afform, après avoir ajouté HelloAsso comme mode de paiement sur un
+  formulaire, enregistrer une première fois le formulaire avant de revenir dans
+  son interface d'administration. Les paramètres supplémentaires, notamment
+  ceux des échéanciers, apparaissent au second passage.
+- Dans Afform, le contributeur HelloAsso est le contact défini dans l'onglet
+  **Contribution**, pas celui de l'onglet **Contact**. C'est donc ce contact
+  qui est envoyé à HelloAsso et contrôlé par les règles de validation sur le
+  prénom, le nom et l'adresse e-mail.
+- Pour transmettre un nom d'entreprise à HelloAsso, le contact payeur doit
+  être de type **Organisation**. Dans ce cas, l'adresse e-mail par défaut
+  utilisée pour le payeur est le `billing email`.
+- Dans les formulaires QuickForm, les paiements en plusieurs fois exigent une
+  fréquence de `1` mois et l'activation de l'option d'échéancier. L'extension
+  ne surcharge pas l'UI d'administration standard, mais les échéanciers envoyés
+  à HelloAsso restent toujours finis et ne créent pas de paiements perpétuels.
+- Le réglage `Message de redirection HelloAsso sur les formulaires standards`
+  permet d'insérer un texte explicatif sur les pages de paiement QuickForm.
+  L'extension fournit par défaut une version en trois langues. Vous pouvez la
+  remplacer, par exemple pour expliquer le modèle solidaire HelloAsso. Si ce
+  message doit rester multilingue, il faut traduire manuellement le nouveau
+  texte dans **Administrer > Localisation > Traduire les chaînes**.
+
 ## Contributions Et Intégrations Spécifiques
 
 Le processeur doit conserver un coeur générique, mais il a également vocation
@@ -335,6 +380,10 @@ Deux formes d'intégration sont déjà utilisées sur le terrain :
   CiviCRM / HelloAsso, par exemple pour porter un parcours Webform métier tout
   en laissant ce processeur gérer le checkout, les webhooks et la
   réconciliation.
+  Le module Drupal
+  [helloasso_webform_validation](https://www.drupal.org/project/helloasso_webform_validation)
+  s'appuie sur ce point d'intégration pour compléter un parcours Webform et est recommandé,
+  particuliérement pour utiliser le formulaire de paiement dans un iframe.
 
 ### Accès Service En Lecture Seule
 

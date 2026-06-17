@@ -88,16 +88,18 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
 
     if (!empty($stateData['payment_processor_id'])) {
       $paymentProcessorId = (int) $stateData['payment_processor_id'];
-      $this->getProcessorAuthConfig()->storeLink($paymentProcessorId, $link);
+      $processorAuthConfig = $this->getProcessorAuthConfig();
+      $processorAuthConfig->storeLink($paymentProcessorId, $link);
       $this->paymentProcessorId = $paymentProcessorId;
       $this->paymentProcessor = NULL;
-      if ($this->isTestProcessor()) {
-        $this->getProcessorAuthConfig()->clearClassicCredentials($paymentProcessorId);
-      }
-      if ($this->getProcessorAuthConfig()->isWebhookAutoRegistrationEnabled($paymentProcessorId)) {
+      // A successful authorization-screen connection becomes the source of
+      // truth for the connected processor, in sandbox and production alike.
+      $processorAuthConfig->clearClassicCredentials($paymentProcessorId);
+      $processorAuthConfig->setConnectionMode($paymentProcessorId, 'plugin_public');
+      if ($processorAuthConfig->isWebhookAutoRegistrationEnabled($paymentProcessorId)) {
         $webhookUrl = CRM_HelloassoPaymentProcessor_Webhook::getWebhookPath($paymentProcessorId);
         $webhookRegistration = $this->configureOrganizationWebhook($webhookUrl);
-        $this->getProcessorAuthConfig()->storeWebhookRegistration($paymentProcessorId, [
+        $processorAuthConfig->storeWebhookRegistration($paymentProcessorId, [
           'url' => $webhookRegistration['url'] ?? $webhookUrl,
           'signatureKey' => $webhookRegistration['signatureKey'] ?? NULL,
         ]);

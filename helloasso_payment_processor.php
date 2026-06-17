@@ -128,8 +128,15 @@ function helloasso_payment_processor_civicrm_buildForm(string $formName, mixed &
     return;
   }
 
+  if (Civi::settings()->get('helloasso_partner_auth_enabled')) {
+    helloasso_payment_processor_replace_payment_processor_form_rule($form);
+  }
+
   $liveProcessorId = (int) $form->getVar('_id');
   if (!$liveProcessorId) {
+    if (Civi::settings()->get('helloasso_partner_auth_enabled')) {
+      helloasso_payment_processor_inject_payment_processor_creation_notice();
+    }
     return;
   }
 
@@ -141,9 +148,6 @@ function helloasso_payment_processor_civicrm_buildForm(string $formName, mixed &
   if (!$sandboxProcessor) {
     return;
   }
-
-  helloasso_payment_processor_replace_payment_processor_form_rule($form);
-
   $sandboxProcessorId = (int) $sandboxProcessor['id'];
   $liveProcessorConfig = helloasso_payment_processor_get_payment_processor($liveProcessorId) ?? [];
   $processorAuthConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
@@ -424,6 +428,13 @@ function helloasso_payment_processor_payment_processor_form_rule(mixed $fields, 
   }
 
   $normalizedFields = is_array($fields) ? $fields : [];
+  if (helloasso_payment_processor_should_allow_partner_first_save($form)) {
+    foreach (['user_name', 'password', 'test_user_name', 'test_password'] as $fieldName) {
+      if (trim((string) ($normalizedFields[$fieldName] ?? '')) === '') {
+        $normalizedFields[$fieldName] = '__helloasso_partner_first_save__';
+      }
+    }
+  }
   $submittedLiveMode = (string) ($normalizedFields['helloasso_live_connection_mode'] ?? $_POST['helloasso_live_connection_mode'] ?? '');
   $submittedMode = (string) ($normalizedFields['helloasso_test_connection_mode'] ?? $_POST['helloasso_test_connection_mode'] ?? '');
   if ($submittedLiveMode === 'plugin_public') {
@@ -438,6 +449,54 @@ function helloasso_payment_processor_payment_processor_form_rule(mixed $fields, 
   }
 
   return CRM_Admin_Form_PaymentProcessor::formRule($normalizedFields);
+}
+
+function helloasso_payment_processor_should_allow_partner_first_save(CRM_Core_Form $form): bool {
+  if (!Civi::settings()->get('helloasso_partner_auth_enabled')) {
+    return FALSE;
+  }
+
+  if ((int) $form->getVar('_id') > 0) {
+    return FALSE;
+  }
+
+  $paymentProcessorType = $form->getVar('_paymentProcessorDAO');
+  return $paymentProcessorType && $paymentProcessorType->class_name === 'Payment_HelloAsso';
+}
+
+function helloasso_payment_processor_inject_payment_processor_creation_notice(): void {
+  $panel = [];
+  $panel[] = '<div id="helloasso-payment-processor-create-notice" class="messages status no-popup">';
+  $panel[] = '<fieldset><legend>' . E::ts('HelloAsso authorization-screen setup') . '</legend>';
+  $panel[] = '<p>' . E::ts("This HelloAsso processor can be saved a first time without API credentials when the authorization screen is enabled.") . '</p>';
+  $panel[] = '<p class="description">' . E::ts("Enter the processor name, save once, then return to this processor to configure the live and sandbox authorization-screen connections.") . '</p>';
+  $panel[] = '<p class="description"><a href="' . htmlspecialchars(helloasso_payment_processor_get_helloasso_settings_url(), ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open HelloAsso settings') . '</a></p>';
+  $panel[] = '</fieldset></div>';
+  $panelHtml = implode('', $panel);
+
+  Civi::resources()->addScript("
+    CRM.\$(function(\$) {
+      var panelHtml = " . json_encode($panelHtml) . ";
+      var \$panel = \$('#helloasso-payment-processor-create-notice');
+      if (\$panel.length) {
+        \$panel.remove();
+      }
+      var \$submitButtons = \$('.crm-paymentProcessor-form-block .crm-submit-buttons').first();
+      if (\$submitButtons.length) {
+        \$submitButtons.before(panelHtml);
+        return;
+      }
+      var \$targetFieldset = \$('.crm-paymentProcessor-form-block fieldset').last();
+      if (\$targetFieldset.length) {
+        \$targetFieldset.after(panelHtml);
+        return;
+      }
+      var \$container = \$('.crm-paymentProcessor-form-block').first();
+      if (\$container.length) {
+        \$container.prepend(panelHtml);
+      }
+    });
+  ");
 }
 
 function helloasso_payment_processor_get_partner_page_url(string $query): string {

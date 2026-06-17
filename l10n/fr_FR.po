@@ -24,6 +24,22 @@ msgid "%1 monthly installments"
 msgstr "%1 mensualités"
 
 #. Maintained French translation
+msgid "HelloAsso authorization-screen setup"
+msgstr "Configuration de la mire HelloAsso"
+
+#. Maintained French translation
+msgid "This HelloAsso processor can be saved a first time without API credentials when the authorization screen is enabled."
+msgstr "Ce processeur HelloAsso peut être enregistré une première fois sans identifiants API lorsque la mire est activée."
+
+#. Maintained French translation
+msgid "Enter the processor name, save once, then return to this processor to configure the live and sandbox authorization-screen connections."
+msgstr "Saisissez le nom du processeur, enregistrez une première fois, puis revenez sur ce processeur pour configurer les connexions mire live et sandbox."
+
+#. Maintained French translation
+msgid "Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments handled by HelloAsso."
+msgstr "Payez en une fois ou répartissez ce paiement selon un échéancier fixe de 2 à 12 mensualités géré par HelloAsso."
+
+#. Maintained French translation
 msgid "A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1"
 msgstr "Une liaison d'autorisation HelloAsso n'a pas pu être renouvelée. Reconnectez-la avant d'accepter de nouveaux paiements via la mire : %1"
 
@@ -1564,4 +1580,3 @@ msgstr "rafraîchissement refusé"
 #. Maintained French translation
 msgid "sandbox"
 msgstr "bac à sable"
-
