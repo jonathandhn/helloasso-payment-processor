@@ -1737,6 +1737,13 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 TRUE,
                 $this->isLongFollowUpTerminalState($state)
             );
+            if ($this->shouldQueueImmediatePlanInspection($state, $contributionRecurId, $eventType)) {
+                $this->requestImmediatePlanContributionSynchronization(
+                    $contributionRecurId,
+                    (int) $contribution->id,
+                    'installment canceled'
+                );
+            }
         }
 
         return $contributionChanged;
@@ -2702,6 +2709,41 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         ));
     }
 
+    private function requestImmediatePlanContributionSynchronization(int $contributionRecurId, int $currentContributionId, string $context): void
+    {
+        if ($contributionRecurId <= 0) {
+            return;
+        }
+
+        $planContributionId = $this->findPlanSynchronizationContributionId($contributionRecurId, $currentContributionId);
+        if (!$planContributionId) {
+            return;
+        }
+
+        $this->requestImmediateContributionSynchronization($planContributionId, $context);
+    }
+
+    private function findPlanSynchronizationContributionId(int $contributionRecurId, int $currentContributionId): int
+    {
+        $candidateId = (int) CRM_Core_DAO::singleValueQuery(
+            'SELECT id
+             FROM civicrm_contribution
+             WHERE contribution_recur_id = %1
+               AND id <> %2
+             ORDER BY id ASC
+             LIMIT 1',
+            [
+                1 => [$contributionRecurId, 'Integer'],
+                2 => [$currentContributionId, 'Integer'],
+            ]
+        );
+        if ($candidateId > 0) {
+            return $candidateId;
+        }
+
+        return $currentContributionId;
+    }
+
     private function ensureLongFollowUpSchedule(int $contributionId, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata, ?array $paymentData = NULL): void
     {
         if (!$this->hasHelloAssoMetadataColumn('long_sync_next_date')) {
@@ -2956,6 +2998,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return FALSE;
         }
         return CRM_HelloassoPaymentProcessor_PaymentState::isLongFollowUpTerminal($state);
+    }
+
+    private function shouldQueueImmediatePlanInspection(string $state, int $contributionRecurId, ?string $eventType): bool
+    {
+        if ($state !== 'Canceled' || $contributionRecurId <= 0) {
+            return FALSE;
+        }
+
+        return strpos((string) $eventType, 'LongCronSync') !== 0;
     }
 
     private function armInstallmentRecovery(

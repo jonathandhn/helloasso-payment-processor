@@ -1142,7 +1142,7 @@ function helloasso_payment_processor_civicrm_check(mixed &$messages): void {
     if ($missingPaymentInstruments) {
       $messages[] = new CRM_Utils_Check_Message(
         'helloasso_payment_processor_payment_instrument_missing',
-        E::ts('One or more HelloAsso payment processors have no payment method configured: %1. Configure a payment method on the processor; new processors use Credit Card by default.', [1 => implode('; ', $missingPaymentInstruments)]),
+        E::ts('One or more HelloAsso payment processors have no payment method configured: %1. Configure a payment method on the processor; new processors use the dedicated HelloAsso payment instrument by default.', [1 => implode('; ', $missingPaymentInstruments)]),
         E::ts('HelloAsso: Payment Method Missing'),
         \Psr\Log\LogLevel::WARNING,
         'fa-credit-card'
@@ -1152,7 +1152,7 @@ function helloasso_payment_processor_civicrm_check(mixed &$messages): void {
     if ($unexpectedPaymentInstruments) {
       $messages[] = new CRM_Utils_Check_Message(
         'helloasso_payment_processor_payment_instrument_check',
-        E::ts('One or more HelloAsso payment processors use Check as their payment method: %1. Review the processor configuration and select Credit Card or your existing HelloAsso online payment method.', [1 => implode('; ', $unexpectedPaymentInstruments)]),
+        E::ts('One or more HelloAsso payment processors use Check as their payment method: %1. Review the processor configuration and select the dedicated HelloAsso payment instrument or your existing HelloAsso online payment method.', [1 => implode('; ', $unexpectedPaymentInstruments)]),
         E::ts('HelloAsso: Payment Method Requires Review'),
         \Psr\Log\LogLevel::WARNING,
         'fa-credit-card'

@@ -51,10 +51,11 @@ cv flush
 4. Ouvrir **Administrer > CiviContribute > Passerelles de paiement** et créer
    une passerelle de type **HelloAsso**.
 
-Les nouveaux processeurs HelloAsso utilisent `Credit Card` comme moyen de
+Les nouveaux processeurs HelloAsso utilisent `HelloAsso` comme moyen de
 paiement par défaut. Une instance qui dispose déjà d'un moyen de paiement en
 ligne dédié à HelloAsso peut le sélectionner ; les configurations existantes ne
-sont pas remplacées automatiquement.
+sont pas remplacées automatiquement lorsqu'un autre moyen de paiement est déjà
+configuré.
 
 ## Connexion Par Clé API
 
@@ -76,7 +77,7 @@ paiement sous `/v5`.
 
 ## Connexion Par Mire HelloAsso
 
-La mire est optionnelle et désactivée par défaut. Elle permet à une
+La mire est optionnelle et activée par défaut. Elle permet à une
 organisation de se connecter depuis CiviCRM et apporte la gestion automatique
 du webhook partenaire et de sa clé de signature.
 
@@ -162,6 +163,22 @@ cv ev 'echo CRM_HelloassoPaymentProcessor_Webhook::getWebhookPath(1), PHP_EOL;'
 ```
 
 Remplacer `1` par l'ID du processeur à déclarer chez HelloAsso.
+
+### Annulation D'Un Plan D'Échéances
+
+L'annulation d'un plan HelloAsso ne se fait pas depuis l'écran de
+remboursement. Elle se déclenche depuis la page CiviCRM des contributions
+périodiques du contact, via l'action native d'annulation de la récurrence.
+
+Cette action n'est disponible que pour les processeurs HelloAsso reliés par la
+mire OAuth. En cas d'annulation acceptée par HelloAsso, l'extension annule
+localement les échéances futures non encaissées sans rembourser les paiements
+déjà collectés.
+
+Si une échéance d'un plan remonte l'état `Canceled`, l'extension programme un
+contrôle immédiat du plan au prochain cron court afin de recharger le
+`checkout_intent` et de vérifier le reste des échéances du même plan, sans
+attendre la prochaine date du rail long.
 
 Par défaut :
 
@@ -258,7 +275,7 @@ de désactiver accidentellement des protections de base.
 | `helloasso_v2_cron_limit` | `15` | Oui, page globale | Limite le nombre de contributions traitées par processeur lors des jobs de maintenance. |
 | `helloasso_v2_require_webhook_signature` | Désactivé | Oui, page globale | Rejette les webhooks legacy dont la signature `invoiceID` / `sig` est absente ou invalide. |
 | `helloasso_v2_require_partner_webhook_signature` | Activé | Oui, page globale | Rejette les webhooks mire dont `x-ha-signature` est absent ou invalide lorsqu'une clé de signature est stockée. Peut être désactivé pour les architectures multi-instances ou avec relais webhook. |
-| `helloasso_partner_auth_enabled` | Désactivé | Oui, page globale | Affiche et autorise les pages de connexion par mire HelloAsso. |
+| `helloasso_partner_auth_enabled` | Activé | Oui, page globale | Affiche et autorise les pages de connexion par mire HelloAsso. |
 | `helloasso_partner_client_id_test` | Vide | Oui, page mire sandbox | Client ID partenaire pour la mire sandbox. |
 | `helloasso_partner_client_secret_test` | Vide | Oui, page mire sandbox | Client secret partenaire pour la mire sandbox. |
 | `helloasso_partner_client_id_live` | Vide | Oui, page mire production | Client ID partenaire pour la mire production. |
