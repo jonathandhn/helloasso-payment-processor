@@ -10,7 +10,9 @@
 
       this.$onInit = () => {
         const defn = this.field.defn || {};
-        this.enabled = defn.helloasso_installments_enabled === true;
+        this.enabled = defn.helloasso_installments_enabled === true
+          || defn.helloasso_installments_enabled === 1
+          || defn.helloasso_installments_enabled === '1';
         this.minimum = clamp(defn.helloasso_installments_min, 2, 12, 2);
         this.maximum = clamp(defn.helloasso_installments_max, this.minimum, 12, 12);
         this.options = [
@@ -25,6 +27,7 @@
         }
 
         if (!this.enabled) {
+          delete this.checkout.checkout_params.is_recur;
           delete this.checkout.checkout_params.helloasso_installments;
           delete this.checkout.checkout_params.helloasso_installments_enabled;
           delete this.checkout.checkout_params.helloasso_installments_min;
@@ -40,6 +43,24 @@
         if (selected && (selected < this.minimum || selected > this.maximum)) {
           this.checkout.checkout_params.helloasso_installments = '';
         }
+
+        this.checkout.checkout_params.is_recur = Boolean(this.checkout.checkout_params.is_recur)
+          || this.checkout.checkout_params.helloasso_installments !== '';
+      };
+
+      this.onRecurChange = () => {
+        if (this.checkout.checkout_params.is_recur) {
+          if (!this.checkout.checkout_params.helloasso_installments) {
+            this.checkout.checkout_params.helloasso_installments = String(this.minimum);
+          }
+          return;
+        }
+
+        this.checkout.checkout_params.helloasso_installments = '';
+      };
+
+      this.onInstallmentsChange = () => {
+        this.checkout.checkout_params.is_recur = this.checkout.checkout_params.helloasso_installments !== '';
       };
 
       function clamp(value, minimum, maximum, fallback) {

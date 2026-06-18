@@ -17,7 +17,8 @@ class HelloAssoConnections extends AutoService implements EventSubscriberInterfa
   public static function getSubscribedEvents() {
     return [
       'civi.checkout.options' => 'getCheckoutOptions',
-      'civi.afform.input_types' => 'alterAfformInputTypes',
+      // Run after civi_contribute registers CheckoutBlock so our admin wrapper sticks.
+      'civi.afform.input_types' => ['alterAfformInputTypes', -100],
     ];
   }
 
@@ -40,7 +41,7 @@ class HelloAssoConnections extends AutoService implements EventSubscriberInterfa
     $e->inputTypes['CheckoutBlock']['admin_module'] = 'crmHelloassoPaymentProcessor';
   }
 
-  private function isEnabled(): bool {
+  protected function isEnabled(): bool {
     return (bool) \Civi::settings()->get('helloasso_v2_afform_checkout');
   }
 

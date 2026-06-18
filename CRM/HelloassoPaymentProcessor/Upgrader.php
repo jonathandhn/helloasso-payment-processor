@@ -517,6 +517,44 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return TRUE;
   }
 
+  public function upgrade_4221(): bool {
+    $this->ctx->log->info('Applying update 4221: split HelloAsso authorization-screen URLs by live and sandbox rail.');
+
+    $legacyAuthorizeUrl = trim((string) Civi::settings()->get('helloasso_partner_authorize_url'));
+    $legacyTokenUrl = trim((string) Civi::settings()->get('helloasso_partner_token_url'));
+
+    $liveAuthorizeUrl = trim((string) Civi::settings()->get('helloasso_partner_authorize_url_live'));
+    $testAuthorizeUrl = trim((string) Civi::settings()->get('helloasso_partner_authorize_url_test'));
+    $liveTokenUrl = trim((string) Civi::settings()->get('helloasso_partner_token_url_live'));
+    $testTokenUrl = trim((string) Civi::settings()->get('helloasso_partner_token_url_test'));
+
+    if ($liveAuthorizeUrl === '' && $legacyAuthorizeUrl !== '' && strpos($legacyAuthorizeUrl, 'helloasso-sandbox') === FALSE) {
+      Civi::settings()->set('helloasso_partner_authorize_url_live', $legacyAuthorizeUrl);
+    }
+    if ($testAuthorizeUrl === '' && $legacyAuthorizeUrl !== '') {
+      Civi::settings()->set(
+        'helloasso_partner_authorize_url_test',
+        strpos($legacyAuthorizeUrl, 'helloasso-sandbox') !== FALSE
+          ? $legacyAuthorizeUrl
+          : 'https://auth.helloasso-sandbox.com/authorize'
+      );
+    }
+
+    if ($liveTokenUrl === '' && $legacyTokenUrl !== '' && strpos($legacyTokenUrl, 'helloasso-sandbox') === FALSE) {
+      Civi::settings()->set('helloasso_partner_token_url_live', $legacyTokenUrl);
+    }
+    if ($testTokenUrl === '' && $legacyTokenUrl !== '') {
+      Civi::settings()->set(
+        'helloasso_partner_token_url_test',
+        strpos($legacyTokenUrl, 'helloasso-sandbox') !== FALSE
+          ? $legacyTokenUrl
+          : 'https://api.helloasso-sandbox.com/oauth2/token'
+      );
+    }
+
+    return TRUE;
+  }
+
   private function addColumnIfMissing(string $columnName, string $sql): void {
     $column = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM civicrm_hello_asso_metadata LIKE %1", [
       1 => [$columnName, 'String'],

@@ -1,8 +1,20 @@
 <div class="form-group af-checkout-field af-checkout-field_helloasso_installments" ng-if="$ctrl.enabled">
+  <label>
+    <input
+      type="checkbox"
+      name="is_recur"
+      ng-model="$ctrl.checkout.checkout_params.is_recur"
+      ng-change="$ctrl.onRecurChange()"
+    />
+    {{:: ts('Recurring payment') }}
+  </label>
+  <br />
   <label>{{:: ts('Payment schedule') }}</label>
   <select
     name="helloasso_installments"
     ng-model="$ctrl.checkout.checkout_params.helloasso_installments"
+    ng-change="$ctrl.onInstallmentsChange()"
+    ng-disabled="!$ctrl.checkout.checkout_params.is_recur"
   >
     <option ng-repeat="option in $ctrl.options" value="{{:: option.id }}">{{:: option.label }}</option>
   </select>
