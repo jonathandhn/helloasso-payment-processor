@@ -556,6 +556,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             throw new PaymentProcessorException(E::ts("Unable to update contribution %1.", [1 => $contributionId]));
         }
 
+        if ($propertyBag->getIsRecur() && $propertyBag->has('contributionRecurID') && !empty($_POST['helloasso_installments'])) {
+            if (isset($request['initialAmount'])) {
+                \Civi\Api4\ContributionRecur::update(FALSE)
+                    ->addWhere('id', '=', $propertyBag->getContributionRecurID())
+                    ->addValue('amount', $request['initialAmount'] / 100)
+                    ->execute();
+            }
+        }
+
         if (empty($contribution->invoice_id)) {
             $contribution->invoice_id = $propertyBag->getInvoiceID();
         }
@@ -594,6 +603,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             if (!empty($options['schedule_total_amount'])) {
                 return CRM_HelloassoPaymentProcessor_InstallmentSchedule::buildMonthly(
                     (int) round(((float) $options['schedule_total_amount']) * 100),
+                    $propertyBag->has('recurInstallments') ? (int) $propertyBag->getRecurInstallments() : 0,
+                    new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())),
+                    min((int) date('j'), 27)
+                );
+            }
+
+            if (!empty($_POST['helloasso_installments'])) {
+                return CRM_HelloassoPaymentProcessor_InstallmentSchedule::buildMonthly(
+                    $installmentAmount,
                     $propertyBag->has('recurInstallments') ? (int) $propertyBag->getRecurInstallments() : 0,
                     new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())),
                     min((int) date('j'), 27)
