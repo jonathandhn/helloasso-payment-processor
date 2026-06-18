@@ -1043,14 +1043,17 @@ function helloasso_payment_processor_get_payment_processor_admin_link(int $payme
 function helloasso_payment_processor_get_admin_edit_payment_processor_id(int $paymentProcessorId): int {
   try {
     $processor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $paymentProcessorId]);
-    if (empty($processor['is_test']) || empty($processor['name'])) {
+    if (empty($processor['is_test'])) {
       return $paymentProcessorId;
     }
 
-    foreach ([
-      ['name' => $processor['name'], 'is_test' => 0],
-      ['id' => $paymentProcessorId + 1, 'is_test' => 0],
-    ] as $params) {
+    $lookups = [];
+    if (!empty($processor['name'])) {
+      $lookups[] = ['name' => $processor['name'], 'is_test' => 0];
+    }
+    $lookups[] = ['id' => $paymentProcessorId + 1, 'is_test' => 0];
+
+    foreach ($lookups as $params) {
       try {
         $liveProcessor = civicrm_api3('PaymentProcessor', 'getsingle', $params);
         if (
