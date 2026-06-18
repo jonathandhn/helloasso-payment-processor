@@ -105,18 +105,13 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
     {
         $this->assertSslVerificationEnabled($is_test);
 
-        $oauth_response = $this->getGuzzleClient()->request('POST', $oauthUrl, [
+        $oauth_response = $this->getGuzzleClient()->request('POST', $oauthUrl, CRM_HelloassoPaymentProcessor_RequestOptions::defaults([
             'form_params' => [
                 'grant_type' => 'client_credentials',
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret
             ],
-            'curl' => [
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-            ],
-            'http_errors' => FALSE,
-        ]);
+        ]));
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
@@ -131,17 +126,12 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
     {
         $this->assertSslVerificationEnabled($is_test);
 
-        $oauth_response = $this->getGuzzleClient()->request('POST', $oauthUrl, [
+        $oauth_response = $this->getGuzzleClient()->request('POST', $oauthUrl, CRM_HelloassoPaymentProcessor_RequestOptions::defaults([
             'form_params' => [
                 'grant_type' => 'refresh_token',
                 'refresh_token' => Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor))->refresh_token
             ],
-            'curl' => [
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-            ],
-            'http_errors' => FALSE,
-        ]);
+        ]));
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
@@ -253,14 +243,9 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         $oauthUrl = $baseUrl . '/oauth2/token';
         $token = $this->getToken($is_test, $paymentProcessor, $oauthUrl, (string) ($paymentProcessor['user_name'] ?? ''), (string) ($paymentProcessor['password'] ?? ''));
 
-        $requestOptions = $options + [
+        $requestOptions = CRM_HelloassoPaymentProcessor_RequestOptions::defaults($options + [
             'headers' => [],
-            'http_errors' => FALSE,
-            'curl' => [
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-            ],
-        ];
+        ]);
         $requestOptions['headers']['Authorization'] = 'Bearer ' . $token->access_token;
 
         $response = $this->getGuzzleClient()->request($method, $baseUrl . $path, $requestOptions);

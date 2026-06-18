@@ -20,6 +20,13 @@ function helloasso_payment_processor_civicrm_angularModules(mixed &$angularModul
   $module = include __DIR__ . '/ang/crmHelloassoPaymentProcessor.ang.php';
   $module['ext'] = E::LONG_NAME;
   $angularModules['crmHelloassoPaymentProcessor'] = $module;
+  Civi::resources()->addVars('helloassoAfform', [
+    'supportsInstallments' => helloasso_payment_processor_supports_afform_installments(),
+  ]);
+}
+
+function helloasso_payment_processor_supports_afform_installments(): bool {
+  return version_compare(CRM_Utils_System::version(), '6.15', '>=');
 }
 
 /**
@@ -382,7 +389,7 @@ function helloasso_payment_processor_add_quickform_checkout_controls(
     'installmentsValue' => $submittedInstallments ?: '',
     'installmentsLabel' => E::ts('Number of installments'),
     'oneTimeLabel' => E::ts('One-time payment'),
-    'installmentsDescription' => E::ts('Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments.'),
+    'installmentsDescription' => E::ts('Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments.'),
   ]);
   Civi::resources()->addScriptFile(E::LONG_NAME, 'js/quickform-checkout.js');
 }

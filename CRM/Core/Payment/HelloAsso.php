@@ -304,8 +304,18 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                     'back_url' => $backUrl,
                     'error_url' => $errorUrl,
                     'return_url' => $returnUrl,
+                    'helloasso_installments' => CRM_Utils_Request::retrieveValue(
+                        'helloasso_installments',
+                        'Positive',
+                        NULL,
+                        FALSE,
+                        'POST'
+                    ),
                 ]
             );
+        }
+        catch (PaymentProcessorException $e) {
+            throw $e;
         }
         catch (\Throwable $e) {
             \Civi::log()->warning(sprintf(
@@ -355,8 +365,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                     'back_url' => $backUrl,
                     'error_url' => $errorUrl,
                     'return_url' => $returnUrl,
+                    'schedule_total_amount' => $urls['schedule_total_amount'] ?? NULL,
                 ]
             );
+        }
+        catch (PaymentProcessorException $e) {
+            throw $e;
         }
         catch (\Throwable $e) {
             \Civi::log()->warning(sprintf(
@@ -556,14 +570,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             throw new PaymentProcessorException(E::ts("Unable to update contribution %1.", [1 => $contributionId]));
         }
 
-        if ($propertyBag->getIsRecur() && $propertyBag->has('contributionRecurID') && !empty($_POST['helloasso_installments'])) {
-            if (isset($request['initialAmount'])) {
-                \Civi\Api4\ContributionRecur::update(FALSE)
-                    ->addWhere('id', '=', $propertyBag->getContributionRecurID())
-                    ->addValue('amount', $request['initialAmount'] / 100)
-                    ->execute();
-            }
-        }
+        $this->synchronizePreparedInstallmentAmounts($propertyBag, $request, $options);
 
         if (empty($contribution->invoice_id)) {
             $contribution->invoice_id = $propertyBag->getInvoiceID();
@@ -609,7 +616,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 );
             }
 
-            if (!empty($_POST['helloasso_installments'])) {
+            if (!empty($options['helloasso_installments'])) {
                 return CRM_HelloassoPaymentProcessor_InstallmentSchedule::buildMonthly(
                     $installmentAmount,
                     $propertyBag->has('recurInstallments') ? (int) $propertyBag->getRecurInstallments() : 0,
@@ -631,6 +638,29 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 1 => $e->getMessage(),
             ]));
         }
+    }
+
+    private function synchronizePreparedInstallmentAmounts(
+        \Civi\Payment\PropertyBag $propertyBag,
+        array $request,
+        array $options
+    ): void {
+        if (
+            !$propertyBag->getIsRecur()
+            || !$propertyBag->has('contributionRecurID')
+            || !isset($request['initialAmount'])
+            || (
+                empty($options['helloasso_installments'])
+                && empty($options['schedule_total_amount'])
+            )
+        ) {
+            return;
+        }
+
+        \Civi\Api4\ContributionRecur::update(FALSE)
+            ->addWhere('id', '=', $propertyBag->getContributionRecurID())
+            ->addValue('amount', ((int) $request['initialAmount']) / 100)
+            ->execute();
     }
 
     private function buildPayerFromPropertyBag(\Civi\Payment\PropertyBag $propertyBag): array
@@ -1772,12 +1802,18 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return FALSE;
         }
 
+        $paymentAmount = $this->resolveContributionPaymentAmount($contribution, $paymentData);
+        if (abs((float) $contribution->total_amount - $paymentAmount) > 0.0001) {
+            $contribution->total_amount = $paymentAmount;
+            $contribution->save();
+        }
+
         $paymentDate = $this->formatCiviBusinessTimestamp($paymentData['date'] ?? NULL);
         $paymentParams = [
             'trxn_id' => $paymentData['id'],
             'payment_processor_id' => $this->getPaymentProcessorId(),
             'contribution_id' => $contribution->id,
-            'total_amount' => $contribution->total_amount,
+            'total_amount' => $paymentAmount,
         ];
         if ($paymentDate) {
             $paymentParams['trxn_date'] = $paymentDate;
@@ -1816,6 +1852,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         return TRUE;
+    }
+
+    private function resolveContributionPaymentAmount(CRM_Contribute_BAO_Contribution $contribution, array $paymentData): float
+    {
+        if (!empty($paymentData['amount'])) {
+            return round(((int) $paymentData['amount']) / 100, 2);
+        }
+
+        return (float) $contribution->total_amount;
     }
 
     private function markContributionRefunded(CRM_Contribute_BAO_Contribution $contribution, array $paymentData): bool

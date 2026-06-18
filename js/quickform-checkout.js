@@ -104,6 +104,9 @@
     }
     var value = $('#helloasso_installments').val();
     if (!value) {
+      if (force) {
+        return;
+      }
       $('#installments').val('');
       $('[name="is_recur"]').prop('checked', false).val(0);
       return;

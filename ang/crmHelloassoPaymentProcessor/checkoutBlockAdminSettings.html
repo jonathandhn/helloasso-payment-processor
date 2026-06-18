@@ -1,14 +1,20 @@
 <div>
+  <div class="form-group" ng-if="!$ctrl.supportsInstallments">
+    <p class="description">
+      {{:: ts('HelloAsso installment payments require a newer CiviCRM checkout integration. The standard HelloAsso Afform payment option remains available, but installment controls are disabled on this version.') }}
+    </p>
+  </div>
   <div class="form-group">
     <label>
       <input
         type="checkbox"
         ng-model="$ctrl.node.defn.helloasso_installments_enabled"
+        ng-disabled="!$ctrl.supportsInstallments"
       />
       {{:: ts('Offer HelloAsso installment payments') }}
     </label>
   </div>
-  <div ng-if="$ctrl.node.defn.helloasso_installments_enabled">
+  <div ng-if="$ctrl.supportsInstallments && $ctrl.node.defn.helloasso_installments_enabled">
     <div class="form-group">
       <label>
         {{:: ts('Minimum installments') }}
