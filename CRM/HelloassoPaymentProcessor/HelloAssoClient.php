@@ -9,7 +9,6 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
     // Refresh token will be valid only for 30 days.
     // https://dev.helloasso.com/docs/getting-started
     private const REFRESH_TOKEN_EXP = '30 days';
-    private const ACCESS_TOKEN_EXP_MARGIN = 30;
     private static $instance = null;
 
     /**
@@ -95,11 +94,11 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             return TRUE;
         }
 
-        if ((time() + self::ACCESS_TOKEN_EXP_MARGIN) > $token->not_after) {
-            return TRUE;
-        }
-
-        return FALSE;
+        return !CRM_HelloassoPaymentProcessor_OAuthTokenLifetime::isAccessTokenUsable(
+            (string) ($token->access_token ?? ''),
+            isset($token->not_after) ? (int) $token->not_after : NULL,
+            time()
+        );
     }
 
     private function accessToken($is_test, array $paymentProcessor, $oauthUrl, $clientId, $clientSecret)
@@ -211,6 +210,37 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
+    public function cancelOrder(array $paymentProcessor, $isTest, int $orderId): array
+    {
+        $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
+        $authConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
+        if (
+            !$paymentProcessorId
+            || !$authConfig->shouldUsePluginPublic($paymentProcessorId, $paymentProcessor)
+        ) {
+            throw new PaymentProcessorException(E::ts('HelloAsso installment cancellation requires an authorization-screen connection.'));
+        }
+
+        $partnerInformation = (new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId))
+            ->getPartnerInformation();
+        $apiClient = is_array($partnerInformation['apiClient'] ?? NULL)
+            ? $partnerInformation['apiClient']
+            : [];
+        $privileges = is_array($apiClient['privileges'] ?? NULL)
+            ? $apiClient['privileges']
+            : [];
+        if (!in_array('RefundManagement', $privileges, TRUE)) {
+            throw new PaymentProcessorException(E::ts('The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments.'));
+        }
+
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'POST',
+            '/v5/orders/' . $orderId . '/cancel'
+        );
+    }
+
     private function requestHelloAsso(array $paymentProcessor, $is_test, string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array
     {
         $this->assertSslVerificationEnabled($is_test);
@@ -244,6 +274,15 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         }
 
         if ($statusCode < 200 || $statusCode >= 300) {
+            if (
+                $statusCode === 403
+                && $method === 'POST'
+                && preg_match('#^/v5/orders/\d+/cancel$#', $path)
+            ) {
+                throw new PaymentProcessorException(E::ts(
+                    'HelloAsso refused the cancellation. Reconnect the organization through the authorization screen and grant the OrganizationAdmin or FormAdmin role; the client must also include the RefundManagement privilege.'
+                ));
+            }
             $this->throwApiError($paymentProcessor, $method, $path, $statusCode, $decoded);
         }
 

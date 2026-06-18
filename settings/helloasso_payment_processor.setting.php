@@ -57,8 +57,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Payment status reliability for automations (T+5 / T+15 min)"),
-    'description' => E::ts("Enable automatic checks at T+5 and T+15 after creation of a HelloAsso checkout. Long-term monitoring of later changes, including refunds, remains independent."),
+    'title' => E::ts("Payment status reliability for automations (T+5 / T+15 / T+45 min)"),
+    'description' => E::ts("Enable automatic checks at T+5, T+15 and T+45 after creation of a HelloAsso checkout. The final check expires an unpaid installment plan or marks a classic checkout as abandoned while keeping its contribution pending for cart reminders. Long-term monitoring of later changes, including refunds, remains independent."),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -98,6 +98,54 @@ return [
       ],
     ],
   ],
+  'helloasso_enable_installments' => [
+    'name' => 'helloasso_enable_installments',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'title' => E::ts('Enable HelloAsso installment payments'),
+    'description' => E::ts('Allow finite monthly installment checkout payloads for HelloAsso payment processors.'),
+    'html_attributes' => [],
+    'settings_pages' => [
+      'helloasso' => [
+        'weight' => 59,
+      ],
+    ],
+  ],
+  'helloasso_quickform_redirect_message' => [
+    'name' => 'helloasso_quickform_redirect_message',
+    'type' => 'String',
+    'html_type' => 'text',
+    'default' => E::ts('You will be redirected to HelloAsso to complete your payment.'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'title' => E::ts('HelloAsso redirect message on standard forms'),
+    'description' => E::ts('Message displayed on standard contribution and event forms when the selected payment processor is HelloAsso.'),
+    'html_attributes' => ['size' => 80],
+    'settings_pages' => [
+      'helloasso' => [
+        'weight' => 60,
+      ],
+    ],
+  ],
+  'helloasso_enable_sepa' => [
+    'name' => 'helloasso_enable_sepa',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 1,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'title' => E::ts('Enable HelloAsso SEPA direct debit'),
+    'description' => E::ts('Offer SEPA direct debit on HelloAsso Checkout, including installment checkouts. HelloAsso only displays it for eligible organizations and may keep card payment available.'),
+    'html_attributes' => [],
+    'settings_pages' => [
+      'helloasso' => [
+        'weight' => 61,
+      ],
+    ],
+  ],
   'helloasso_v2_cron_limit' => [
     'name' => 'helloasso_v2_cron_limit',
     'type' => 'Integer',
@@ -110,7 +158,7 @@ return [
     'html_attributes' => ['size' => 6],
     'settings_pages' => [
       'helloasso' => [
-        'weight' => 60,
+        'weight' => 65,
       ],
     ],
   ],

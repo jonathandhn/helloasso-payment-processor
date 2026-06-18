@@ -6,7 +6,7 @@ import struct
 import unicodedata
 from datetime import datetime, timezone
 
-PROJECT_VERSION = "helloasso-payment-processor 2.0.0"
+PROJECT_VERSION = "helloasso-payment-processor 2.1.0-alpha1"
 TRANSLATOR = "Jonathan Dahan <jonathan@dhn.one>"
 
 # English source strings mapped to the reviewed French user interface wording.
@@ -23,6 +23,11 @@ FRENCH_TRANSLATIONS = {
     "Publish a HelloAsso Checkout Option for Afform / Form Builder based on the CiviCRM core checkout mechanism.": "Publie une Checkout Option HelloAsso pour Afform / Form Builder en s'appuyant sur le mécanisme de checkout du core CiviCRM.",
     "Enable HelloAsso refunds": "Activer les remboursements HelloAsso",
     "Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. Refunds require the HelloAsso authorization-screen mode. HelloAsso partial refunds remain unsupported by this integration.": "Autorise les utilisateurs CiviCRM disposant des droits de remboursement à demander des remboursements complets HelloAsso depuis l'écran de remboursement. Les remboursements nécessitent le mode mire HelloAsso. Les remboursements partiels HelloAsso restent non pris en charge par cette intégration.",
+    "HelloAsso redirect message on standard forms": "Message de redirection HelloAsso sur les formulaires classiques",
+    "Message displayed on standard contribution and event forms when the selected payment processor is HelloAsso.": "Message affiché sur les formulaires classiques de contribution et d'inscription à un événement lorsque le processeur de paiement sélectionné est HelloAsso.",
+    "Number of installments": "Nombre d'échéances",
+    "One-time payment": "Paiement en une fois",
+    "Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments.": "Choisissez un paiement en une fois ou un échéancier fixe de 2 à 12 mensualités.",
     "Maximum processing batch size (Cron)": "Taille maximale des lots de traitement (Cron)",
     "Maximum number of HelloAsso contributions processed per payment processor during a normal cron execution.": "Nombre maximum de contributions HelloAsso traitées par processeur pendant une exécution normale du cron.",
     "Strict legacy signature verification": "Vérification stricte de la signature historique",
@@ -196,6 +201,44 @@ FRENCH_TRANSLATIONS = {
     "HelloAsso: Domain Mismatch (Staging/Dev Instance)": "HelloAsso : Décalage de domaine (Instance de Test/Staging)",
     "The HelloAsso webhook registered for %1 points to a different domain. Inbound payments will not be processed on this CiviCRM instance: %2.": "Le webhook enregistré pour %1 pointe vers un domaine différent de cette instance. Les notifications de paiement HelloAsso ne seront pas reçues ni traitées sur ce CiviCRM : %2.",
     "HelloAsso: Webhook Domain Mismatch": "HelloAsso : Décalage de domaine du Webhook",
+    "%1 monthly installments": "%1 mensualités",
+    "A recurring HelloAsso payment is missing its order or installment identity.": "Un paiement récurrent HelloAsso ne contient pas l'identifiant de sa commande ou de son échéance.",
+    "Allow finite monthly installment checkout payloads for HelloAsso payment processors.": "Autorise les échéanciers mensuels limités pour les processeurs de paiement HelloAsso.",
+    "CiviCRM could not create the contribution for HelloAsso installment %1.": "CiviCRM n'a pas pu créer la contribution correspondant à l'échéance HelloAsso %1.",
+    "Contribution is not a future scheduled HelloAsso installment.": "La contribution n'est pas une échéance future planifiée HelloAsso.",
+    "Contribution is not a future HelloAsso installment": "La contribution n'est pas une échéance future HelloAsso",
+    "Enable HelloAsso installment payments": "Activer les paiements HelloAsso en plusieurs fois",
+    "Enable HelloAsso SEPA direct debit": "Activer le prélèvement SEPA HelloAsso",
+    "Future HelloAsso installments were cancelled successfully. Payments already collected were not refunded.": "Les échéances futures HelloAsso ont été annulées. Les paiements déjà encaissés n'ont pas été remboursés.",
+    "HelloAsso installment cancellation is available only for processors connected through the authorization screen.": "L'annulation d'un échéancier HelloAsso est disponible uniquement pour les processeurs connectés via la mire.",
+    "HelloAsso installment cancellation requires an authorization-screen connection.": "L'annulation d'un échéancier HelloAsso nécessite une connexion via la mire.",
+    "HelloAsso installment payments are disabled.": "Les paiements HelloAsso en plusieurs fois sont désactivés.",
+    "HelloAsso installments must be collected every month.": "Les échéances HelloAsso doivent être prélevées chaque mois.",
+    "HelloAsso installments must be monthly.": "Les échéances HelloAsso doivent être mensuelles.",
+    "HelloAsso requires between %1 and %2 installments for this form.": "HelloAsso exige entre %1 et %2 échéances pour ce formulaire.",
+    "HelloAsso requires between 2 and 12 installments.": "HelloAsso exige entre 2 et 12 échéances.",
+    "HelloAsso refused the cancellation. Reconnect the organization through the authorization screen and grant the OrganizationAdmin or FormAdmin role; the client must also include the RefundManagement privilege.": "HelloAsso a refusé l'annulation. Reconnectez l'association via la mire et accordez le rôle OrganizationAdmin ou FormAdmin ; le client doit également disposer du privilège RefundManagement.",
+    "Invalid HelloAsso installment schedule: %1": "Échéancier HelloAsso invalide : %1",
+    "Long follow-up scheme": "Schéma de suivi à long terme",
+    "Maximum installments": "Nombre maximal d'échéances",
+    "Minimum installments": "Nombre minimal d'échéances",
+    "Next scheduled long sync date": "Prochaine date de synchronisation longue planifiée",
+    "Next scheduled sync date": "Prochaine date de synchronisation planifiée",
+    "Only process follow-ups due on or before this date/time. Leave empty to disable this filter.": "Traite uniquement les suivis arrivant à échéance au plus tard à cette date et heure. Laissez vide pour désactiver ce filtre.",
+    "Only process long follow-ups due on or before this date/time. Leave empty to use now.": "Traite uniquement les suivis longs arrivant à échéance au plus tard à cette date et heure. Laissez vide pour utiliser la date actuelle.",
+    "Offer HelloAsso installment payments": "Proposer le paiement HelloAsso en plusieurs fois",
+    "Offer SEPA direct debit on HelloAsso Checkout, including installment checkouts. HelloAsso only displays it for eligible organizations and may keep card payment available.": "Propose le prélèvement SEPA sur le Checkout HelloAsso, y compris pour les paiements en plusieurs fois. HelloAsso l'affiche uniquement pour les associations éligibles et peut maintenir le paiement par carte.",
+    "Pay in full": "Payer en une fois",
+    "Payment schedule": "Échéancier de paiement",
+    "Process scheduled HelloAsso payment follow-ups and targeted synchronisations.": "Traite les suivis planifiés des paiements HelloAsso et les synchronisations ciblées.",
+    "Process scheduled long-window HelloAsso consistency checks.": "Traite les contrôles de cohérence HelloAsso planifiés à long terme.",
+    "The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments.": "L'autorisation HelloAsso ne contient pas le privilège RefundManagement requis pour annuler les échéances futures.",
+    "The HelloAsso installment mapping table is missing. Apply the extension database upgrades before processing installments.": "La table de correspondance des échéances HelloAsso est absente. Appliquez les mises à niveau de la base de données de l'extension avant de traiter les échéances.",
+    "The HelloAsso order ID is missing from this recurring contribution.": "L'identifiant de commande HelloAsso est absent de cette contribution périodique.",
+    "The HelloAsso order ID stored on this recurring contribution is invalid.": "L'identifiant de commande HelloAsso enregistré sur cette contribution périodique est invalide.",
+    "The contribution mapped to this HelloAsso installment no longer exists.": "La contribution associée à cette échéance HelloAsso n'existe plus.",
+    "The HelloAsso v2 schema upgrade is incomplete. %1 Run <code>cv updb</code> and then <code>cv flush</code> before relying on webhook queueing, follow-up sync, or legacy repair.": "La mise à niveau du schéma HelloAsso v2 est incomplète. %1 Exécutez <code>cv updb</code> puis <code>cv flush</code> avant d'utiliser la file de webhooks, la synchronisation de suivi ou la réparation des anciennes données.",
+    "When enabled, only contributions with a scheduled HelloAsso follow-up are processed.": "Lorsque cette option est activée, seules les contributions ayant un suivi HelloAsso planifié sont traitées.",
 }
 
 def build_header(language, is_template=False):
@@ -366,24 +409,34 @@ def compile_mo(po_dict, output_path):
 
 def extract_strings(root_dir):
     strings = set()
-    regex = re.compile(r'\bE?::ts\(\s*(?:\'((?:[^\'\\]|\\.)*)\'|"((?:[^"\\]|\\.)*)")\s*(?:,|\))')
+    php_regex = re.compile(r'(?:\bE::ts|(?<![.\w])ts)\(\s*(?:\'((?:[^\'\\]|\\.)*)\'|"((?:[^"\\]|\\.)*)")\s*(?:,|\))')
+    frontend_regex = re.compile(r'(?<![.\w])ts\(\s*(?:\'((?:[^\'\\]|\\.)*)\'|"((?:[^"\\]|\\.)*)")\s*(?:,|\))')
     
     for dirpath, _, filenames in os.walk(root_dir):
         if any(ignored in dirpath for ignored in [".git", "tests", "l10n", "vendor"]):
             continue
         for filename in filenames:
-            if filename.endswith(".php"):
+            extension = os.path.splitext(filename)[1]
+            if extension == ".json":
                 path = os.path.join(dirpath, filename)
                 with open(path, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
-                for m in regex.finditer(content):
-                    val = m.group(1) or m.group(2)
-                    # Decode single or double quotes escapes
-                    if m.group(1):
-                        val = val.replace("\\'", "'")
-                    else:
-                        val = val.replace('\\"', '"')
-                    strings.add(val)
+                for label in re.findall(r'"label"\s*:\s*"((?:[^"\\]|\\.)*)"', content):
+                    strings.add(label.replace('\\"', '"'))
+                continue
+            if extension not in {".php", ".js", ".html"}:
+                continue
+            path = os.path.join(dirpath, filename)
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            regex = php_regex if extension == ".php" else frontend_regex
+            for m in regex.finditer(content):
+                val = m.group(1) or m.group(2)
+                if m.group(1):
+                    val = val.replace("\\'", "'")
+                else:
+                    val = val.replace('\\"', '"')
+                strings.add(val)
     return strings
 
 def main():
@@ -479,6 +532,9 @@ def main():
         "Online contribution": "Contribución en línea",
         "Online contribution: %1": "Contribución en línea: %1",
         "You will be redirected to HelloAsso to complete your payment.": "Será redirigido a HelloAsso para realizar el pago.",
+        "Number of installments": "Número de plazos",
+        "One-time payment": "Pago único",
+        "Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments.": "Elija un pago único o un calendario fijo de 2 a 12 mensualidades.",
         
         # Form validation errors
         "First/last name must contain at least 3 characters (HelloAsso rule).": "El nombre/apellido debe contener al menos 3 caracteres (regla HelloAsso).",
@@ -496,6 +552,35 @@ def main():
         "The %1 must contain at least one vowel (HelloAsso rule).": "El %1 debe contener al menos una vocal (regla HelloAsso).",
         "The value of %1 is not allowed by HelloAsso.": "El valor de %1 no está permitido por HelloAsso.",
         "The %1 contains unauthorized characters (HelloAsso rule).": "El %1 contiene caracteres no permitidos (regla HelloAsso).",
+
+        # Finite recurring installment checkout
+        "%1 monthly installments": "%1 mensualidades",
+        "A recurring HelloAsso payment is missing its order or installment identity.": "Falta el identificador del pedido o de la cuota en un pago recurrente de HelloAsso.",
+        "CiviCRM could not create the contribution for HelloAsso installment %1.": "CiviCRM no pudo crear la contribución correspondiente a la cuota HelloAsso %1.",
+        "Contribution is not a future HelloAsso installment": "La contribución no es una cuota futura de HelloAsso",
+        "Future HelloAsso installments were cancelled successfully. Payments already collected were not refunded.": "Las futuras cuotas de HelloAsso se cancelaron correctamente. Los pagos ya cobrados no se reembolsaron.",
+        "Enable HelloAsso installment payments": "Activar los pagos HelloAsso en cuotas",
+        "Enable HelloAsso SEPA direct debit": "Activar el débito directo SEPA de HelloAsso",
+        "HelloAsso installment cancellation is available only for processors connected through the authorization screen.": "La cancelación de cuotas HelloAsso solo está disponible para procesadores conectados mediante la pantalla de autorización.",
+        "HelloAsso installment cancellation requires an authorization-screen connection.": "La cancelación de cuotas HelloAsso requiere una conexión mediante la pantalla de autorización.",
+        "HelloAsso installment payments are disabled.": "Los pagos de HelloAsso en cuotas están desactivados.",
+        "HelloAsso installments must be collected every month.": "Las cuotas HelloAsso deben cobrarse cada mes.",
+        "HelloAsso installments must be monthly.": "Las cuotas HelloAsso deben ser mensuales.",
+        "HelloAsso requires between %1 and %2 installments for this form.": "HelloAsso requiere entre %1 y %2 cuotas para este formulario.",
+        "HelloAsso requires between 2 and 12 installments.": "HelloAsso requiere entre 2 y 12 cuotas.",
+        "HelloAsso refused the cancellation. Reconnect the organization through the authorization screen and grant the OrganizationAdmin or FormAdmin role; the client must also include the RefundManagement privilege.": "HelloAsso rechazó la cancelación. Vuelva a conectar la asociación mediante la pantalla de autorización y conceda el rol OrganizationAdmin o FormAdmin; el cliente también debe incluir el privilegio RefundManagement.",
+        "Invalid HelloAsso installment schedule: %1": "Calendario de cuotas HelloAsso no válido: %1",
+        "Maximum installments": "Número máximo de cuotas",
+        "Minimum installments": "Número mínimo de cuotas",
+        "Offer HelloAsso installment payments": "Ofrecer el pago HelloAsso en cuotas",
+        "Offer SEPA direct debit on HelloAsso Checkout, including installment checkouts. HelloAsso only displays it for eligible organizations and may keep card payment available.": "Ofrece el débito directo SEPA en HelloAsso Checkout, incluidos los pagos en cuotas. HelloAsso solo lo muestra para las asociaciones elegibles y puede mantener disponible el pago con tarjeta.",
+        "Pay in full": "Pagar en un solo pago",
+        "Payment schedule": "Calendario de pagos",
+        "The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments.": "La autorización de HelloAsso no incluye el privilegio RefundManagement necesario para cancelar futuras cuotas.",
+        "The HelloAsso installment mapping table is missing. Apply the extension database upgrades before processing installments.": "Falta la tabla de correspondencia de cuotas HelloAsso. Aplique las actualizaciones de la base de datos de la extensión antes de procesar las cuotas.",
+        "The HelloAsso order ID is missing from this recurring contribution.": "Falta el identificador del pedido HelloAsso en esta contribución recurrente.",
+        "The HelloAsso order ID stored on this recurring contribution is invalid.": "El identificador del pedido HelloAsso guardado en esta contribución recurrente no es válido.",
+        "The contribution mapped to this HelloAsso installment no longer exists.": "La contribución asociada a esta cuota HelloAsso ya no existe.",
     }
     
     new_es = {

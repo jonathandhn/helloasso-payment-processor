@@ -18,6 +18,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `civicrm_hello_asso_metadata`;
+DROP TABLE IF EXISTS `civicrm_hello_asso_installment`;
 
 SET FOREIGN_KEY_CHECKS=1;
 -- /*******************************************************
@@ -62,6 +63,38 @@ CREATE TABLE `civicrm_hello_asso_metadata` (
   INDEX `index_sync_next_date` (`sync_next_date`),
   INDEX `index_payment_processor_id_long_sync_next_date` (`payment_processor_id`, `long_sync_next_date`),
   CONSTRAINT FK_civicrm_hello_asso_metadata_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE
+)
+ENGINE=InnoDB;
+
+-- /*******************************************************
+-- *
+-- * civicrm_hello_asso_installment
+-- *
+-- * Idempotent mapping of HelloAsso installments to CiviCRM contributions
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_hello_asso_installment` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `payment_processor_id` int unsigned NOT NULL,
+  `contribution_recur_id` int unsigned NOT NULL,
+  `contribution_id` int unsigned NULL DEFAULT NULL,
+  `checkout_intent_id` bigint unsigned NULL DEFAULT NULL,
+  `order_id` bigint unsigned NOT NULL,
+  `installment_number` int unsigned NOT NULL,
+  `helloasso_payment_id` bigint unsigned NOT NULL,
+  `amount` int unsigned NULL DEFAULT NULL,
+  `payment_date` datetime NULL DEFAULT NULL,
+  `state` varchar(64) NULL DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_processor_payment` (`payment_processor_id`, `helloasso_payment_id`),
+  UNIQUE KEY `uniq_processor_order_installment` (`payment_processor_id`, `order_id`, `installment_number`),
+  KEY `index_contribution_recur_id` (`contribution_recur_id`),
+  KEY `index_contribution_id` (`contribution_id`),
+  KEY `index_checkout_intent_id` (`checkout_intent_id`),
+  CONSTRAINT `FK_hello_asso_installment_recur` FOREIGN KEY (`contribution_recur_id`) REFERENCES `civicrm_contribution_recur`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_hello_asso_installment_contribution` FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE SET NULL
 )
 ENGINE=InnoDB;
 

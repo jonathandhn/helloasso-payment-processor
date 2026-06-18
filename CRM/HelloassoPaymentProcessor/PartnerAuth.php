@@ -12,8 +12,6 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 class CRM_HelloassoPaymentProcessor_PartnerAuth {
 
   private const STATE_TTL = '10 minutes';
-  private const REFRESH_TOKEN_TTL_SECONDS = 2592000;
-  private const ACCESS_TOKEN_MARGIN = 30;
   private const PROD_AUTHORIZE_URL = 'https://auth.helloasso.com/authorize';
   private const PROD_TOKEN_URL = 'https://api.helloasso.com/oauth2/token';
   private const SANDBOX_AUTHORIZE_URL = 'https://auth.helloasso-sandbox.com/authorize';
@@ -279,7 +277,11 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       throw new PaymentProcessorException($this->getReconnectRequiredPaymentMessage());
     }
 
-    if ((time() + self::ACCESS_TOKEN_MARGIN) > (int) ($link['expires_at'] ?? 0)) {
+    if (!CRM_HelloassoPaymentProcessor_OAuthTokenLifetime::isAccessTokenUsable(
+      (string) ($link['access_token'] ?? ''),
+      isset($link['expires_at']) ? (int) $link['expires_at'] : NULL,
+      time()
+    )) {
       $link = $this->refreshStoredLink();
     }
 
@@ -565,58 +567,26 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   }
 
   private function isAccessTokenUsable(?array $link): bool {
-    return !empty($link['access_token'])
-      && ((time() + self::ACCESS_TOKEN_MARGIN) <= (int) ($link['expires_at'] ?? 0));
+    return CRM_HelloassoPaymentProcessor_OAuthTokenLifetime::isAccessTokenUsable(
+      (string) ($link['access_token'] ?? ''),
+      isset($link['expires_at']) ? (int) $link['expires_at'] : NULL,
+      time()
+    );
   }
 
   private function isRefreshTokenPastHalfLife(array $link): bool {
-    $expiresAt = (int) ($link['refresh_expires_at'] ?? 0);
-    if (!$expiresAt) {
-      return TRUE;
-    }
-
-    $issuedAt = (int) ($link['refresh_issued_at'] ?? 0);
-    if (!$issuedAt) {
-      // Existing stored links predate refresh_issued_at and used the documented TTL.
-      $issuedAt = max(0, $expiresAt - self::REFRESH_TOKEN_TTL_SECONDS);
-    }
-
-    $midpoint = $issuedAt + (int) floor(($expiresAt - $issuedAt) / 2);
-    return time() >= $midpoint;
+    return CRM_HelloassoPaymentProcessor_OAuthTokenLifetime::isRefreshTokenPastHalfLife(
+      isset($link['refresh_issued_at']) ? (int) $link['refresh_issued_at'] : NULL,
+      isset($link['refresh_expires_at']) ? (int) $link['refresh_expires_at'] : NULL,
+      time()
+    );
   }
 
   private function getRefreshTokenWindow(array $token, int $fallbackIssuedAt): array {
-    $claims = $this->decodeJwtClaims((string) ($token['refresh_token'] ?? ''));
-    $issuedAt = !empty($claims['iat']) ? (int) $claims['iat'] : $fallbackIssuedAt;
-    if (!empty($claims['exp']) && (int) $claims['exp'] > $issuedAt) {
-      return [$issuedAt, (int) $claims['exp']];
-    }
-
-    foreach (['refresh_token_expires_in', 'refresh_expires_in'] as $field) {
-      if (!empty($token[$field]) && (int) $token[$field] > 0) {
-        return [$issuedAt, $issuedAt + (int) $token[$field]];
-      }
-    }
-
-    // HelloAsso currently documents the refresh token lifetime but does not expose it in its published response schema.
-    return [$issuedAt, $issuedAt + self::REFRESH_TOKEN_TTL_SECONDS];
-  }
-
-  private function decodeJwtClaims(string $token): array {
-    $parts = explode('.', $token);
-    if (count($parts) < 2) {
-      return [];
-    }
-
-    $payload = strtr($parts[1], '-_', '+/');
-    $payload .= str_repeat('=', (4 - strlen($payload) % 4) % 4);
-    $decoded = base64_decode($payload, TRUE);
-    if (!is_string($decoded)) {
-      return [];
-    }
-
-    $claims = json_decode($decoded, TRUE);
-    return is_array($claims) ? $claims : [];
+    return CRM_HelloassoPaymentProcessor_OAuthTokenLifetime::refreshWindow(
+      $token,
+      $fallbackIssuedAt
+    );
   }
 
   private function getProcessorAuthConfig(): CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {

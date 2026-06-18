@@ -17,6 +17,7 @@ class HelloAssoConnections extends AutoService implements EventSubscriberInterfa
   public static function getSubscribedEvents() {
     return [
       'civi.checkout.options' => 'getCheckoutOptions',
+      'civi.afform.input_types' => 'alterAfformInputTypes',
     ];
   }
 
@@ -28,6 +29,15 @@ class HelloAssoConnections extends AutoService implements EventSubscriberInterfa
     foreach ($this->getPaymentProcessorPairs() as $name => $pair) {
       $e->options['helloasso_hosted_checkout_' . $name] = new HelloAssoHostedCheckout($pair['live'] ?? NULL, $pair['test'] ?? NULL);
     }
+  }
+
+  public function alterAfformInputTypes(GenericHookEvent $e): void {
+    if (!$this->isEnabled() || empty($e->inputTypes['CheckoutBlock'])) {
+      return;
+    }
+
+    $e->inputTypes['CheckoutBlock']['admin_template'] = '~/crmHelloassoPaymentProcessor/checkoutBlockAdmin.html';
+    $e->inputTypes['CheckoutBlock']['admin_module'] = 'crmHelloassoPaymentProcessor';
   }
 
   private function isEnabled(): bool {

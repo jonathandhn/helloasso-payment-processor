@@ -16,6 +16,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `civicrm_hello_asso_metadata`;
+DROP TABLE IF EXISTS `civicrm_hello_asso_installment`;
 DROP TABLE IF EXISTS `civicrm_hello_asso_processor_auth`;
 
 SET FOREIGN_KEY_CHECKS=1;

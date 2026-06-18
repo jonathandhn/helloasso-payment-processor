@@ -18,7 +18,7 @@ L'extension est publiée sous licence [AGPL-3.0](LICENSE.txt).
   du webhook et vérification de sa signature.
 - Intégration Afform / Form Builder par `Checkout Option` CiviCRM.
 - File d'attente des webhooks via `PaymentprocessorWebhook`.
-- Revérifications courtes à `T+5` et `T+15` minutes après un checkout.
+- Revérifications courtes à `T+5`, `T+15` et `T+45` minutes après un checkout.
 - Suivi long indépendant pour détecter les évolutions ultérieures, notamment
   les remboursements.
 - Fonctionnement validé sur des instances CiviCRM Drupal, WordPress et
@@ -206,7 +206,7 @@ Vérifier que les jobs suivants sont actifs dans CiviCRM :
 | Job | Rôle |
 | --- | --- |
 | `Job.process_paymentprocessor_webhooks` | Traite les notifications placées en file d'attente. |
-| `Job.process_helloasso` | Exécute le rattrapage court `T+5` / `T+15`. |
+| `Job.process_helloasso` | Exécute le rattrapage court `T+5` / `T+15` / `T+45`; le dernier passage annule un plan multi-échéance resté sans paiement ou marque un panier classique abandonné en conservant sa contribution `Pending` pour les relances. |
 | `Job.process_helloasso_long_followup` | Contrôle les changements tardifs, dont les remboursements. |
 | `Job.refresh_helloasso_partner_links` | Renouvelle les liaisons mire avant leur expiration. |
 
@@ -249,9 +249,12 @@ de désactiver accidentellement des protections de base.
 | `helloasso_v2_standard_frontend_bridge` | Activé | Non | Active le pont frontend `CRM.payment` / `mjwshared` utilisé par les formulaires classiques et Webform. |
 | `helloasso_v2_safe_abort_urls` | Activé | Non | Remplace les URL d'annulation ou d'erreur fragiles par une URL sûre lorsque le contexte est AJAX ou CiviCRM interne. |
 | `helloasso_v2_queue_webhooks` | Activé | Oui, page globale | Place les webhooks dans la file `PaymentprocessorWebhook` au lieu de les traiter immédiatement. |
-| `helloasso_v2_followup_enabled` | Activé | Oui, page globale | Programme les contrôles courts `T+5` / `T+15` après création d'un checkout. |
+| `helloasso_v2_followup_enabled` | Activé | Oui, page globale | Programme les contrôles courts `T+5` / `T+15` / `T+45` après création d'un checkout. À `T+45`, un checkout classique sans paiement reste `Pending` pour permettre les relances de panier. |
 | `helloasso_v2_afform_checkout` | Activé | Oui, page globale | Expose la Checkout Option HelloAsso pour Afform / Form Builder. |
 | `helloasso_enable_refunds` | Désactivé | Oui, page globale | Autorise les remboursements complets HelloAsso depuis l'écran de remboursement CiviCRM. Nécessite le mode mire HelloAsso. |
+| `helloasso_enable_installments` | Désactivé | Oui, page globale | Autorise les échéanciers mensuels finis de 2 à 12 paiements dans Afform, Webform et les formulaires de contribution classiques. Dans QuickForm, laisser le champ vide conserve un paiement unique. |
+| `helloasso_quickform_redirect_message` | « Vous serez redirigé… » | Oui, page globale | Message affiché sur les formulaires classiques de contribution et d'inscription à un événement, uniquement lorsque HelloAsso est sélectionné. |
+| `helloasso_enable_sepa` | Activé | Oui, page globale | Demande à HelloAsso de proposer le prélèvement SEPA sur les checkouts simples et avec échéances. L'affichage dépend de l'éligibilité et du réglage de l'association chez HelloAsso. |
 | `helloasso_v2_cron_limit` | `15` | Oui, page globale | Limite le nombre de contributions traitées par processeur lors des jobs de maintenance. |
 | `helloasso_v2_require_webhook_signature` | Désactivé | Oui, page globale | Rejette les webhooks legacy dont la signature `invoiceID` / `sig` est absente ou invalide. |
 | `helloasso_v2_require_partner_webhook_signature` | Activé | Oui, page globale | Rejette les webhooks mire dont `x-ha-signature` est absent ou invalide lorsqu'une clé de signature est stockée. Peut être désactivé pour les architectures multi-instances ou avec relais webhook. |
@@ -265,6 +268,36 @@ de désactiver accidentellement des protections de base.
 
 Les données opérationnelles par processeur de la mire sont stockées dans la
 table dédiée de l'extension lorsque le schéma est à jour.
+
+Pour les échéances futures, les contrôles courts T+5/T+15/T+45 sont désactivés. En
+cas de webhook manquant, le cron long vérifie les paiements carte à J+1, J+7 et
+J+30 après l'échéance, et les prélèvements SEPA à J+9, J+15 et J+30. Les états
+HelloAsso d'attente restent en instance; les états validés terminent la
+contribution, les refus et incohérences passent en échec, et `Contested` devient
+un `Chargeback` CiviCRM.
+
+| États HelloAsso | Traitement CiviCRM |
+| --- | --- |
+| `Authorized`, `Registered`, `AuthorizedPreprod`, `Corrected` | Contribution terminée |
+| `Pending`, `Unknown`, `Waiting`, `WaitingBankValidation`, `WaitingBankWithdraw`, `WaitingAuthentication`, `Init` | Contribution en instance et suivi maintenu |
+| `Refused` sur une échéance future | Contribution en échec, plan `Overdue`, suivi de régularisation pendant 30 jours |
+| `Refused` hors régularisation, `Error`, `Canceled`, `Abandoned`, `Deleted`, `Inconsistent`, `NoDonation` | Contribution en échec, suivis arrêtés |
+| `Refunding` | Statut courant conservé jusqu'à la confirmation |
+| `Refunded` | Contribution remboursée, suivis arrêtés |
+| `Contested` | Contribution en rejet bancaire (`Chargeback`), suivis arrêtés |
+
+Un état HelloAsso inconnu est conservé en instance par prudence. Les paiements
+terminés restent surveillés par le cron long pendant sa fenêtre afin de
+détecter un remboursement ou une contestation tardive; les webhooks restent la
+source principale après la dernière vérification planifiée.
+
+Une échéance refusée conserve sa contribution en échec et place le plan
+`ContributionRecur` en retard (`Overdue`). Le cron long vérifie sa
+régularisation à J+1, J+7, J+15 et J+30. HelloAsso transmet directement le lien
+de régularisation au payeur; ce lien n'est pas fourni dans son webhook ou son
+API publique. Une régularisation réussie réactive le cycle du plan. À J+30,
+une échéance toujours refusée est marquée localement `RecoveryExpired` et le
+plan passe en échec.
 
 ## Contributions Et Intégrations Spécifiques
 

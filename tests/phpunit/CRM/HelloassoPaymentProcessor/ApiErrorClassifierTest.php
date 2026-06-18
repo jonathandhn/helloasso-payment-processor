@@ -30,7 +30,7 @@ class CRM_HelloassoPaymentProcessor_ApiErrorClassifierTest extends \PHPUnit\Fram
         );
     }
 
-    public function unrelatedApiResponses(): array
+    public static function unrelatedApiResponses(): array
     {
         return [
             'checkout unauthorized' => [

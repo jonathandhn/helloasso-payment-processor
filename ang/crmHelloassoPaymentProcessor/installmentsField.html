@@ -1,0 +1,9 @@
+<div class="form-group af-checkout-field af-checkout-field_helloasso_installments" ng-if="$ctrl.enabled">
+  <label>{{:: ts('Payment schedule') }}</label>
+  <select
+    name="helloasso_installments"
+    ng-model="$ctrl.checkout.checkout_params.helloasso_installments"
+  >
+    <option ng-repeat="option in $ctrl.options" value="{{:: option.id }}">{{:: option.label }}</option>
+  </select>
+</div>
