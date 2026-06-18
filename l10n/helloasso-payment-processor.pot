@@ -585,6 +585,9 @@ msgstr ""
 msgid "Installment Number"
 msgstr ""
 
+msgid "Installment schedule"
+msgstr ""
+
 msgid "Invalid HelloAsso installment schedule: %1"
 msgstr ""
 

@@ -794,6 +794,10 @@ msgid "Installment Number"
 msgstr "Numéro de l'échéance"
 
 #. Maintained French translation
+msgid "Installment schedule"
+msgstr "Échéancier de paiement"
+
+#. Maintained French translation
 msgid "Invalid HelloAsso installment schedule: %1"
 msgstr "Échéancier HelloAsso invalide : %1"
 
