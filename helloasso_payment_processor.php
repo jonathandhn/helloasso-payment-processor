@@ -349,18 +349,40 @@ function helloasso_payment_processor_add_quickform_checkout_controls(
   }
 
   $supportsInstallments = $formName === 'CRM_Contribute_Form_Contribution_Main'
-    && (bool) Civi::settings()->get('helloasso_enable_installments');
+    && (bool) Civi::settings()->get('helloasso_enable_installments')
+    && !empty($form->_values['is_recur']);
+  if ($supportsInstallments) {
+    $form->add('text', 'helloasso_installments', E::ts('Number of installments'), [
+      'min' => 2,
+      'max' => 12,
+      'inputmode' => 'numeric',
+      'pattern' => '[0-9]*',
+      'size' => 3,
+      'class' => 'three',
+    ]);
+  }
 
   $configuredMessage = trim((string) Civi::settings()->get('helloasso_quickform_redirect_message'));
   $defaultMessage = 'You will be redirected to HelloAsso to complete your payment.';
   $message = $configuredMessage !== '' && $configuredMessage !== $defaultMessage
     ? $configuredMessage
     : E::ts($defaultMessage);
+  $submittedInstallments = CRM_Utils_Request::retrieveValue(
+    'helloasso_installments',
+    'Positive',
+    NULL,
+    FALSE,
+    'POST'
+  );
 
   Civi::resources()->addVars('helloassoQuickForm', [
     'processorIds' => $processorIds,
     'supportsInstallments' => $supportsInstallments,
     'message' => $message,
+    'installmentsValue' => $submittedInstallments ?: '',
+    'installmentsLabel' => E::ts('Number of installments'),
+    'oneTimeLabel' => E::ts('One-time payment'),
+    'installmentsDescription' => E::ts('Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments.'),
   ]);
   Civi::resources()->addScriptFile(E::LONG_NAME, 'js/quickform-checkout.js');
 }
@@ -1451,6 +1473,18 @@ function helloasso_payment_processor_civicrm_validateForm(string $formName, mixe
 
   if (!$is_helloasso) {
       return;
+  }
+
+  if (
+    $formName === 'CRM_Contribute_Form_Contribution_Main'
+    && array_key_exists('helloasso_installments', $fields)
+  ) {
+    try {
+      $fields = CRM_HelloassoPaymentProcessor_QuickFormInstallments::apply($fields);
+    }
+    catch (InvalidArgumentException $e) {
+      $errors['helloasso_installments'] = E::ts('HelloAsso requires between 2 and 12 installments.');
+    }
   }
 
   if (
