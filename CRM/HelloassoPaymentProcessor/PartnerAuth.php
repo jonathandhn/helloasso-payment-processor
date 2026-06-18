@@ -641,7 +641,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       }
     }
 
-    if (!empty($decoded['error'])) {
+    if (!empty($decoded['message'])) {
       return (string) $decoded['message'];
     }
 

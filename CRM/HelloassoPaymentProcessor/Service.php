@@ -78,7 +78,7 @@ class CRM_HelloassoPaymentProcessor_Service {
   public function listOrganizationPayments(bool $isTest, array $query = []): array {
     $processor = $this->getPreferredProcessorConfig($isTest);
     return CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
-      ->listOrganizationPayments($processor, $isTest ? 1 : 0, $query);
+      ->listOrganizationPayments($processor, $isTest, $query);
   }
 
   /**
@@ -94,7 +94,7 @@ class CRM_HelloassoPaymentProcessor_Service {
   public function getPayment(bool $isTest, int $paymentId, array $query = []): array {
     $processor = $this->getPreferredProcessorConfig($isTest);
     return CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
-      ->getPayment($processor, $isTest ? 1 : 0, $paymentId, $query);
+      ->getPayment($processor, $isTest, $paymentId, $query);
   }
 
   /**
@@ -110,7 +110,7 @@ class CRM_HelloassoPaymentProcessor_Service {
   public function getCheckoutIntent(bool $isTest, int $checkoutIntentId, array $query = []): array {
     $processor = $this->getPreferredProcessorConfig($isTest);
     return CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
-      ->getCheckoutIntent($processor, $isTest ? 1 : 0, $checkoutIntentId, $query);
+      ->getCheckoutIntent($processor, $isTest, $checkoutIntentId, $query);
   }
 
   /**

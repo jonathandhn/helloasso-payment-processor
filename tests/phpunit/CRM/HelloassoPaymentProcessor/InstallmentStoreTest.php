@@ -30,7 +30,7 @@ class CRM_HelloassoPaymentProcessor_TestableInstallmentStore extends CRM_Helloas
     public function exposeNullableParameter(
         array &$params,
         int $index,
-        $value,
+        mixed $value,
         string $type
     ): string {
         return $this->nullableParameter($params, $index, $value, $type);

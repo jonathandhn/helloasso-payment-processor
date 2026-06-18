@@ -32,12 +32,12 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
     /**
      * @param \GuzzleHttp\Client $guzzleClient
      */
-    public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient)
+    public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient): void
     {
         $this->guzzleClient = $guzzleClient;
     }
 
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();
@@ -45,7 +45,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return self::$instance;
     }
 
-    public function getToken($is_test, array $paymentProcessor, $oauthUrl, $clientId, $clientSecret)
+    public function getToken(bool $is_test, array $paymentProcessor, string $oauthUrl, string $clientId, string $clientSecret): object
     {
         if (Civi::cache('long')->has($this->getCacheKey($is_test, $paymentProcessor))
             && !$this->isAccessTokenExpired($is_test, $paymentProcessor)) {
@@ -82,12 +82,12 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
     }
 
-    public function invalidateToken($is_test, array $paymentProcessor)
+    public function invalidateToken(bool $is_test, array $paymentProcessor): void
     {
         Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
     }
 
-    private function isAccessTokenExpired($is_test, array $paymentProcessor)
+    private function isAccessTokenExpired(bool $is_test, array $paymentProcessor): bool
     {
         $token = Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
         if (empty($token) || empty($token->not_after)) {
@@ -101,7 +101,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    private function accessToken($is_test, array $paymentProcessor, $oauthUrl, $clientId, $clientSecret)
+    private function accessToken(bool $is_test, array $paymentProcessor, string $oauthUrl, string $clientId, string $clientSecret): void
     {
         $this->assertSslVerificationEnabled($is_test);
 
@@ -127,7 +127,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         Civi::cache('long')->set($this->getCacheKey($is_test, $paymentProcessor), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
     }
 
-    private function refreshToken($is_test, array $paymentProcessor, $oauthUrl)
+    private function refreshToken(bool $is_test, array $paymentProcessor, string $oauthUrl): void
     {
         $this->assertSslVerificationEnabled($is_test);
 
@@ -152,7 +152,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         Civi::cache('long')->set($this->getCacheKey($is_test, $paymentProcessor), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
     }
 
-    public function createCheckoutIntent(array $paymentProcessor, $isTest, array $request): array
+    public function createCheckoutIntent(array $paymentProcessor, bool $isTest, array $request): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
@@ -163,7 +163,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    public function getCheckoutIntent(array $paymentProcessor, $isTest, int $checkoutIntentId, array $query = []): array
+    public function getCheckoutIntent(array $paymentProcessor, bool $isTest, int $checkoutIntentId, array $query = []): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
@@ -174,7 +174,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    public function getPayment(array $paymentProcessor, $isTest, int $paymentId, array $query = []): array
+    public function getPayment(array $paymentProcessor, bool $isTest, int $paymentId, array $query = []): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
@@ -185,7 +185,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    public function listOrganizationPayments(array $paymentProcessor, $isTest, array $query = []): array
+    public function listOrganizationPayments(array $paymentProcessor, bool $isTest, array $query = []): array
     {
         return $this->requestHelloAsso(
             $paymentProcessor,
@@ -196,7 +196,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    public function refundPayment(array $paymentProcessor, $isTest, int $paymentId): array
+    public function refundPayment(array $paymentProcessor, bool $isTest, int $paymentId): array
     {
         if (!(bool) Civi::settings()->get('helloasso_enable_refunds')) {
             throw new PaymentProcessorException(E::ts('HelloAsso refunds are disabled by this extension.'));
@@ -210,7 +210,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    public function cancelOrder(array $paymentProcessor, $isTest, int $orderId): array
+    public function cancelOrder(array $paymentProcessor, bool $isTest, int $orderId): array
     {
         $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
         $authConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
@@ -241,7 +241,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    private function requestHelloAsso(array $paymentProcessor, $is_test, string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array
+    private function requestHelloAsso(array $paymentProcessor, bool $is_test, string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array
     {
         $this->assertSslVerificationEnabled($is_test);
 
@@ -294,7 +294,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         string $method,
         string $path,
         int $statusCode,
-        $decoded
+        mixed $decoded
     ): void {
         $errorMessage = $this->buildApiErrorMessage($decoded, $statusCode);
         if (CRM_HelloassoPaymentProcessor_ApiErrorClassifier::isOrganizationPaymentBlocked(
@@ -357,14 +357,14 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return E::ts('HelloAsso API error (%1)', [1 => $statusCode]);
     }
 
-    private function assertSslVerificationEnabled($is_test): void
+    private function assertSslVerificationEnabled(bool $is_test): void
     {
         if (!$is_test && !Civi::settings()->get('verifySSL')) {
             throw new PaymentProcessorException(E::ts('HelloAsso live API calls require SSL verification to be enabled.'));
         }
     }
 
-    private function getCacheKey($is_test, array $paymentProcessor): string
+    private function getCacheKey(bool $is_test, array $paymentProcessor): string
     {
         $processorIdentifier = $paymentProcessor['id']
             ?? sha1(implode('|', [
@@ -376,12 +376,12 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return 'helloasso-token-' . $processorIdentifier . ($is_test ? '-test' : '-live');
     }
 
-    private function getTokenLockName($is_test, array $paymentProcessor): string
+    private function getTokenLockName(bool $is_test, array $paymentProcessor): string
     {
         return 'data.helloasso.api.refresh.' . sha1($this->getCacheKey($is_test, $paymentProcessor));
     }
 
-    private function shouldUsePluginPublic(array $paymentProcessor, $is_test): bool
+    private function shouldUsePluginPublic(array $paymentProcessor, bool $is_test): bool
     {
         $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
         if (!$paymentProcessorId) {
@@ -391,7 +391,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return (new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig())->shouldUsePluginPublic($paymentProcessorId, $paymentProcessor);
     }
 
-    private function getOrganizationSlug(array $paymentProcessor, $is_test): string
+    private function getOrganizationSlug(array $paymentProcessor, bool $is_test): string
     {
         if ($this->shouldUsePluginPublic($paymentProcessor, $is_test)) {
             $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);

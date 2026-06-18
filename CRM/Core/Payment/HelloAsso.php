@@ -2987,7 +2987,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 ->shouldUsePluginPublic($paymentProcessorId, $this->getPaymentProcessorConfig());
     }
 
-    private function normalizeNullableTimestamp($value): ?string
+    private function normalizeNullableTimestamp(mixed $value): ?string
     {
         if ($value === NULL || $value === '') {
             return NULL;
@@ -3011,7 +3011,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
     }
 
-    private function formatCiviBusinessTimestamp($value): ?string
+    private function formatCiviBusinessTimestamp(mixed $value): ?string
     {
         if ($value === NULL || $value === '') {
             return NULL;

@@ -180,13 +180,22 @@ class CRM_HelloassoPaymentProcessor_PartnerCredentials {
   }
 
   private function hasCompletePair(array $credentials): bool {
-    return trim((string) ($credentials['clientId'] ?? '')) !== ''
-      && trim((string) ($credentials['clientSecret'] ?? '')) !== '';
+    $clientId = trim((string) ($credentials['clientId'] ?? ''));
+    $clientSecret = trim((string) ($credentials['clientSecret'] ?? ''));
+
+    return $clientId !== ''
+      && $clientSecret !== ''
+      && !$this->isBuildPlaceholder($clientId)
+      && !$this->isBuildPlaceholder($clientSecret);
   }
 
   private function hasAnyValue(array $credentials): bool {
     return trim((string) ($credentials['clientId'] ?? '')) !== ''
       || trim((string) ($credentials['clientSecret'] ?? '')) !== '';
+  }
+
+  private function isBuildPlaceholder(string $value): bool {
+    return preg_match('/^%%[A-Z0-9_]+%%$/', $value) === 1;
   }
 
 }
