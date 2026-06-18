@@ -555,6 +555,26 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return TRUE;
   }
 
+  public function upgrade_4222(): bool {
+    $this->ctx->log->info('Applying update 4222: resync recurring support flags on existing HelloAsso payment processors.');
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_payment_processor_type
+      SET is_recur = 1
+      WHERE class_name = 'Payment_HelloAsso'
+        AND (is_recur IS NULL OR is_recur = 0)
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_payment_processor
+      SET is_recur = 1
+      WHERE class_name = 'Payment_HelloAsso'
+        AND (is_recur IS NULL OR is_recur = 0)
+    ");
+
+    return TRUE;
+  }
+
   private function addColumnIfMissing(string $columnName, string $sql): void {
     $column = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM civicrm_hello_asso_metadata LIKE %1", [
       1 => [$columnName, 'String'],
