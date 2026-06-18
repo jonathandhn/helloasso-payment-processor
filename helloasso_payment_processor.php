@@ -1011,19 +1011,8 @@ function helloasso_payment_processor_describe_payment_processor(int $paymentProc
     $processor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $paymentProcessorId]);
     $title = trim((string) ($processor['title'] ?? $processor['name'] ?? ''));
     if ($title !== '') {
-      $pairedProcessorId = helloasso_payment_processor_get_paired_payment_processor_id($processor);
-      if ($pairedProcessorId && !empty($processor['is_test'])) {
-        return E::ts('%1 (#%2, sandbox linked to live processor #%3)', [
-          1 => $title,
-          2 => $paymentProcessorId,
-          3 => $pairedProcessorId,
-        ]);
-      }
-      return E::ts('%1 (#%2, %3)', [
-        1 => $title,
-        2 => $paymentProcessorId,
-        3 => !empty($processor['is_test']) ? E::ts('sandbox') : E::ts('production'),
-      ]);
+      $mode = !empty($processor['is_test']) ? E::ts('sandbox') : E::ts('production');
+      return sprintf('%s (#%d, %s)', $title, $paymentProcessorId, $mode);
     }
   }
   catch (Exception $e) {
@@ -1038,36 +1027,50 @@ function helloasso_payment_processor_describe_payment_processor(int $paymentProc
   return sprintf('Processor #%d', $paymentProcessorId);
 }
 
-function helloasso_payment_processor_get_paired_payment_processor_id(array $processor): ?int {
-  $processorId = (int) ($processor['id'] ?? 0);
-  $processorName = trim((string) ($processor['name'] ?? ''));
-  if ($processorName === '') {
-    return NULL;
-  }
-
-  try {
-    $pairedProcessor = civicrm_api3('PaymentProcessor', 'getsingle', [
-      'name' => $processorName,
-      'is_test' => !empty($processor['is_test']) ? 0 : 1,
-    ]);
-    $pairedProcessorId = (int) ($pairedProcessor['id'] ?? 0);
-    return $pairedProcessorId && $pairedProcessorId !== $processorId ? $pairedProcessorId : NULL;
-  }
-  catch (Exception $e) {
-    return NULL;
-  }
-}
-
 function helloasso_payment_processor_get_payment_processor_admin_link(int $paymentProcessorId): string {
   $label = helloasso_payment_processor_describe_payment_processor($paymentProcessorId, []);
+  $adminProcessorId = helloasso_payment_processor_get_admin_edit_payment_processor_id($paymentProcessorId);
   $url = CRM_Utils_System::url(
     'civicrm/admin/paymentProcessor',
-    'reset=1&action=update&id=' . $paymentProcessorId
+    'reset=1&action=update&id=' . $adminProcessorId
   );
 
   return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">'
     . htmlspecialchars($label, ENT_QUOTES, 'UTF-8')
     . '</a>';
+}
+
+function helloasso_payment_processor_get_admin_edit_payment_processor_id(int $paymentProcessorId): int {
+  try {
+    $processor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $paymentProcessorId]);
+    if (empty($processor['is_test']) || empty($processor['name'])) {
+      return $paymentProcessorId;
+    }
+
+    foreach ([
+      ['name' => $processor['name'], 'is_test' => 0],
+      ['id' => $paymentProcessorId + 1, 'is_test' => 0],
+    ] as $params) {
+      try {
+        $liveProcessor = civicrm_api3('PaymentProcessor', 'getsingle', $params);
+        if (
+          !empty($liveProcessor['id'])
+          && (empty($processor['payment_processor_type_id'])
+            || empty($liveProcessor['payment_processor_type_id'])
+            || (int) $liveProcessor['payment_processor_type_id'] === (int) $processor['payment_processor_type_id'])
+        ) {
+          return (int) $liveProcessor['id'];
+        }
+      }
+      catch (Exception $e) {
+        // Try the next safe lookup before falling back to the original id.
+      }
+    }
+  }
+  catch (Exception $e) {
+    return $paymentProcessorId;
+  }
+  return $paymentProcessorId;
 }
 
 function helloasso_payment_processor_get_api_key_health(array $paymentProcessor): array {
