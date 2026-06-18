@@ -312,16 +312,36 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
       return;
     }
 
+    if (!empty($state['browser_return_fallback'])) {
+      \Civi::log()->warning(sprintf(
+        'HelloAsso browser return fallback to pending for contribution %d after a bounded synchronization attempt: %s',
+        $session->getContributionId(),
+        implode(' | ', array_map('strval', $state['synchronization_errors'] ?? []))
+      ));
+    }
+
     switch ($state['checkout_status']) {
       case 'success':
+        \Civi::log()->info(sprintf(
+          'HelloAsso browser return finalized contribution %d immediately with status success.',
+          $session->getContributionId()
+        ));
         $session->success();
         return;
 
       case 'cancel':
+        \Civi::log()->info(sprintf(
+          'HelloAsso browser return finalized contribution %d immediately with status cancel.',
+          $session->getContributionId()
+        ));
         $session->cancel();
         return;
 
       case 'fail':
+        \Civi::log()->info(sprintf(
+          'HelloAsso browser return finalized contribution %d immediately with status fail.',
+          $session->getContributionId()
+        ));
         $session->fail();
         return;
     }

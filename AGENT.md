@@ -23,6 +23,19 @@ Il fixe uniquement:
 - Regle de projet: raisonner en **PHPUnit 11**.
 - Si un doute existe, la reference est la configuration PHPUnit du depot, pas un souvenir de version ni une dependance dev ancienne.
 - Ne pas introduire de syntaxe ou de conventions de tests incompatibles avec PHPUnit 11.
+- Sur un build Drupal, PHPUnit s'utilise ou s'installe au niveau du `composer` racine du site, pas dans l'extension seule.
+- Un agent ne doit pas conclure trop vite que PHPUnit est "absent" juste parce que `vendor/bin/phpunit` manque dans le dossier de l'extension.
+- Exception importante: ne pas appliquer cette hypothese aveuglement sur un build WordPress ou sur un autre packaging qui n'utilise pas le meme root `composer`.
+
+### 1.2.b Outils du root Drupal
+
+- Sur un build Drupal avec root `composer`, verifier d'abord les executables dans `vendor/bin` du site avant de conclure qu'un outil est absent.
+- Cela vaut au minimum pour:
+  - `phpunit`
+  - `phpstan`
+  - `civix`
+  - et les autres outils de dev portes par le root Drupal
+- Un agent ne doit pas s'arreter a l'absence d'un binaire dans le dossier courant de l'extension si le projet est manifestement pilote par le root Drupal.
 
 ### 1.3 PHPStan
 
@@ -137,6 +150,10 @@ Interdits:
 - Le premier paiement d'un echeancier doit etre comptabilise sur le montant reellement encaisse.
 - Il ne doit pas etre comptabilise sur le montant total promis si seul l'acompte initial a ete preleve.
 - La contribution d'ancrage, le `ContributionRecur.amount` et le paiement cree dans Civi doivent rester coherents.
+- La contribution d'ancrage doit representer le premier terme reel, pas toute la promesse restante.
+- Si le premier terme de `5 EUR` est entierement encaisse, cette contribution doit pouvoir finir en `Completed`.
+- Le plan `ContributionRecur` peut rester `In Progress` ou l'equivalent tant que les echeances suivantes ne sont pas toutes collectees.
+- Il ne faut pas laisser la contribution d'ancrage en `Partially paid` uniquement parce que des termes futurs restent a venir.
 
 ### 3.5 L'intention utilisateur ne doit pas etre perdue
 

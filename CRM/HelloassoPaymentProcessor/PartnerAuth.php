@@ -137,24 +137,35 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     throw new PaymentProcessorException(E::ts('HelloAsso partner authorization requires a payment processor.'));
   }
 
-  public function listOrganizationPayments(array $query = []): array {
-    $link = $this->getUsableLink();
+  public function listOrganizationPayments(
+    array $query = [],
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    $link = $this->getUsableLink($requestProfile);
     return $this->request('GET', '/v5/organizations/' . rawurlencode($link['organization_slug']) . '/payments', [
       'query' => $query,
-    ]);
+    ], TRUE, $requestProfile);
   }
 
-  public function getPayment(int $paymentId, array $query = []): array {
+  public function getPayment(
+    int $paymentId,
+    array $query = [],
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
     return $this->request('GET', '/v5/payments/' . $paymentId, [
       'query' => $query,
-    ]);
+    ], TRUE, $requestProfile);
   }
 
-  public function getCheckoutIntent(int $checkoutIntentId, array $query = []): array {
-    $link = $this->getUsableLink();
+  public function getCheckoutIntent(
+    int $checkoutIntentId,
+    array $query = [],
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    $link = $this->getUsableLink($requestProfile);
     return $this->request('GET', '/v5/organizations/' . rawurlencode($link['organization_slug']) . '/checkout-intents/' . $checkoutIntentId, [
       'query' => $query,
-    ]);
+    ], TRUE, $requestProfile);
   }
 
   public function configureOrganizationWebhook(string $url): array {
@@ -170,8 +181,13 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     return $this->request('GET', '/v5/partners/me');
   }
 
-  public function requestApi(string $method, string $path, array $options = []): array {
-    return $this->request($method, $path, $options);
+  public function requestApi(
+    string $method,
+    string $path,
+    array $options = [],
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    return $this->request($method, $path, $options, TRUE, $requestProfile);
   }
 
   /**
@@ -220,12 +236,18 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     return $this->getTokenUrl();
   }
 
-  private function request(string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array {
-    $link = $this->getUsableLink();
+  private function request(
+    string $method,
+    string $path,
+    array $options = [],
+    bool $retryOnUnauthorized = TRUE,
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    $link = $this->getUsableLink($requestProfile);
 
     $requestOptions = CRM_HelloassoPaymentProcessor_RequestOptions::defaults($options + [
       'headers' => [],
-    ]);
+    ], $requestProfile);
     $requestOptions['headers']['Authorization'] = 'Bearer ' . $link['access_token'];
 
     $response = $this->getGuzzleClient()->request($method, $this->getApiBaseUrl() . $path, $requestOptions);
@@ -234,8 +256,8 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     $decoded = $body === '' ? [] : json_decode($body, TRUE);
 
     if ($statusCode === 401 && $retryOnUnauthorized) {
-      $this->refreshStoredLink(TRUE);
-      return $this->request($method, $path, $options, FALSE);
+      $this->refreshStoredLink(TRUE, FALSE, $requestProfile);
+      return $this->request($method, $path, $options, FALSE, $requestProfile);
     }
 
     if ($statusCode < 200 || $statusCode >= 300) {
@@ -262,7 +284,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     return is_array($decoded) ? $decoded : [];
   }
 
-  private function getUsableLink(): array {
+  private function getUsableLink(string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT): array {
     $link = $this->getStoredLink();
     if (!$link) {
       throw new PaymentProcessorException(E::ts('HelloAsso partner authorization is not linked to an organization.'));
@@ -277,13 +299,17 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       isset($link['expires_at']) ? (int) $link['expires_at'] : NULL,
       time()
     )) {
-      $link = $this->refreshStoredLink();
+      $link = $this->refreshStoredLink(FALSE, FALSE, $requestProfile);
     }
 
     return $link;
   }
 
-  private function refreshStoredLink(bool $force = FALSE, bool $refreshAtHalfLife = FALSE): array {
+  private function refreshStoredLink(
+    bool $force = FALSE,
+    bool $refreshAtHalfLife = FALSE,
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
     $initialLink = $this->getStoredLink();
     $initialRefreshToken = (string) ($initialLink['refresh_token'] ?? '');
     $lock = Civi::lockManager()->acquire($this->getRefreshLockName(), 10);
@@ -322,7 +348,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       $token = $this->requestToken([
         'grant_type' => 'refresh_token',
         'refresh_token' => $link['refresh_token'],
-      ], TRUE);
+      ], TRUE, $requestProfile);
 
       $refreshed = $this->normalizeToken($token) + [
         'organization_slug' => $token['organization_slug'] ?? $link['organization_slug'],
@@ -344,7 +370,11 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     }
   }
 
-  private function requestToken(array $formParams, bool $isRefreshRequest = FALSE): array {
+  private function requestToken(
+    array $formParams,
+    bool $isRefreshRequest = FALSE,
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
     $this->assertSslVerificationEnabled();
 
     $response = $this->getGuzzleClient()->request('POST', $this->getTokenUrl(), CRM_HelloassoPaymentProcessor_RequestOptions::defaults([
@@ -352,7 +382,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       'headers' => [
         'content-type' => 'application/x-www-form-urlencoded',
       ],
-    ]));
+    ], $requestProfile));
 
     $statusCode = $response->getStatusCode();
     $body = (string) $response->getBody();

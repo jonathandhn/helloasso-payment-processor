@@ -393,9 +393,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
     public function synchronizeContributionForHostedCheckout(int $contributionId): array
     {
-        $this->processScheduledSynchronization([
+        $syncResults = $this->processScheduledSynchronization([
             'contribution_id' => $contributionId,
             'limit' => 1,
+            'request_profile' => CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_BROWSER_RETURN,
         ]);
 
         $contribution = $this->loadContributionById($contributionId);
@@ -413,6 +414,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $gatewayState = (string) ($metadata->state ?? '');
         $outcome = CRM_HelloassoPaymentProcessor_PaymentState::outcome($gatewayState);
         $checkoutStatus = 'pending';
+        $browserReturnFallback = !empty($syncResults['errors']);
         if ((string) $statusName === 'Completed' || $outcome === CRM_HelloassoPaymentProcessor_PaymentState::SUCCESS) {
             $checkoutStatus = 'success';
         }
@@ -433,10 +435,16 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             $checkoutStatus = 'fail';
         }
 
+        if ($checkoutStatus === 'pending') {
+            $this->requestImmediateContributionSynchronization($contributionId, 'browser-return');
+        }
+
         return [
             'checkout_status' => $checkoutStatus,
             'contribution_status_name' => (string) $statusName,
             'gateway_state' => $gatewayState,
+            'browser_return_fallback' => $browserReturnFallback,
+            'synchronization_errors' => $syncResults['errors'] ?? [],
         ];
     }
 
@@ -662,10 +670,14 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         array $request,
         array $options
     ): void {
+        $contributionId = !empty($options['contribution_id'])
+            ? (int) $options['contribution_id']
+            : (int) $propertyBag->getContributionID();
         if (
             !$propertyBag->getIsRecur()
             || !$propertyBag->has('contributionRecurID')
             || !isset($request['initialAmount'])
+            || !$contributionId
             || (
                 empty($options['helloasso_installments'])
                 && empty($options['schedule_total_amount'])
@@ -678,6 +690,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             ->addWhere('id', '=', $propertyBag->getContributionRecurID())
             ->addValue('amount', ((int) $request['initialAmount']) / 100)
             ->execute();
+
+        $this->synchronizeInitialInstallmentContributionAmountShape(
+            $contributionId,
+            (int) $request['initialAmount']
+        );
     }
 
     private function buildPayerFromPropertyBag(\Civi\Payment\PropertyBag $propertyBag): array
@@ -1123,6 +1140,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             }
 
             $this->applyHelloAssoPaymentState($contribution, $authoritativePayload[0], $authoritativePayload[1], $payload['eventType'] ?? NULL);
+            Civi::log()->info(sprintf(
+                'HelloAsso webhook finalized contribution %d with gateway state %s.',
+                (int) $contribution->id,
+                (string) (($authoritativePayload[0]['state'] ?? '') ?: ($authoritativePayload[1]['state'] ?? ''))
+            ));
 
             \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
                 ->addWhere('id', '=', $webhookEvent['id'])
@@ -1144,7 +1166,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
     }
 
-    public function synchronizePendingContributions(int $limit = 30, array $filters = []): array
+    public function synchronizePendingContributions(
+        int $limit = 30,
+        array $filters = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         $results = [
             'checked' => 0,
@@ -1240,7 +1266,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                         $this->getPaymentProcessorConfig(),
                         $this->_is_test,
                         (int) $dao->helloasso_payment_id,
-                        ['withFailedRefundOperation' => 'true']
+                        ['withFailedRefundOperation' => 'true'],
+                        $requestProfile
                     );
                     $contribution = $this->loadContributionById((int) $dao->contribution_id);
                     if ($contribution) {
@@ -1254,7 +1281,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                         $this->getPaymentProcessorConfig(),
                         $this->_is_test,
                         $checkoutIntentId,
-                        ['withFailedRefundOperation' => 'true']
+                        ['withFailedRefundOperation' => 'true'],
+                        $requestProfile
                     );
                     $contribution = $this->loadContributionById((int) $dao->contribution_id);
                     $hasPayments = $contribution && !empty($checkoutIntent['order']['payments']);
@@ -1293,6 +1321,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
                 if ($updated) {
                     $results['updated']++;
+                    Civi::log()->info(sprintf(
+                        'HelloAsso cron follow-up finalized contribution %d with gateway state %s.',
+                        (int) $dao->contribution_id,
+                        (string) ($this->loadMetadataForContribution((int) $dao->contribution_id)->state ?? '')
+                    ));
                 }
             }
             catch (\Throwable $e) {
@@ -1331,13 +1364,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         if (!empty($filters['allow_recent_scan']) && $results['checked'] < $limit && empty($filters['contribution_id']) && empty($filters['only_scheduled']) && empty($filters['due_before'])) {
-            $results = $this->mergeSyncResults($results, $this->synchronizeRecentOrganizationPayments());
+            $results = $this->mergeSyncResults($results, $this->synchronizeRecentOrganizationPayments($requestProfile));
         }
 
         return $results;
     }
 
-    private function synchronizeRecentOrganizationPayments(): array
+    private function synchronizeRecentOrganizationPayments(
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
     {
         $results = [
             'checked' => 0,
@@ -1354,7 +1389,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 'pageSize' => 100,
                 'sortField' => 'UpdateDate',
                 'sortOrder' => 'Desc',
-            ]
+            ],
+            $requestProfile
         );
 
         foreach ($payments['data'] ?? [] as $payment) {
@@ -1372,6 +1408,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             try {
                 if ($this->applyHelloAssoPaymentState($contribution, $payment, $payment['order'] ?? [], 'CronSyncOrganizationPayments')) {
                     $results['updated']++;
+                    Civi::log()->info(sprintf(
+                        'HelloAsso cron recent-scan finalized contribution %d with gateway state %s.',
+                        (int) $contribution->id,
+                        (string) ($payment['state'] ?? '')
+                    ));
                 }
             }
             catch (\Throwable $e) {
@@ -1418,8 +1459,11 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         $limit = !empty($options['limit']) ? (int) $options['limit'] : $this->getFollowUpCronLimit();
+        $requestProfile = !empty($options['request_profile'])
+            ? (string) $options['request_profile']
+            : CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT;
 
-        return $this->synchronizePendingContributions($limit, $filters);
+        return $this->synchronizePendingContributions($limit, $filters, $requestProfile);
     }
 
     public function synchronizeLongPendingContributions(int $limit = 30, array $filters = []): array
@@ -1820,6 +1864,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         $paymentAmount = $this->resolveContributionPaymentAmount($contribution, $paymentData);
+        $this->synchronizeInitialInstallmentContributionAmountShape(
+            (int) $contribution->id,
+            (int) round($paymentAmount * 100)
+        );
         if (abs((float) $contribution->total_amount - $paymentAmount) > 0.0001) {
             $contribution->total_amount = $paymentAmount;
             $contribution->save();
@@ -1878,6 +1926,146 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         return (float) $contribution->total_amount;
+    }
+
+    private function synchronizeInitialInstallmentContributionAmountShape(
+        int $contributionId,
+        int $targetAmountCents
+    ): void {
+        if ($contributionId < 1 || $targetAmountCents < 0) {
+            return;
+        }
+
+        $targetAmount = round($targetAmountCents / 100, 2);
+        CRM_Core_DAO::executeQuery(
+            'UPDATE civicrm_contribution
+             SET total_amount = %1
+             WHERE id = %2',
+            [
+                1 => [$targetAmount, 'Money'],
+                2 => [$contributionId, 'Integer'],
+            ]
+        );
+
+        $lineItemRows = [];
+        $lineItemQuery = CRM_Core_DAO::executeQuery(
+            'SELECT id, qty, unit_price, line_total
+             FROM civicrm_line_item
+             WHERE entity_table = %1
+               AND entity_id = %2
+             ORDER BY id ASC',
+            [
+                1 => ['civicrm_contribution', 'String'],
+                2 => [$contributionId, 'Integer'],
+            ]
+        );
+        while ($lineItemQuery->fetch()) {
+            $lineItemRows[] = [
+                'id' => (int) $lineItemQuery->id,
+                'qty' => (float) $lineItemQuery->qty,
+                'unit_price' => (float) $lineItemQuery->unit_price,
+                'line_total' => (float) $lineItemQuery->line_total,
+            ];
+        }
+
+        if ($lineItemRows === []) {
+            return;
+        }
+
+        $weights = [];
+        foreach ($lineItemRows as $row) {
+            $weights[] = max(0, (int) round($row['line_total'] * 100));
+        }
+
+        if (array_sum($weights) === 0) {
+            $weights = array_fill(0, count($lineItemRows), 0);
+            $weights[0] = $targetAmountCents;
+        }
+
+        $allocatedTotals = $this->allocateAmountCentsByWeight($targetAmountCents, $weights);
+        foreach ($lineItemRows as $index => $row) {
+            $lineTotal = round($allocatedTotals[$index] / 100, 2);
+            $qty = abs($row['qty']) > 0.0000001 ? $row['qty'] : 1.0;
+            $unitPrice = round($lineTotal / $qty, 2);
+            if ($index === array_key_last($lineItemRows)) {
+                $lineTotal = $targetAmount;
+                foreach ($allocatedTotals as $previousIndex => $allocatedTotal) {
+                    if ($previousIndex === $index) {
+                        continue;
+                    }
+                    $lineTotal -= round($allocatedTotal / 100, 2);
+                }
+                $lineTotal = round($lineTotal, 2);
+                $unitPrice = round($lineTotal / $qty, 2);
+            }
+
+            CRM_Core_DAO::executeQuery(
+                'UPDATE civicrm_line_item
+                 SET line_total = %1,
+                     unit_price = %2
+                 WHERE id = %3',
+                [
+                    1 => [$lineTotal, 'Money'],
+                    2 => [$unitPrice, 'Money'],
+                    3 => [$row['id'], 'Integer'],
+                ]
+            );
+
+            CRM_Core_DAO::executeQuery(
+                'UPDATE civicrm_financial_item
+                 SET amount = %1
+                 WHERE entity_table = %2
+                   AND entity_id = %3',
+                [
+                    1 => [$lineTotal, 'Money'],
+                    2 => ['civicrm_line_item', 'String'],
+                    3 => [$row['id'], 'Integer'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * @param array<int, int> $weights
+     *
+     * @return array<int, int>
+     */
+    private function allocateAmountCentsByWeight(int $targetAmountCents, array $weights): array
+    {
+        if ($weights === []) {
+            return [];
+        }
+
+        $sum = array_sum($weights);
+        if ($sum <= 0) {
+            $allocated = array_fill(0, count($weights), 0);
+            $allocated[0] = $targetAmountCents;
+            return $allocated;
+        }
+
+        $allocated = [];
+        $remainders = [];
+        $distributed = 0;
+        foreach ($weights as $index => $weight) {
+            $numerator = $targetAmountCents * $weight;
+            $base = (int) floor($numerator / $sum);
+            $allocated[$index] = $base;
+            $remainders[$index] = $numerator - ($base * $sum);
+            $distributed += $base;
+        }
+
+        $remaining = $targetAmountCents - $distributed;
+        arsort($remainders);
+        foreach (array_keys($remainders) as $index) {
+            if ($remaining <= 0) {
+                break;
+            }
+            $allocated[$index]++;
+            $remaining--;
+        }
+
+        ksort($allocated);
+        return array_values($allocated);
     }
 
     private function markContributionRefunded(CRM_Contribute_BAO_Contribution $contribution, array $paymentData): bool
@@ -2484,6 +2672,34 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             $metadata->long_sync_error_count = 0;
         }
         $metadata->save();
+    }
+
+    private function requestImmediateContributionSynchronization(int $contributionId, string $context = 'manual'): void
+    {
+        if (!$this->isFollowUpEnabled()) {
+            return;
+        }
+
+        $metadata = $this->loadMetadataForContribution($contributionId);
+        $now = $this->nowForMetadata();
+        $metadata->contribution_id = $contributionId;
+        if (empty($metadata->sync_origin_date)) {
+            $metadata->sync_origin_date = $this->formatMetadataTimestamp($now);
+        }
+        $metadata->sync_next_date = $this->formatMetadataTimestamp($now);
+        if (empty($metadata->sync_last_date)) {
+            $metadata->sync_last_date = 'null';
+        }
+        if (!isset($metadata->sync_attempt_count)) {
+            $metadata->sync_attempt_count = 0;
+        }
+        $metadata->save();
+
+        Civi::log()->info(sprintf(
+            'HelloAsso queued an immediate follow-up for contribution %d after %s.',
+            $contributionId,
+            $context
+        ));
     }
 
     private function ensureLongFollowUpSchedule(int $contributionId, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata, ?array $paymentData = NULL): void
