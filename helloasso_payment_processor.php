@@ -349,7 +349,8 @@ function helloasso_payment_processor_add_quickform_checkout_controls(
   }
 
   $supportsInstallments = $formName === 'CRM_Contribute_Form_Contribution_Main'
-    && (bool) Civi::settings()->get('helloasso_enable_installments');
+    && (bool) Civi::settings()->get('helloasso_enable_installments')
+    && !empty($form->_values['is_recur']);
   if ($supportsInstallments) {
     $form->add('text', 'helloasso_installments', E::ts('Number of installments'), [
       'min' => 2,
