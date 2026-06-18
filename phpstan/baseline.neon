@@ -1,0 +1,1717 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:applyHelloAssoPaymentState\(\) has parameter \$orderData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:applyHelloAssoPaymentState\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:armInstallmentRecovery\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:armLongFollowUp\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:buildCheckoutAmountFields\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:buildCheckoutAmountFields\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:buildPayerFromPropertyBag\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:buildWebhookEventId\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:buildWebhookIdentifier\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:chooseBestContactDetails\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:chooseBestContactDetails\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:completeInstallmentRecovery\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:createCheckoutIntentAndStore\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:createCheckoutIntentAndStore\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:createRepeatedInstallmentContribution\(\) has parameter \$identity with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:detectLongFollowUpScheme\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:doCancelRecurring\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:doPayment\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:doPayment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:doRefund\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:doRefund\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:ensureLongFollowUpSchedule\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:extractSuccessfulRefundOperation\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:extractSuccessfulRefundOperation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:fetchAuthoritativeWebhookPaymentState\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:fetchAuthoritativeWebhookPaymentState\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:findContributionFromWebhookPayload\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:getLongFollowUpDays\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:getPaymentProcessorConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:getSafeAbortUrl\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:getShortFollowUpMinutes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:markContributionCompleted\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:markContributionRefunded\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:mergeSyncResults\(\) has parameter \$left with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:mergeSyncResults\(\) has parameter \$right with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:mergeSyncResults\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:processLongScheduledSynchronization\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:processLongScheduledSynchronization\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:processScheduledSynchronization\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:processScheduledSynchronization\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:processWebhookEvent\(\) has parameter \$webhookEvent with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:queueWebhookPayload\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:recordHelloAssoRefundPayment\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:recordHelloAssoRefundPayment\(\) has parameter \$refundOperation with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:resolveInstallmentContribution\(\) has parameter \$orderData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:resolveInstallmentContribution\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:resolveLongFollowUpOriginDate\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:startHostedCheckoutForContribution\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:synchronizeContributionForHostedCheckout\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:synchronizeLongPendingContributions\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:synchronizeLongPendingContributions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:synchronizePendingContributions\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:synchronizePendingContributions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso\:\:synchronizeRecentOrganizationPayments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/Core/Payment/HelloAsso.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata\:\:export\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata\:\:fields\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata\:\:import\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata\:\:indices\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuard\:\:isFuturePendingInstallment\(\) has parameter \$installment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/FutureInstallmentReminderGuard.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:accessToken\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:cancelOrder\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:cancelOrder\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:createCheckoutIntent\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:createCheckoutIntent\(\) has parameter \$request with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:createCheckoutIntent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getCacheKey\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getCheckoutIntent\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getCheckoutIntent\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getCheckoutIntent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getOrganizationSlug\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getPayment\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getPayment\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getPayment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getToken\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:getTokenLockName\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:invalidateToken\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:isAccessTokenExpired\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:listOrganizationPayments\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:listOrganizationPayments\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:listOrganizationPayments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:refreshToken\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:refundPayment\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:refundPayment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:requestHelloAsso\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:requestHelloAsso\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:requestHelloAsso\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:requestHelloAssoViaPluginPublic\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:requestHelloAssoViaPluginPublic\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:requestHelloAssoViaPluginPublic\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:shouldUsePluginPublic\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_HelloAssoClient\:\:throwApiError\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentCancellation\:\:cancelInstallments\(\) has parameter \$installmentIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentCancellation.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentCancellation\:\:cancelPendingContributions\(\) has parameter \$contributionIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentCancellation.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentCancellation\:\:stopContributionFollowUps\(\) has parameter \$contributionIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentCancellation.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentFollowUp\:\:isFuturePending\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentFollowUp.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentFollowUp\:\:originDate\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentFollowUp.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentFollowUp\:\:paymentDate\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentFollowUp.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentIdentity\:\:fromPayment\(\) has parameter \$orderData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentIdentity.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentIdentity\:\:fromPayment\(\) has parameter \$paymentData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentIdentity.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentLifecycle\:\:result\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentLifecycle.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentStore\:\:claim\(\) has parameter \$identity with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentStore.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentStore\:\:nullableParameter\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentStore.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentStore\:\:updateState\(\) has parameter \$identity with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/InstallmentStore.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Logger\:\:debug\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Logger.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_OAuthTokenLifetime\:\:decodeJwtClaims\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/OAuthTokenLifetime.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_OAuthTokenLifetime\:\:refreshWindow\(\) has parameter \$token with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/OAuthTokenLifetime.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Page_PartnerAuth\:\:formatPartnerNotifications\(\) has parameter \$notifications with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Page_PartnerAuth\:\:renderPartnerInformation\(\) has parameter \$partnerInformation with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:buildApiErrorMessage\(\) has parameter \$decoded with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:completeCallback\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:configureOrganizationWebhook\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getCheckoutIntent\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getCheckoutIntent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getLinkedOrganization\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getPartnerInformation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getPayment\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getPayment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getPaymentProcessor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getRefreshTokenWindow\(\) has parameter \$token with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getRefreshTokenWindow\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getResolvedCredentials\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getStoredLink\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:getUsableLink\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:isAccessTokenUsable\(\) has parameter \$link with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:isRefreshTokenPastHalfLife\(\) has parameter \$link with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:listOrganizationPayments\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:listOrganizationPayments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:normalizeToken\(\) has parameter \$token with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:normalizeToken\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:refreshStoredLink\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:request\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:request\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:requestApi\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:requestApi\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:requestToken\(\) has parameter \$formParams with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:requestToken\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerAuth\:\:storeLinkSafely\(\) has parameter \$link with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Property CRM_HelloassoPaymentProcessor_PartnerAuth\:\:\$paymentProcessor type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerAuth.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:fingerprint\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:getCommunityCredentials\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:getCommunityCredentialsConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:getCommunityFingerprints\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:getConfiguredFingerprints\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:getLocalCredentials\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:hasAnyValue\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:hasCompletePair\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:isCommunityOwnedPair\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentials\:\:resolve\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PayerCompany\:\:organizationName\(\) has parameter \$contact with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PayerCompany.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PayerCompany\:\:organizationName\(\) has parameter \$contribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/PayerCompany.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:buildNullableIntegerParam\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:buildNullableTimestampParam\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:get\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getAll\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getAllFromTable\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getConnectionMode\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getDefaultConnectionMode\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getLinkedOrganization\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getLinkedProcessors\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getStoredLink\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:getWebhookRegistration\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:hasClassicCredentials\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:mapRowToConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:set\(\) has parameter \$config with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:setInTable\(\) has parameter \$config with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:shouldUsePluginPublic\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:storeLink\(\) has parameter \$link with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ProcessorAuthConfig\:\:storeWebhookRegistration\(\) has parameter \$registration with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_QuickFormInstallments\:\:apply\(\) has parameter \$fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/QuickFormInstallments.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_QuickFormInstallments\:\:apply\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/QuickFormInstallments.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_SepaOptions\:\:build\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/SepaOptions.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getCheckoutIntent\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getCheckoutIntent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPartnerCheckoutIntent\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPartnerCheckoutIntent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPartnerLinkedOrganization\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPartnerPayment\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPartnerPayment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPayment\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPayment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPreferredPartnerProcessorConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPreferredProcessor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getPreferredProcessorConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getProcessorById\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getProcessorConfigById\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getProcessorConfigs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:getProcessors\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:listOrganizationPayments\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:listOrganizationPayments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:listPartnerOrganizationPayments\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:listPartnerOrganizationPayments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:sanitizeProcessor\(\) has parameter \$processor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Service\:\:sanitizeProcessor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Service.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:applyLegacyRepair\(\) has parameter \$candidate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:applyLegacyRepair\(\) has parameter \$checkoutIntent with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:applyLegacyRepair\(\) has parameter \$payment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:applyLegacyRepair\(\) has parameter \$processor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:buildNullableIntegerParam\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:buildNullableTimestampParam\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:extractPaymentIdsFromCheckoutIntent\(\) has parameter \$checkoutIntent with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:extractPaymentIdsFromCheckoutIntent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:getActiveHelloAssoProcessors\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:getContributionStatusIds\(\) has parameter \$statusNames with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:getContributionStatusIds\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:getHelloAssoProcessorConfigForContribution\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:getLegacyRepairCandidateIds\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:hasColumns\(\) has parameter \$columnNames with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:inferPaymentStateFromCheckoutIntent\(\) has parameter \$checkoutIntent with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:isLegacyRepairMatchValid\(\) has parameter \$candidate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:isLegacyRepairMatchValid\(\) has parameter \$checkoutIntent with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:isLegacyRepairMatchValid\(\) has parameter \$payment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:loadLegacyRepairCandidate\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:normalizeCheckoutIntentPayload\(\) has parameter \$checkoutIntent with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:normalizeCheckoutIntentPayload\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:normalizePaymentPayload\(\) has parameter \$payment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:normalizePaymentPayload\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:resolveLegacyRepairContext\(\) has parameter \$candidate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:resolveLegacyRepairContext\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_Upgrader\:\:taskLegacyRepairBatch\(\) has parameter \$contributionIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../CRM/HelloassoPaymentProcessor/Upgrader.php
+
+		-
+			message: '#^Method Civi\\HelloassoPaymentProcessor\\CheckoutOption\\HelloAssoHostedCheckout\:\:__construct\(\) has parameter \$liveConnection with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php
+
+		-
+			message: '#^Method Civi\\HelloassoPaymentProcessor\\CheckoutOption\\HelloAssoHostedCheckout\:\:__construct\(\) has parameter \$testConnection with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php
+
+		-
+			message: '#^Method Civi\\HelloassoPaymentProcessor\\CheckoutOption\\HelloAssoHostedCheckout\:\:getAfformSettings\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php
+
+		-
+			message: '#^Method Civi\\HelloassoPaymentProcessor\\CheckoutOption\\HelloAssoHostedCheckout\:\:getConnectionDetails\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php
+
+		-
+			message: '#^Property Civi\\HelloassoPaymentProcessor\\CheckoutOption\\HelloAssoHostedCheckout\:\:\$liveConnection type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php
+
+		-
+			message: '#^Property Civi\\HelloassoPaymentProcessor\\CheckoutOption\\HelloAssoHostedCheckout\:\:\$testConnection type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php
+
+		-
+			message: '#^Method Civi\\HelloassoPaymentProcessor\\HelloAssoConnections\:\:getPaymentProcessorPairs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../Civi/HelloassoPaymentProcessor/HelloAssoConnections.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_run\(\) has parameter \$api3 with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 2
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_run\(\) has parameter \$createSuccess with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 3
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_run\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_run\(\) has parameter \$processorFactory with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_run\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_spec\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function civicrm_api3_job_process_helloasso\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function civicrm_api3_job_process_helloasso\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloasso.php
+
+		-
+			message: '#^Function _civicrm_api3_job_process_helloasso_long_followup_spec\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloassoLongFollowup.php
+
+		-
+			message: '#^Function civicrm_api3_job_process_helloasso_long_followup\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloassoLongFollowup.php
+
+		-
+			message: '#^Function civicrm_api3_job_process_helloasso_long_followup\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/ProcessHelloassoLongFollowup.php
+
+		-
+			message: '#^Function _civicrm_api3_job_refresh_helloasso_partner_links_spec\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/RefreshHelloassoPartnerLinks.php
+
+		-
+			message: '#^Function civicrm_api3_job_refresh_helloasso_partner_links\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/RefreshHelloassoPartnerLinks.php
+
+		-
+			message: '#^Function civicrm_api3_job_refresh_helloasso_partner_links\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../api/v3/Job/RefreshHelloassoPartnerLinks.php
+
+		-
+			message: '#^Function _helloasso_payment_processor_civix_insert_navigation_menu\(\) has parameter \$item with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.civix.php
+
+		-
+			message: '#^Function _helloasso_payment_processor_civix_insert_navigation_menu\(\) has parameter \$menu with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.civix.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ExtensionUtil\:\:ts\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.civix.php
+
+		-
+			message: '#^Function helloasso_payment_processor_describe_payment_processor\(\) has parameter \$link with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_api_key_health\(\) has parameter \$paymentProcessor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_api_key_health\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_editable_sandbox_processor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_missing_auth_columns\(\) has parameter \$expectedColumns with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_missing_auth_columns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_missing_metadata_columns\(\) has parameter \$expectedColumns with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_missing_metadata_columns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_missing_metadata_indexes\(\) has parameter \$expectedIndexes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_missing_metadata_indexes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_payment_processor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_get_primary_processor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_payment_processor_form_rule\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Function helloasso_payment_processor_render_settings_page_launch_panel\(\) has parameter \$processor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../helloasso_payment_processor.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ReleaseCredentialInjector\:\:inject\(\) has parameter \$environment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../scripts/ReleaseCredentialInjector.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ApiErrorClassifierTest\:\:unrelatedApiResponses\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/ApiErrorClassifierTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_FollowUpScheduleTest\:\:scheduleProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/FollowUpScheduleTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_FollowUpScheduleTest\:\:testUsesExpectedSchedule\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/FollowUpScheduleTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuardTest\:\:reminderCandidateProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/FutureInstallmentReminderGuardTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuardTest\:\:testAllowsNormalReminderCandidates\(\) has parameter \$installment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/FutureInstallmentReminderGuardTest.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoPaymentTest\.php\:8\:\:synchronizePendingContributions\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoPaymentTest.php
+
+		-
+			message: '#^Method CRM_Core_Payment_HelloAsso@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoPaymentTest\.php\:8\:\:synchronizePendingContributions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoPaymentTest.php
+
+		-
+			message: '#^Property CRM_Core_Payment_HelloAsso@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoPaymentTest\.php\:8\:\:\$capturedFilters type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoPaymentTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentFollowUpTest\:\:notFuturePendingProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentFollowUpTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentFollowUpTest\:\:testRejectsPaymentsThatAreNotFuturePendingInstallments\(\) has parameter \$payment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentFollowUpTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentIdentityTest\:\:incompleteIdentityProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentIdentityTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentIdentityTest\:\:testRejectsIncompleteIdentity\(\) has parameter \$order with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentIdentityTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentIdentityTest\:\:testRejectsIncompleteIdentity\(\) has parameter \$payment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentIdentityTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentLifecycleTest\:\:term\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentLifecycleTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentPlanTest\:\:invalidPlanProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentPlanTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_InstallmentScheduleTest\:\:invalidScheduleProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentScheduleTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_TestableInstallmentStore\:\:exposeNullableParameter\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentStoreTest.php
+
+		-
+			message: '#^Method class@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest\.php\:21\:\:__construct\(\) has parameter \$processor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest.php
+
+		-
+			message: '#^Method class@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest\.php\:21\:\:processScheduledSynchronization\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest.php
+
+		-
+			message: '#^Method class@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest\.php\:21\:\:processScheduledSynchronization\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest.php
+
+		-
+			message: '#^Property class@anonymous/tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest\.php\:9\:\:\$calls type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/MockApiTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_OAuthTokenLifetimeTest\:\:jwt\(\) has parameter \$claims with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/OAuthTokenLifetimeTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentialsTest\:\:credentialPairProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/PartnerCredentialsTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PartnerCredentialsTest\:\:testBuildPlaceholdersAreNotCompleteCredentials\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/PartnerCredentialsTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_PaymentStateTest\:\:outcomeProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/PaymentStateTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_QuickFormInstallmentsTest\:\:invalidInstallmentsProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/QuickFormInstallmentsTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ReleaseCredentialInjectorTest\:\:environment\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/ReleaseCredentialInjectorTest.php
+
+		-
+			message: '#^Method CRM_HelloassoPaymentProcessor_ReleaseCredentialInjectorTest\:\:fixture\(\) has parameter \$environment with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/CRM/HelloassoPaymentProcessor/ReleaseCredentialInjectorTest.php
