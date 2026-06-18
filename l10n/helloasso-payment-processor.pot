@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"POT-Creation-Date: 2026-05-28 15:11+0000\n"
-"PO-Revision-Date: 2026-05-28 15:11+0000\n"
+"POT-Creation-Date: 2026-05-29 08:57+0000\n"
+"PO-Revision-Date: 2026-05-29 08:57+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -168,6 +168,9 @@ msgstr ""
 msgid "HelloAsso Payments Processor"
 msgstr ""
 
+msgid "HelloAsso accepted the refund request but did not return a refund operation ID."
+msgstr ""
+
 msgid "HelloAsso authentication is currently being refreshed. Please retry the payment."
 msgstr ""
 
@@ -217,6 +220,9 @@ msgid "HelloAsso endpoint used to exchange the authorization code and refresh OA
 msgstr ""
 
 msgid "HelloAsso error"
+msgstr ""
+
+msgid "HelloAsso has accepted the refund request. The local CiviCRM refund has been recorded immediately; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization."
 msgstr ""
 
 msgid "HelloAsso helps associations collect online payments and provides its services free of charge. It covers all transaction fees so that you can receive the full amount paid by your supporters, without fees. Voluntary contributions left by them are its only source of revenue."
@@ -334,6 +340,12 @@ msgid "HelloAsso production authorization screen"
 msgstr ""
 
 msgid "HelloAsso production connection"
+msgstr ""
+
+msgid "HelloAsso refund cannot be requested without a payment ID and a positive amount."
+msgstr ""
+
+msgid "HelloAsso refund requested"
 msgstr ""
 
 msgid "HelloAsso refunds are disabled by this extension."
