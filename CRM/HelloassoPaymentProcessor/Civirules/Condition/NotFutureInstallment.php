@@ -1,6 +1,10 @@
 <?php
 
-if (class_exists('CRM_Civirules_Condition')) {
+if (!class_exists('CRM_Civirules_Condition')) {
+    return;
+}
+
+use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 
 /**
  * Optional CiviRules condition excluding scheduled HelloAsso installments.
@@ -55,6 +59,4 @@ class CRM_HelloassoPaymentProcessor_Civirules_Condition_NotFutureInstallment ext
 
         return (int) $triggerData->getEntityId();
     }
-}
-
 }
