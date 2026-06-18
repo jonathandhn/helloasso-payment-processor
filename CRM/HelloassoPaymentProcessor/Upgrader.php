@@ -322,6 +322,23 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
   public function upgrade_4215(): bool {
     $this->ctx->log->info('Applying update 4215: add idempotent HelloAsso installment mapping.');
 
+    $this->ensureInstallmentTable();
+
+    return TRUE;
+  }
+
+  public function upgrade_4220(): bool {
+    $this->ctx->log->info('Applying update 4220: repair installment schema on previously upgraded installations.');
+
+    $this->ensureInstallmentTable();
+    $this->upgrade_4216();
+    $this->upgrade_4217();
+    $this->upgrade_4218();
+
+    return TRUE;
+  }
+
+  private function ensureInstallmentTable(): void {
     CRM_Core_DAO::executeQuery("
       CREATE TABLE IF NOT EXISTS civicrm_hello_asso_installment (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -349,8 +366,6 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
           FOREIGN KEY (contribution_id) REFERENCES civicrm_contribution(id) ON DELETE SET NULL
       ) ENGINE=InnoDB
     ");
-
-    return TRUE;
   }
 
   public function upgrade_4216(): bool {
@@ -544,7 +559,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return $statusIds;
   }
 
-  private function normalizeNullableInt($value): ?int {
+  private function normalizeNullableInt(mixed $value): ?int {
     if ($value === NULL || $value === '') {
       return NULL;
     }
@@ -552,7 +567,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return (int) $value;
   }
 
-  private function normalizeNullableString($value): string {
+  private function normalizeNullableString(mixed $value): string {
     if ($value === NULL) {
       return '';
     }
@@ -560,7 +575,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return (string) $value;
   }
 
-  private function normalizeNullableDateTime($value): ?string {
+  private function normalizeNullableDateTime(mixed $value): ?string {
     if ($value === NULL || $value === '') {
       return NULL;
     }
@@ -583,7 +598,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     }
   }
 
-  private function buildNullableIntegerParam($value): array {
+  private function buildNullableIntegerParam(mixed $value): array {
     $value = $this->normalizeNullableInt($value);
     if ($value === NULL) {
       return ['null', 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
@@ -592,7 +607,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return [$value, 'Integer'];
   }
 
-  private function buildNullableTimestampParam($value): array {
+  private function buildNullableTimestampParam(mixed $value): array {
     $value = $this->normalizeNullableDateTime($value);
     if ($value === NULL || $value === '') {
       return ['null', 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];

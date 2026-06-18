@@ -9,14 +9,14 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
-function helloasso_payment_processor_civicrm_config(&$config): void {
+function helloasso_payment_processor_civicrm_config(mixed &$config): void {
   _helloasso_payment_processor_civix_civicrm_config($config);
 }
 
 /**
  * Implements hook_civicrm_angularModules().
  */
-function helloasso_payment_processor_civicrm_angularModules(&$angularModules): void {
+function helloasso_payment_processor_civicrm_angularModules(mixed &$angularModules): void {
   $module = include __DIR__ . '/ang/crmHelloassoPaymentProcessor.ang.php';
   $module['ext'] = E::LONG_NAME;
   $angularModules['crmHelloassoPaymentProcessor'] = $module;
@@ -66,7 +66,7 @@ function helloasso_payment_processor_register_civirules_conditions(): void {
 /**
  * Implements hook_civicrm_alterMenu().
  */
-function helloasso_payment_processor_civicrm_alterMenu(&$items): void {
+function helloasso_payment_processor_civicrm_alterMenu(mixed &$items): void {
   foreach ([
     'civicrm/admin/setting/helloasso',
     'civicrm/admin/setting/preferences/helloasso',
@@ -92,7 +92,7 @@ function helloasso_payment_processor_civicrm_alterMenu(&$items): void {
 /**
  * Implements hook_civicrm_buildForm().
  */
-function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void {
+function helloasso_payment_processor_civicrm_buildForm(string $formName, mixed &$form): void {
   if (in_array($formName, [
     'CRM_Contribute_Form_Contribution_Main',
     'CRM_Event_Form_Registration_Register',
@@ -410,7 +410,7 @@ function helloasso_payment_processor_replace_payment_processor_form_rule(CRM_Cor
   $form->_formRules = $updatedRules;
 }
 
-function helloasso_payment_processor_payment_processor_form_rule($fields, $files, $form) {
+function helloasso_payment_processor_payment_processor_form_rule(mixed $fields, mixed $files, mixed $form): bool|array {
   if (!$form instanceof CRM_Core_Form) {
     return CRM_Admin_Form_PaymentProcessor::formRule($fields);
   }
@@ -737,7 +737,7 @@ function helloasso_payment_processor_inject_settings_page_panel(): void {
 /**
  * Implements hook_civicrm_postProcess().
  */
-function helloasso_payment_processor_civicrm_postProcess($formName, &$form): void {
+function helloasso_payment_processor_civicrm_postProcess(string $formName, mixed &$form): void {
   if ($formName === 'CRM_Mjwshared_Form_PaymentRefund') {
     helloasso_payment_processor_show_refund_success_message();
     return;
@@ -794,7 +794,7 @@ function helloasso_payment_processor_civicrm_postProcess($formName, &$form): voi
 /**
  * Implements hook_civicrm_check().
  */
-function helloasso_payment_processor_civicrm_check(&$messages): void {
+function helloasso_payment_processor_civicrm_check(mixed &$messages): void {
   try {
     $missingColumns = helloasso_payment_processor_get_missing_metadata_columns([
       'checkout_intent_id',
@@ -1223,7 +1223,7 @@ function helloasso_payment_processor_get_api_key_health(array $paymentProcessor)
   return $result;
 }
 
-function helloasso_payment_processor_format_datetime($value): string {
+function helloasso_payment_processor_format_datetime(mixed $value): string {
   if ($value === NULL || $value === '') {
     return '';
   }
@@ -1342,7 +1342,7 @@ function helloasso_payment_processor_has_partner_client_credentials(?bool $isTes
 /**
  * Implements hook_civicrm_cron().
  */
-function helloasso_payment_processor_civicrm_cron($job = NULL): void {
+function helloasso_payment_processor_civicrm_cron(mixed $job = NULL): void {
   try {
     $processors = civicrm_api3('PaymentProcessor', 'get', [
       'class_name' => 'Payment_HelloAsso',
@@ -1423,7 +1423,7 @@ function helloasso_payment_processor_show_refund_success_message(): void {
 /**
  * Implements hook_civicrm_validateForm().
  */
-function helloasso_payment_processor_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+function helloasso_payment_processor_civicrm_validateForm(string $formName, mixed &$fields, mixed &$files, mixed &$form, mixed &$errors): void {
   // Check if this is a form that might use a payment processor
   $is_payment_form = in_array($formName, [
     'CRM_Contribute_Form_Contribution_Main',

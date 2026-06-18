@@ -621,8 +621,8 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
   }
 
-  private function buildApiErrorMessage($decoded, int $statusCode): string {
-    if (is_array($decoded) && !empty($decoded['errors']) && is_array($decoded['errors'])) {
+  private function buildApiErrorMessage(array $decoded, int $statusCode): string {
+    if (!empty($decoded['errors'])) {
       $messages = [];
       foreach ($decoded['errors'] as $error) {
         if (is_array($error) && !empty($error['message'])) {
@@ -641,7 +641,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       }
     }
 
-    if (is_array($decoded) && !empty($decoded['message'])) {
+    if (!empty($decoded['error'])) {
       return (string) $decoded['message'];
     }
 

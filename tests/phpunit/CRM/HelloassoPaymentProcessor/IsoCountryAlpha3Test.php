@@ -2,7 +2,7 @@
 
 class CRM_HelloassoPaymentProcessor_IsoCountryAlpha3Test extends \PHPUnit\Framework\TestCase
 {
-    public function testGetCountryAlpha3MatchesIso3166()
+    public function testGetCountryAlpha3MatchesIso3166(): void
     {
         $converter = CRM_HelloassoPaymentProcessor_IsoCountryAlpha3::getInstance();
 
@@ -24,7 +24,7 @@ class CRM_HelloassoPaymentProcessor_IsoCountryAlpha3Test extends \PHPUnit\Framew
         $this->assertNull($converter->get(''));
     }
 
-    public function testSupportReturnsBooleanCorrectly()
+    public function testSupportReturnsBooleanCorrectly(): void
     {
         $converter = CRM_HelloassoPaymentProcessor_IsoCountryAlpha3::getInstance();
 

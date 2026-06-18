@@ -254,13 +254,13 @@ class CRM_HelloassoPaymentProcessor_IsoCountryAlpha3
         'AX' => 'ALA'
     ];
 
-    private static $instance = null;
+    private static ?CRM_HelloassoPaymentProcessor_IsoCountryAlpha3 $instance = null;
 
     private function __construct()
     {
     }
 
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();

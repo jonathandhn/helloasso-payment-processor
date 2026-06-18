@@ -1,0 +1,181 @@
+includes:
+    # PHPStan baseline — décommenter après la première run propre pour figer les erreurs restantes :
+    # - phpstan/baseline.neon
+
+parameters:
+    level: 6
+
+    # -------------------------------------------------------------------
+    # Paths à analyser (code de l'extension uniquement)
+    # -------------------------------------------------------------------
+    paths:
+        - CRM
+        - Civi
+        - api
+        - helloasso_payment_processor.php
+        - helloasso_payment_processor.civix.php
+
+    # -------------------------------------------------------------------
+    # Exclusions : scripts de développement et bootstrap de tests
+    # -------------------------------------------------------------------
+    excludePaths:
+        analyse:
+            - scripts/make-dao.php
+            - scripts/test_partner_webhook.php
+            - scripts/inject_release_credentials.php
+            - scripts/ReleaseCredentialInjector.php
+            - tests/phpunit/bootstrap.php
+            - phpstan/
+
+    # -------------------------------------------------------------------
+    # CiviCRM core : scan des sources vendor pour résoudre CRM_* et Civi\*
+    # sans bootstrapper le CMS complet.
+    # Chemin relatif depuis la racine de l'extension (7 niveaux vers vendor/)
+    # -------------------------------------------------------------------
+    scanDirectories:
+        - %currentWorkingDirectory%/../../../../../../../vendor/civicrm/civicrm-core/CRM
+        - %currentWorkingDirectory%/../../../../../../../vendor/civicrm/civicrm-core/Civi
+        - %currentWorkingDirectory%/../../../../../../../vendor/civicrm/civicrm-packages/HTML
+        - %currentWorkingDirectory%/../../../../../../../vendor/pear/pear_exception
+
+    # -------------------------------------------------------------------
+    # Bootstrap files : chargés avant l'analyse (require() réel).
+    # Utilisés pour les fonctions globales qui ne peuvent pas être stubées.
+    # -------------------------------------------------------------------
+    bootstrapFiles:
+        - %currentWorkingDirectory%/../../../../../../../vendor/civicrm/civicrm-core/functions.php
+        - %currentWorkingDirectory%/../../../../../../../vendor/civicrm/civicrm-core/api/api.php
+        - %currentWorkingDirectory%/phpstan/bootstrap/global-functions.php
+        - %currentWorkingDirectory%/phpstan/bootstrap/missing-classes.php
+
+    # stubFiles: aucun pour l'instant — les nouvelles classes sont dans
+    # phpstan/bootstrap/missing-classes.php (bootstrapFiles = require() réel)
+    # stubFiles peut être utilisé plus tard pour surcharger des types existants.
+
+    # -------------------------------------------------------------------
+    # PHPDoc : adapté au style CiviCRM (beaucoup de @return array sans types)
+    # -------------------------------------------------------------------
+    treatPhpDocTypesAsCertain: false
+
+    # -------------------------------------------------------------------
+    # Suppression d'erreurs ciblées
+    # -------------------------------------------------------------------
+    ignoreErrors:
+        # mb_strlen($str, $encoding) — 2e param valide en PHP 8, faux positif PHPStan
+        - message: '#Function mb_strlen invoked with 2 parameters, 1 required#'
+          identifier: arguments.count
+
+        # GenericHookEvent utilise __get/__set dynamiques — propriétés dynamiques normales
+        - message: '#Access to an undefined property Civi\\Core\\Event\\GenericHookEvent::#'
+          identifier: property.notFound
+
+        # HTML_QuickForm::$_formRules — déclaration PEAR non typée, isset valide
+        - message: '#Property HTML_QuickForm::\$_formRules .array. in isset\(\) is not nullable#'
+          identifier: isset.property
+
+        # method_exists(CRM_Core_Form, 'elementExists') — méthode réellement présente,
+        # PHPStan la détecte dans le scan et considère le check toujours vrai
+        - message: '#Call to function method_exists\(\) with CRM_Core_Form and .elementExists. will always evaluate to true#'
+          identifier: function.alreadyNarrowedType
+
+        # CiviCRM DAO/BAO : les propriétés sont déclarées dynamiquement via __get/__set
+        # ou via des annotations @property en phpDoc non typées. PHPStan ne les voit pas.
+        # On supprime tous les nullCoalesce sur les propriétés DAO de l'extension.
+        - message: '#Property CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata::\$.+ on left side of \?\? is not nullable#'
+          identifier: nullCoalesce.property
+
+        - message: '#Property CRM_HelloassoPaymentProcessor_HelloAssoClient::\$.+ on left side of \?\? is not nullable#'
+          identifier: nullCoalesce.property
+
+        # CRM_Contribute_BAO_Contribution / CRM_Contribute_BAO_* — propriétés DAO dynamiques
+        - message: '#Access to an undefined property CRM_Contribute_BAO_Contribution::#'
+          identifier: property.notFound
+
+        - message: '#Access to an undefined property CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata::\$__table#'
+          identifier: property.notFound
+
+        # Méthodes privées dans l'Upgrader déclarées pour de futures migrations
+        - message: '#Method CRM_HelloassoPaymentProcessor_Upgrader::normalize.+\(\) is unused#'
+          identifier: method.unused
+
+        - message: '#Method CRM_HelloassoPaymentProcessor_Upgrader::build.+\(\) is unused#'
+          identifier: method.unused
+
+        # E est un alias de classe CiviCRM généré par civix (use CRM_..._ExtensionUtil as E)
+        # PHPStan ne peut pas résoudre les alias définis dans des fichiers scannés
+        - message: '#Call to static method ts\(\) on an unknown class E\.#'
+          identifier: class.notFound
+
+        # CRM_Utils_System::url() — certaines versions de CiviCRM acceptent null comme $query
+        - message: '#Parameter \#2 \$query of static method CRM_Utils_System::url\(\) expects array\|string, null given#'
+          identifier: argument.type
+
+        # empty() sur $indices — variable toujours initialisée dans ce contexte DAO
+        - message: '#Variable \$indices in empty\(\) always exists and is not falsy#'
+          identifier: empty.variable
+
+        # booleanNot.alwaysFalse / booleanOr.rightAlwaysFalse — flow analysis sur
+        # variables conditionnelles dans try/catch (PHPStan ne voit pas tous les chemins)
+        - message: '#Negated boolean expression is always false#'
+          identifier: booleanNot.alwaysFalse
+
+        - message: '#Right side of \|\| is always false#'
+          identifier: booleanOr.rightAlwaysFalse
+
+        # CiviCRM DAO find() — hérité de DB_DataObject (PEAR), non scanné
+        # Supprimer les erreurs method.notFound sur find() pour les classes BAO/DAO CiviCRM
+        - message: '#Call to an undefined method CRM_(Contribute|HelloassoPaymentProcessor)_BAO_[A-Za-z]+::find\(\)#'
+          identifier: method.notFound
+
+        # CRM_Core_Payment_HelloAsso — patterns CiviCRM framework
+        # checkConfig() retourne null (convention : null = pas d'erreur)
+        - message: '#Method CRM_Core_Payment_HelloAsso::checkConfig\(\) should return string but returns null#'
+          identifier: return.type
+
+        # buildForm() : CRM_Core_Payment déclare bool, HelloAsso override déclare void
+        - message: '#Return type \(void\) of method CRM_Core_Payment_HelloAsso::buildForm\(\) should be compatible#'
+          identifier: method.childReturnType
+
+        # $_mode est déclaré object dans le parent mais reçoit une string de mode
+        - message: '#Property CRM_Core_Payment_HelloAsso::\$_mode \(object\) does not accept string#'
+          identifier: assign.propertyType
+
+        # $guzzleClient avec ?? — propriété non-nullable mais initialisée lazy
+        - message: '#Property CRM_Core_Payment_HelloAsso::\$guzzleClient .+ on left side of \?\? is not nullable#'
+          identifier: nullCoalesce.property
+
+        # CRM_Core_Payment::$cancelUrl — propriété CiviCRM core, isset valide
+        - message: '#Property CRM_Core_Payment::\$cancelUrl \(string\) in isset\(\) is not nullable#'
+          identifier: isset.property
+
+        # CRM_Core_Form::$_paymentProcessor — propriété dynamique du formulaire CiviCRM
+        - message: '#Access to an undefined property CRM_Core_Form::\$_paymentProcessor#'
+          identifier: property.notFound
+
+        # Niveau 6 : On ignore les missingType.iterableValue car CiviCRM utilise énormément
+        # de tableaux associatifs dynamiques sans typage PHPDoc strict.
+        - identifier: missingType.iterableValue
+
+        # Les fichiers .civix.php sont générés automatiquement, on ne doit pas les modifier
+        - message: '#has (parameter|no return type)#'
+          identifier: missingType.parameter
+          path: helloasso_payment_processor.civix.php
+        - message: '#has (parameter|no return type)#'
+          identifier: missingType.return
+          path: helloasso_payment_processor.civix.php
+
+        # Ignorer les types manquants mineurs dans les classes internes (API Client, etc.)
+        - message: '#has parameter \$(isTest|is_test|clientSecret|clientId|oauthUrl|decoded|value)#'
+          identifier: missingType.parameter
+        - message: '#has no return type specified#'
+          identifier: missingType.return
+          path: CRM/HelloassoPaymentProcessor/HelloAssoClient.php
+
+    # Ne pas échouer si un pattern ignoreErrors ne matche aucune erreur
+    reportUnmatchedIgnoredErrors: false
+
+    # -------------------------------------------------------------------
+    # Analyse parallèle
+    # -------------------------------------------------------------------
+    parallel:
+        maximumNumberOfProcesses: 4

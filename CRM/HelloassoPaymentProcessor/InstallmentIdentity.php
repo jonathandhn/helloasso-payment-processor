@@ -39,7 +39,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentIdentity
         ];
     }
 
-    private static function positiveInt($value): ?int
+    private static function positiveInt(mixed $value): ?int
     {
         if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
             return NULL;
@@ -49,7 +49,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentIdentity
         return $value > 0 ? $value : NULL;
     }
 
-    private static function nonNegativeInt($value): ?int
+    private static function nonNegativeInt(mixed $value): ?int
     {
         if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
             return NULL;
@@ -59,7 +59,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentIdentity
         return $value >= 0 ? $value : NULL;
     }
 
-    private static function nullableString($value): ?string
+    private static function nullableString(mixed $value): ?string
     {
         if (!is_scalar($value)) {
             return NULL;
