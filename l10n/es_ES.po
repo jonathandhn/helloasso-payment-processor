@@ -124,6 +124,10 @@ msgid "Invalid HelloAsso installment schedule: %1"
 msgstr "Calendario de cuotas HelloAsso no válido: %1"
 
 #. Public-facing string in checkout or validation flow
+msgid "Installment schedule"
+msgstr "Calendario de pagos"
+
+#. Public-facing string in checkout or validation flow
 msgid "Maximum installments"
 msgstr "Número máximo de cuotas"
 
