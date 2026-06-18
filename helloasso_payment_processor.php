@@ -170,7 +170,7 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
         $help[] = '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if (!empty($liveWebhookRegistration['signatureKey'])) {
-        $help[] = '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $help[] = helloasso_payment_processor_render_webhook_signature_key((string) $liveWebhookRegistration['signatureKey']);
       }
     }
   }
@@ -217,7 +217,7 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
         $help[] = '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if (!empty($webhookRegistration['signatureKey'])) {
-        $help[] = '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $help[] = helloasso_payment_processor_render_webhook_signature_key((string) $webhookRegistration['signatureKey']);
       }
     }
   }
@@ -371,6 +371,25 @@ function helloasso_payment_processor_get_authorize_button_html(string $href, str
 
   return '<a class="helloasso-authorize-button" href="' . $escapedHref . '" aria-label="' . $escapedLabel . '">'
     . '<img src="' . $imageUrl . '" alt="' . $escapedLabel . '" style="max-width: 280px; height: auto;"></a>';
+}
+
+function helloasso_payment_processor_render_webhook_signature_key(string $signatureKey): string {
+  static $counter = 0;
+  $counter++;
+
+  $inputId = 'helloasso-webhook-signature-key-' . $counter;
+  $buttonId = $inputId . '-toggle';
+  $escapedKey = htmlspecialchars($signatureKey, ENT_QUOTES, 'UTF-8');
+  $label = htmlspecialchars(E::ts('Stored webhook signature key'), ENT_QUOTES, 'UTF-8');
+  $showLabel = htmlspecialchars(E::ts('Show'), ENT_QUOTES, 'UTF-8');
+  $hideLabel = htmlspecialchars(E::ts('Hide'), ENT_QUOTES, 'UTF-8');
+
+  return '<p class="description helloasso-webhook-signature-key">'
+    . '<label for="' . $inputId . '">' . $label . '</label><br>'
+    . '<input id="' . $inputId . '" class="huge crm-form-password" type="password" readonly="readonly" value="' . $escapedKey . '" autocomplete="off">'
+    . ' <button id="' . $buttonId . '" type="button" class="button" aria-controls="' . $inputId . '" data-show-label="' . $showLabel . '" data-hide-label="' . $hideLabel . '">' . $showLabel . '</button>'
+    . '</p>'
+    . '<script>(function($){$(function(){var $input=$("#' . $inputId . '"),$button=$("#' . $buttonId . '");$button.on("click",function(){var hidden=$input.attr("type")==="password";$input.attr("type",hidden?"text":"password");$button.text(hidden?$button.data("hide-label"):$button.data("show-label"));});});})(CRM.$);</script>';
 }
 
 function helloasso_payment_processor_get_partner_required_notice(): string {
@@ -550,7 +569,7 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
     $html .= '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
   }
   if (!empty($webhookRegistration['signatureKey'])) {
-    $html .= '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+    $html .= helloasso_payment_processor_render_webhook_signature_key((string) $webhookRegistration['signatureKey']);
   }
 
   $html .= '<p><a class="button" href="' . htmlspecialchars($settingsUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open this authorization-screen settings page') . '</a></p>';
@@ -954,7 +973,7 @@ function helloasso_payment_processor_civicrm_check(&$messages): void {
       if (!$status['ok']) {
         $invalidApiKeys[] = sprintf(
           '%s (%s)',
-          helloasso_payment_processor_describe_payment_processor($processorId, []),
+          helloasso_payment_processor_get_payment_processor_admin_link($processorId),
           $status['message']
         );
       }
@@ -1020,6 +1039,18 @@ function helloasso_payment_processor_describe_payment_processor(int $paymentProc
   }
 
   return sprintf('Processor #%d', $paymentProcessorId);
+}
+
+function helloasso_payment_processor_get_payment_processor_admin_link(int $paymentProcessorId): string {
+  $label = helloasso_payment_processor_describe_payment_processor($paymentProcessorId, []);
+  $url = CRM_Utils_System::url(
+    'civicrm/admin/paymentProcessor',
+    'reset=1&action=update&id=' . $paymentProcessorId
+  );
+
+  return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">'
+    . htmlspecialchars($label, ENT_QUOTES, 'UTF-8')
+    . '</a>';
 }
 
 function helloasso_payment_processor_get_api_key_health(array $paymentProcessor): array {
