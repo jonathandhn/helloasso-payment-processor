@@ -74,6 +74,13 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $usesPluginPublic = $paymentProcessorId
             && $processorAuthConfig->shouldUsePluginPublic($paymentProcessorId, $this->getPaymentProcessorConfig());
 
+        // CiviCRM stores live and sandbox rails together. Allow an intentionally
+        // unused rail to remain blank while saving the processor pair, but keep
+        // it invalid everywhere it could actually be offered for payment.
+        if (!$usesPluginPublic && $this->isBlankRailDuringProcessorSave()) {
+            return NULL;
+        }
+
         if (!$usesPluginPublic && empty($this->_paymentProcessor['user_name'])) {
             $error[] = E::ts('Client Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
         }
@@ -102,6 +109,24 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         } else {
             return NULL;
         }
+    }
+
+    private function isBlankRailDuringProcessorSave(): bool
+    {
+        if (
+            !empty($this->_paymentProcessor['user_name'])
+            || !empty($this->_paymentProcessor['password'])
+            || !empty($this->_paymentProcessor['subject'])
+        ) {
+            return FALSE;
+        }
+
+        if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+            return FALSE;
+        }
+
+        $currentPath = (string) CRM_Utils_System::currentPath();
+        return strpos($currentPath, 'civicrm/admin/paymentProcessor') === 0;
     }
 
     /**

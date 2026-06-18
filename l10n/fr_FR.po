@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-05-27 13:36+0000\n"
+"PO-Revision-Date: 2026-05-27 17:39+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -74,17 +74,17 @@ msgstr "Client ID fourni par HelloAsso pour la mire partagée. Ne pas versionner
 msgid "Client Id"
 msgstr "Client ID"
 
-#: CRM/Core/Payment/HelloAsso.php:74
+#. Maintained French translation
 msgid "Client Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
-msgstr ""
+msgstr "Le Client ID n'est pas renseigné sur cette passerelle de paiement."
 
 #: CRM/Core/Payment/HelloAsso.mgd.php:21
 msgid "Client Secret"
 msgstr "Client Secret"
 
-#: CRM/Core/Payment/HelloAsso.php:77
+#. Maintained French translation
 msgid "Client Secret Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
-msgstr ""
+msgstr "Le Client Secret n'est pas renseigné sur cette passerelle de paiement."
 
 #. Maintained French translation
 msgid "Client secret dedicated to the HelloAsso production authorization screen."
@@ -217,9 +217,9 @@ msgstr "HelloAsso"
 msgid "HelloAsso API error (%1)"
 msgstr "Erreur API HelloAsso (%1)"
 
-#: CRM/Core/Payment/HelloAsso.php:80
+#. Maintained French translation
 msgid "HelloAsso Organization Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
-msgstr ""
+msgstr "Le nom de l'organisation HelloAsso n'est pas renseigné sur cette passerelle de paiement."
 
 #: CRM/Core/Payment/HelloAsso.mgd.php:16
 msgid "HelloAsso Payments Processor"
