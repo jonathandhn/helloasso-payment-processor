@@ -273,16 +273,25 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             throw new PaymentProcessorException(E::ts('HelloAsso installment cancellation requires an authorization-screen connection.'));
         }
 
-        $partnerInformation = (new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId))
-            ->getPartnerInformation();
-        $apiClient = is_array($partnerInformation['apiClient'] ?? NULL)
-            ? $partnerInformation['apiClient']
-            : [];
-        $privileges = is_array($apiClient['privileges'] ?? NULL)
-            ? $apiClient['privileges']
-            : [];
-        if (!in_array('RefundManagement', $privileges, TRUE)) {
-            throw new PaymentProcessorException(E::ts('The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments.'));
+        $partnerAuth = new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId);
+        try {
+            $partnerInformation = $partnerAuth->getPartnerInformation();
+            $apiClient = is_array($partnerInformation['apiClient'] ?? NULL)
+                ? $partnerInformation['apiClient']
+                : [];
+            $privileges = is_array($apiClient['privileges'] ?? NULL)
+                ? $apiClient['privileges']
+                : [];
+            if (!in_array('RefundManagement', $privileges, TRUE)) {
+                throw new PaymentProcessorException(E::ts('The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments.'));
+            }
+        }
+        catch (PaymentProcessorException $e) {
+            $resolvedCredentials = $partnerAuth->getResolvedCredentials();
+            $isCommunityCredential = !empty($resolvedCredentials['is_community']);
+            if (!$isCommunityCredential || !$this->isPartnerInformationForbidden($e)) {
+                throw $e;
+            }
         }
 
         return $this->requestHelloAsso(
@@ -294,6 +303,13 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             TRUE,
             $requestProfile
         );
+    }
+
+    private function isPartnerInformationForbidden(PaymentProcessorException $e): bool
+    {
+        return strpos($e->getMessage(), '(403)') !== FALSE
+            || stripos($e->getMessage(), 'HTTP 403') !== FALSE
+            || stripos($e->getMessage(), 'forbidden') !== FALSE;
     }
 
     private function requestHelloAsso(
@@ -473,6 +489,13 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             }
         }
 
-        return (string) $paymentProcessor['subject'];
+        $subject = trim((string) ($paymentProcessor['subject'] ?? ''));
+        if ($subject !== '') {
+            return $subject;
+        }
+
+        throw new PaymentProcessorException(E::ts(
+            'HelloAsso processor configuration is incomplete: organization slug is missing.'
+        ));
     }
 }

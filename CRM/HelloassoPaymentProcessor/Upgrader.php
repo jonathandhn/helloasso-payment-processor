@@ -10,6 +10,11 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
   private const LEGACY_TRXN_REPAIR_LOCK_DATE = '2028-01-01 00:00:00';
   private const LEGACY_TRXN_GUI_LIMIT = 3000;
   private const LEGACY_TRXN_BATCH_SIZE = 25;
+  private const HELLOASSO_PAYMENT_INSTRUMENT_NAME = 'HelloAsso';
+
+  public function postInstall(): void {
+    $this->ensureHelloAssoPaymentInstrumentDefaults();
+  }
 
   public function upgrade_4200(): bool {
     $this->ctx->log->info('Applying update 4200');
@@ -575,6 +580,13 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     return TRUE;
   }
 
+  public function upgrade_4223(): bool {
+    $this->ctx->log->info('Applying update 4223: create and use a dedicated HelloAsso payment instrument by default.');
+    $this->ensureHelloAssoPaymentInstrumentDefaults();
+
+    return TRUE;
+  }
+
   private function addColumnIfMissing(string $columnName, string $sql): void {
     $column = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM civicrm_hello_asso_metadata LIKE %1", [
       1 => [$columnName, 'String'],
@@ -591,6 +603,69 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     if (!$index->fetch()) {
       CRM_Core_DAO::executeQuery($sql);
     }
+  }
+
+  private function ensureHelloAssoPaymentInstrumentDefaults(): void {
+    $paymentInstrumentId = $this->ensureHelloAssoPaymentInstrumentValue();
+    if (!$paymentInstrumentId) {
+      $this->ctx->log->warning('HelloAsso payment method default was not configured because the HelloAsso payment instrument could not be created.');
+      return;
+    }
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_payment_processor_type
+      SET payment_instrument_id = %1
+      WHERE class_name = 'Payment_HelloAsso'
+    ", [
+      1 => [$paymentInstrumentId, 'Integer'],
+    ]);
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_payment_processor
+      SET payment_instrument_id = %1
+      WHERE class_name = 'Payment_HelloAsso'
+        AND (payment_instrument_id IS NULL OR payment_instrument_id = 0)
+    ", [
+      1 => [$paymentInstrumentId, 'Integer'],
+    ]);
+  }
+
+  private function ensureHelloAssoPaymentInstrumentValue(): int {
+    $existing = \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'payment_instrument')
+      ->addWhere('name', '=', self::HELLOASSO_PAYMENT_INSTRUMENT_NAME)
+      ->execute()
+      ->first();
+    if (!empty($existing['value'])) {
+      return (int) $existing['value'];
+    }
+
+    $highest = \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value', 'weight')
+      ->addWhere('option_group_id:name', '=', 'payment_instrument')
+      ->addOrderBy('value', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first();
+
+    $nextValue = max(1, ((int) ($highest['value'] ?? 0)) + 1);
+    $nextWeight = max(1, ((int) ($highest['weight'] ?? 0)) + 1);
+
+    $created = \Civi\Api4\OptionValue::create(FALSE)
+      ->setValues([
+        'option_group_id:name' => 'payment_instrument',
+        'label' => E::ts('HelloAsso'),
+        'name' => self::HELLOASSO_PAYMENT_INSTRUMENT_NAME,
+        'value' => $nextValue,
+        'weight' => $nextWeight,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+      ])
+      ->execute()
+      ->first();
+
+    return (int) ($created['value'] ?? 0);
   }
 
   private function hasColumns(array $columnNames): bool {

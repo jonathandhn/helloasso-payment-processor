@@ -163,4 +163,20 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_Hell
         $this->assertSame(5.0, $apiRequestOptions['connect_timeout']);
         $this->assertSame(20.0, $apiRequestOptions['timeout']);
     }
+
+    public function testGetOrganizationSlugThrowsClearExceptionWhenSubjectIsMissing(): void
+    {
+        $method = new ReflectionMethod($this->client, 'getOrganizationSlug');
+        $method->setAccessible(TRUE);
+
+        $this->expectException(PaymentProcessorException::class);
+        $this->expectExceptionMessage('organization slug is missing');
+
+        $method->invoke($this->client, [
+            'id' => 999,
+            'url_site' => 'https://api.helloasso.com',
+            'user_name' => 'client_id',
+            'password' => 'client_secret',
+        ], TRUE);
+    }
 }

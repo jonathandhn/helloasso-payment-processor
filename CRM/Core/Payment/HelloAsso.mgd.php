@@ -25,7 +25,6 @@ return [
         'billing_mode' => 4,
         'payment_type' => 1,
         'is_recur' => TRUE,
-        'payment_instrument_id:name' => 'Credit Card',
       ],
       'match' => ['name'],
     ],

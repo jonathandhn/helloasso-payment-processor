@@ -198,7 +198,7 @@ return [
     'name' => 'helloasso_partner_auth_enabled',
     'type' => 'Boolean',
     'html_type' => 'checkbox',
-    'default' => 0,
+    'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
     'title' => E::ts('HelloAsso authorization screen: enable shared connection'),
