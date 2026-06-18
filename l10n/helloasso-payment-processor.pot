@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"POT-Creation-Date: 2026-06-03 13:23+0000\n"
-"PO-Revision-Date: 2026-06-03 13:23+0000\n"
+"POT-Creation-Date: 2026-06-04 08:18+0000\n"
+"PO-Revision-Date: 2026-06-04 08:18+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -12,7 +12,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "%1 (#%2)"
+msgid "%1 (#%2, %3)"
+msgstr ""
+
+msgid "%1 (#%2, sandbox linked to live processor #%3)"
 msgstr ""
 
 msgid "A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1"
@@ -420,10 +423,10 @@ msgstr ""
 msgid "HelloAsso: too many cases (%1) for GUI repair. Use terminal mode."
 msgstr ""
 
-msgid "HelloAsso: unable to obtain the payment processor OAuth token."
+msgid "HelloAsso: unable to authenticate with the payment processor API keys."
 msgstr ""
 
-msgid "Invalid HelloAsso processor configuration for %1 (%2):"
+msgid "Invalid HelloAsso processor configuration for %1:"
 msgstr ""
 
 msgid "Invalid HelloAsso webhook payload in the queue."

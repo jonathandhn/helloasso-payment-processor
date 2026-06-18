@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-06-03 13:23+0000\n"
+"PO-Revision-Date: 2026-06-04 08:18+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -11,8 +11,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "%1 (#%2)"
+msgid "%1 (#%2, %3)"
 msgstr ""
+
+#. Maintained French translation
+msgid "%1 (#%2, sandbox linked to live processor #%3)"
+msgstr "%1 (#%2, bac à sable lié au processeur actif en production #%3)"
 
 #. Maintained French translation
 msgid "A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1"
@@ -50,13 +54,13 @@ msgstr "Activer automatiquement le webhook"
 msgid "Avoid redirecting users to fragile CiviCRM or AJAX URLs when a payment is cancelled or fails."
 msgstr "Évite de renvoyer les utilisateurs vers des URL CiviCRM ou AJAX fragiles lorsqu'un paiement est annulé ou échoue."
 
-#: helloasso_payment_processor.php:252
+#. Maintained French translation
 msgid "Base HelloAsso API URL for live payments. Keep the default production URL unless HelloAsso explicitly instructs otherwise."
-msgstr ""
+msgstr "URL de base de l'API HelloAsso pour les paiements production. Conservez l'URL de production par défaut sauf instruction explicite de HelloAsso."
 
-#: helloasso_payment_processor.php:256
+#. Maintained French translation
 msgid "Base HelloAsso API URL for sandbox payments. Keep the sandbox default unless HelloAsso explicitly instructs otherwise."
-msgstr ""
+msgstr "URL de base de l'API HelloAsso pour les paiements bac à sable. Conservez l'URL bac à sable par défaut sauf instruction explicite de HelloAsso."
 
 #. Maintained French translation
 msgid "Callback URL to declare at HelloAsso:"
@@ -72,7 +76,7 @@ msgstr "Client ID dédié à la mire HelloAsso production."
 
 #. Maintained French translation
 msgid "Client ID dedicated to the HelloAsso sandbox authorization screen."
-msgstr "Client ID dédié à la mire HelloAsso sandbox."
+msgstr "Client ID dédié à la mire HelloAsso bac à sable."
 
 #: CRM/Core/Payment/HelloAsso.mgd.php:20
 msgid "Client Id"
@@ -96,7 +100,7 @@ msgstr "Client secret dédié à la mire HelloAsso production."
 
 #. Maintained French translation
 msgid "Client secret dedicated to the HelloAsso sandbox authorization screen."
-msgstr "Client secret dédié à la mire HelloAsso sandbox."
+msgstr "Client secret dédié à la mire HelloAsso bac à sable."
 
 #: api/v3/Job/ProcessHelloassoLongFollowup.php:82
 msgid "Comma-separated contribution status names to include, for example \"Completed,Pending\"."
@@ -116,7 +120,7 @@ msgstr "Connecter la production à HelloAsso"
 
 #. Maintained French translation
 msgid "Connect sandbox to HelloAsso"
-msgstr "Connecter le sandbox à HelloAsso"
+msgstr "Connecter le bac à sable à HelloAsso"
 
 #. Maintained French translation
 msgid "Connect to HelloAsso"
@@ -141,7 +145,7 @@ msgstr "Statuts de contribution"
 msgid "Disconnect the linked organization"
 msgstr "Déconnecter l'organisation liée"
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "Domain mismatch detected: this CiviCRM instance runs on a different host than the one authorized for the HelloAsso link: %1. OAuth callbacks will not function correctly on this staging/dev instance."
 msgstr "Un décalage de domaine a été détecté : cette instance CiviCRM tourne sur un hôte différent de celui utilisé pour la liaison HelloAsso de : %1. Les redirections et retours OAuth ne fonctionneront pas correctement sur cette instance de test/staging."
 
@@ -186,9 +190,9 @@ msgstr "Active l'intégration frontend standard HelloAsso basée sur CRM.payment
 msgid "Enter the HelloAsso client ID used by this payment processor for the selected environment. Keep the live and test values aligned with the matching HelloAsso application."
 msgstr ""
 
-#: helloasso_payment_processor.php:250
+#. Maintained French translation
 msgid "Enter the HelloAsso client secret paired with the client ID above. Store the live and sandbox secrets separately."
-msgstr ""
+msgstr "Saisissez le client secret HelloAsso associé au client ID ci-dessus. Conservez les secrets production et bac à sable séparément."
 
 #: helloasso_payment_processor.php:251
 msgid "Enter the HelloAsso organization slug or organization name expected by this processor when building API calls and payment links."
@@ -204,7 +208,7 @@ msgstr "Le nom et le prénom ne doivent pas être identiques (règle HelloAsso).
 
 #. Maintained French translation
 msgid "For an initial configuration: enable the authorization screen here, save the page, then open the sandbox or production rail to enter the client ID and client secret before starting the connection."
-msgstr "Pour une première configuration : activez la mire ici, enregistrez la page, puis ouvrez le rail sandbox ou production pour saisir le client ID et le client secret avant de lancer la connexion."
+msgstr "Pour une première configuration : activez la mire ici, enregistrez la page, puis ouvrez le rail bac à sable ou production pour saisir le client ID et le client secret avant de lancer la connexion."
 
 #: api/v3/Job/ProcessHelloasso.php:78
 #: api/v3/Job/ProcessHelloassoLongFollowup.php:77
@@ -221,7 +225,7 @@ msgstr "Forcer le traitement pour une contribution spécifique."
 msgid "HelloAsso"
 msgstr "HelloAsso"
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "HelloAsso API error (%1)"
 msgstr "Erreur API HelloAsso (%1)"
 
@@ -270,11 +274,11 @@ msgstr "Mire HelloAsso : client secret production"
 
 #. Maintained French translation
 msgid "HelloAsso authorization screen: sandbox client ID"
-msgstr "Mire HelloAsso : client ID sandbox"
+msgstr "Mire HelloAsso : client ID bac à sable"
 
 #. Maintained French translation
 msgid "HelloAsso authorization screen: sandbox client secret"
-msgstr "Mire HelloAsso : client secret sandbox"
+msgstr "Mire HelloAsso : client secret bac à sable"
 
 #. Maintained French translation
 msgid "HelloAsso authorization screen: token URL"
@@ -418,7 +422,7 @@ msgstr "La signature du webhook partenaire HelloAsso est requise mais manquante.
 msgid "HelloAsso partner webhook signature mismatch."
 msgstr "Incohérence de la signature du webhook partenaire HelloAsso."
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "HelloAsso payment is temporarily unavailable: HelloAsso connection must be restored by an administrator."
 msgstr "Le paiement HelloAsso est temporairement indisponible : la connexion HelloAsso doit être rétablie par un administrateur."
 
@@ -463,11 +467,11 @@ msgstr "Les remboursements HelloAsso sont désactivés par cette extension."
 
 #. Maintained French translation
 msgid "HelloAsso sandbox authorization screen"
-msgstr "Mire HelloAsso sandbox"
+msgstr "Mire HelloAsso bac à sable"
 
 #. Maintained French translation
 msgid "HelloAsso sandbox connection"
-msgstr "Connexion HelloAsso sandbox"
+msgstr "Connexion HelloAsso bac à sable"
 
 #. Maintained French translation
 msgid "HelloAsso settings"
@@ -503,7 +507,7 @@ msgstr ""
 msgid "HelloAsso: Authorization Renewal Failed"
 msgstr ""
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "HelloAsso: Domain Mismatch (Staging/Dev Instance)"
 msgstr "HelloAsso : Décalage de domaine (Instance de Test/Staging)"
 
@@ -529,7 +533,7 @@ msgstr "HelloAsso : reconnexion nécessaire"
 msgid "HelloAsso: Schema Check Failed"
 msgstr "HelloAsso : Échec de la vérification du schéma"
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "HelloAsso: Webhook Domain Mismatch"
 msgstr "HelloAsso : Décalage de domaine du Webhook"
 
@@ -553,12 +557,12 @@ msgid "HelloAsso: too many cases (%1) for GUI repair. Use terminal mode."
 msgstr "HelloAsso: trop de cas (%1) pour la réparation GUI. Utiliser le mode terminal."
 
 #. Maintained French translation
-msgid "HelloAsso: unable to obtain the payment processor OAuth token."
-msgstr "HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement."
+msgid "HelloAsso: unable to authenticate with the payment processor API keys."
+msgstr "HelloAsso : impossible de s'authentifier avec les clés API du processeur de paiement."
 
 #. Maintained French translation
-msgid "Invalid HelloAsso processor configuration for %1 (%2):"
-msgstr "Configuration du processeur HelloAsso %1 (%2) invalide :"
+msgid "Invalid HelloAsso processor configuration for %1:"
+msgstr "Configuration du processeur HelloAsso %1 invalide :"
 
 #. Maintained French translation
 msgid "Invalid HelloAsso webhook payload in the queue."
@@ -626,7 +630,7 @@ msgstr "Aucune organisation HelloAsso production n'est encore liée à ce proces
 
 #. Maintained French translation
 msgid "No HelloAsso sandbox organization is linked to this processor yet."
-msgstr "Aucune organisation HelloAsso sandbox n'est encore liée à ce processeur."
+msgstr "Aucune organisation HelloAsso bac à sable n'est encore liée à ce processeur."
 
 #. Maintained French translation
 msgid "No active HelloAsso authorization-screen processor is linked for mode %1."
@@ -663,7 +667,7 @@ msgstr "Aucune adresse email principale n'est disponible pour lancer le checkout
 
 #. Maintained French translation
 msgid "No sandbox API key is stored on this processor. The HelloAsso sandbox authorization screen is therefore offered by default."
-msgstr "Aucune clé API sandbox n'est enregistrée sur ce processeur. La mire HelloAsso sandbox est donc proposée par défaut."
+msgstr "Aucune clé API bac à sable n'est enregistrée sur ce processeur. La mire HelloAsso bac à sable est donc proposée par défaut."
 
 #: CRM/Core/Payment/HelloAsso.php:702
 msgid "OK"
@@ -849,7 +853,7 @@ msgstr "Restreindre le traitement à un seul processeur de paiement HelloAsso."
 
 #. Maintained French translation
 msgid "Sandbox API credentials are already present on this processor. API key mode remains the safest choice until you explicitly switch."
-msgstr "Des identifiants API sandbox sont déjà présents sur ce processeur. Le mode par clé API reste le choix le plus prudent tant que vous ne basculez pas explicitement."
+msgstr "Des identifiants API bac à sable sont déjà présents sur ce processeur. Le mode par clé API reste le choix le plus prudent tant que vous ne basculez pas explicitement."
 
 #: helloasso_payment_processor.php:253
 msgid "Sandbox client ID for HelloAsso test payments."
@@ -861,11 +865,11 @@ msgstr "Client Secret Sandbox pour les paiements de test HelloAsso."
 
 #. Maintained French translation
 msgid "Sandbox connection mode"
-msgstr "Mode de connexion sandbox"
+msgstr "Mode de connexion bac à sable"
 
 #. Maintained French translation
 msgid "Sandbox organization linked: %1"
-msgstr "Organisation sandbox liée : %1"
+msgstr "Organisation bac à sable liée : %1"
 
 #: helloasso_payment_processor.php:255
 msgid "Sandbox organization slug or name used for test API calls."
@@ -873,15 +877,15 @@ msgstr ""
 
 #. Maintained French translation
 msgid "Sandbox payment processor ID"
-msgstr "ID du processeur sandbox"
+msgstr "ID du processeur bac à sable"
 
 #. Maintained French translation
 msgid "Sandbox shared client ID"
-msgstr "Client ID partagé sandbox"
+msgstr "Client ID partagé bac à sable"
 
 #. Maintained French translation
 msgid "Sandbox shared client secret"
-msgstr "Client secret partagé sandbox"
+msgstr "Client secret partagé bac à sable"
 
 #. Maintained French translation
 msgid "Save authorization-screen settings"
@@ -958,7 +962,7 @@ msgstr "La vérification du schéma HelloAsso n'a pas pu aboutir : %1"
 msgid "The HelloAsso v2 schema upgrade is incomplete. %1 Run <code>cv updb</code> and then <code>cv flush</code> before relying on webhook queueing, follow-up sync, or legacy repair."
 msgstr ""
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "The HelloAsso webhook registered for %1 points to a different domain. Inbound payments will not be processed on this CiviCRM instance: %2."
 msgstr "Le webhook enregistré pour %1 pointe vers un domaine différent de cette instance. Les notifications de paiement HelloAsso ne seront pas reçues ni traitées sur ce CiviCRM : %2."
 
@@ -1075,7 +1079,7 @@ msgstr "Vous serez redirigé vers HelloAsso pour effectuer le paiement."
 msgid "first name"
 msgstr "prénom"
 
-#. Converted from French to English in source code
+#. Maintained French translation
 msgid "instead of"
 msgstr "au lieu de"
 
@@ -1106,6 +1110,7 @@ msgstr ""
 msgid "refresh refused"
 msgstr "rafraîchissement refusé"
 
+#. Maintained French translation
 msgid "sandbox"
-msgstr ""
+msgstr "bac à sable"
 

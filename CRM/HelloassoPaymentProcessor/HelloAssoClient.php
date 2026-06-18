@@ -121,7 +121,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
-            throw new PaymentProcessorException(E::ts('HelloAsso: unable to obtain the payment processor OAuth token.'));
+            throw new PaymentProcessorException(E::ts('HelloAsso: unable to authenticate with the payment processor API keys.'));
         }
         $token = json_decode($oauth_response->getBody());
         $token->not_after = time() + ($token->expires_in ?? 0);
@@ -146,7 +146,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
-            throw new PaymentProcessorException(E::ts('HelloAsso: unable to obtain the payment processor OAuth token.'));
+            throw new PaymentProcessorException(E::ts('HelloAsso: unable to authenticate with the payment processor API keys.'));
         }
         $token = json_decode($oauth_response->getBody());
         $token->not_after = time() + ($token->expires_in ?? 0);
