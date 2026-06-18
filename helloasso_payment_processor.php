@@ -38,6 +38,16 @@ function helloasso_payment_processor_civicrm_alterMenu(&$items): void {
   foreach ([
     'civicrm/admin/setting/helloasso',
     'civicrm/admin/setting/preferences/helloasso',
+  ] as $path) {
+    if (isset($items[$path])) {
+      $items[$path]['title'] = E::ts('HelloAsso settings');
+      $items[$path]['desc'] = E::ts('HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation.');
+    }
+  }
+
+  foreach ([
+    'civicrm/admin/setting/helloasso',
+    'civicrm/admin/setting/preferences/helloasso',
     'civicrm/helloasso/partner',
     'civicrm/helloasso/partner/callback',
   ] as $path) {
@@ -109,116 +119,116 @@ function helloasso_payment_processor_civicrm_buildForm($formName, &$form): void 
   $accessExpiresAtLabel = helloasso_payment_processor_format_datetime($link['expires_at'] ?? NULL);
   $refreshExpiresAtLabel = helloasso_payment_processor_format_datetime($link['refresh_expires_at'] ?? NULL);
   $modeOptions = [];
-  $modeOptions[] = '<option value="community"' . ($currentMode === 'community' ? ' selected="selected"' : '') . '>' . htmlspecialchars(E::ts('Clé API classique'), ENT_QUOTES, 'UTF-8') . '</option>';
-  $modeOptions[] = '<option value="plugin_public"' . ($currentMode === 'plugin_public' ? ' selected="selected"' : '') . ($sandboxPluginPublicConfigured ? '' : ' disabled="disabled"') . '>' . htmlspecialchars(E::ts('Mire HelloAsso sandbox'), ENT_QUOTES, 'UTF-8') . '</option>';
+  $modeOptions[] = '<option value="community"' . ($currentMode === 'community' ? ' selected="selected"' : '') . '>' . htmlspecialchars(E::ts('Classic API key'), ENT_QUOTES, 'UTF-8') . '</option>';
+  $modeOptions[] = '<option value="plugin_public"' . ($currentMode === 'plugin_public' ? ' selected="selected"' : '') . ($sandboxPluginPublicConfigured ? '' : ' disabled="disabled"') . '>' . htmlspecialchars(E::ts('HelloAsso sandbox authorization screen'), ENT_QUOTES, 'UTF-8') . '</option>';
   $liveModeOptions = [];
-  $liveModeOptions[] = '<option value="community"' . ($liveCurrentMode === 'community' ? ' selected="selected"' : '') . '>' . htmlspecialchars(E::ts('Clé API classique'), ENT_QUOTES, 'UTF-8') . '</option>';
-  $liveModeOptions[] = '<option value="plugin_public"' . ($liveCurrentMode === 'plugin_public' ? ' selected="selected"' : '') . (($livePluginPublicConfigured && !$hasClassicLiveCredentials) ? '' : ' disabled="disabled"') . '>' . htmlspecialchars(E::ts('Mire HelloAsso production'), ENT_QUOTES, 'UTF-8') . '</option>';
+  $liveModeOptions[] = '<option value="community"' . ($liveCurrentMode === 'community' ? ' selected="selected"' : '') . '>' . htmlspecialchars(E::ts('Classic API key'), ENT_QUOTES, 'UTF-8') . '</option>';
+  $liveModeOptions[] = '<option value="plugin_public"' . ($liveCurrentMode === 'plugin_public' ? ' selected="selected"' : '') . (($livePluginPublicConfigured && !$hasClassicLiveCredentials) ? '' : ' disabled="disabled"') . '>' . htmlspecialchars(E::ts('HelloAsso production authorization screen'), ENT_QUOTES, 'UTF-8') . '</option>';
   $liveConnectButton = helloasso_payment_processor_get_authorize_button_html(
     $liveConnectUrl . '&ha_action=connect',
-    E::ts('Connecter la production à HelloAsso')
+    E::ts('Connect production to HelloAsso')
   );
   $sandboxConnectButton = helloasso_payment_processor_get_authorize_button_html(
     $connectUrl . '&ha_action=connect',
-    E::ts('Connecter le sandbox à HelloAsso')
+    E::ts('Connect sandbox to HelloAsso')
   );
 
   $help = [];
-  $help[] = '<fieldset id="helloasso-live-auth-block"><legend>' . E::ts('Connexion HelloAsso production') . '</legend>';
+  $help[] = '<fieldset id="helloasso-live-auth-block"><legend>' . E::ts('HelloAsso production connection') . '</legend>';
   $help[] = '<div class="crm-block crm-form-block"><table class="form-layout-compressed">';
-  $help[] = '<tr><td>' . E::ts('ID du processeur live') . '</td><td><code>' . $liveProcessorId . '</code></td></tr>';
-  $help[] = '<tr><td><label for="helloasso_live_connection_mode">' . E::ts('Mode de connexion live') . '</label></td><td><select id="helloasso_live_connection_mode" name="helloasso_live_connection_mode">' . implode('', $liveModeOptions) . '</select></td></tr>';
-  $help[] = '<tr><td><label for="helloasso_live_webhook_auto_manage">' . E::ts('Activer automatiquement le webhook') . '</label></td><td><input type="checkbox" id="helloasso_live_webhook_auto_manage" name="helloasso_live_webhook_auto_manage" value="1"' . ($liveWebhookAutoManaged ? ' checked="checked"' : '') . '> <span class="description">' . E::ts("Active par défaut l'enregistrement automatique du webhook HelloAsso live pour cette instance CiviCRM. Décochez seulement si une autre instance garde la maîtrise de l'URL webhook.") . '</span></td></tr>';
+  $help[] = '<tr><td>' . E::ts('Live payment processor ID') . '</td><td><code>' . $liveProcessorId . '</code></td></tr>';
+  $help[] = '<tr><td><label for="helloasso_live_connection_mode">' . E::ts('Live connection mode') . '</label></td><td><select id="helloasso_live_connection_mode" name="helloasso_live_connection_mode">' . implode('', $liveModeOptions) . '</select></td></tr>';
+  $help[] = '<tr><td><label for="helloasso_live_webhook_auto_manage">' . E::ts('Automatically enable the webhook') . '</label></td><td><input type="checkbox" id="helloasso_live_webhook_auto_manage" name="helloasso_live_webhook_auto_manage" value="1"' . ($liveWebhookAutoManaged ? ' checked="checked"' : '') . '> <span class="description">' . E::ts("Enable automatic registration of the live HelloAsso webhook for this CiviCRM instance by default. Uncheck only if another instance retains control of the webhook URL.") . '</span></td></tr>';
   $help[] = '</table>';
   $help[] = '<p class="description">' . helloasso_payment_processor_get_partner_required_notice() . '</p>';
-  $help[] = '<p class="description">' . E::ts("Ce bloc permet de connecter la mire HelloAsso production sur ce processeur live : liaison OAuth, organisation liée, webhook et clé de signature. Le rail de paiement live ne peut basculer sur la mire que si ce processeur n'utilise plus de clés API classiques.") . '</p>';
+  $help[] = '<p class="description">' . E::ts("This block connects the production HelloAsso authorization screen on this live processor: OAuth link, linked organization, webhook and signature key. The live payment rail can switch to the authorization screen only when this processor no longer uses classic API keys.") . '</p>';
   if ($hasClassicLiveCredentials) {
-    $help[] = '<p class="description">' . E::ts('Des identifiants API live sont encore présents sur ce processeur. La mire production peut être reliée et testée, mais le mode de paiement live reste bloqué sur la clé API classique tant que ces identifiants ne sont pas retirés.') . '</p>';
+    $help[] = '<p class="description">' . E::ts('Live API credentials are still present on this processor. The production authorization screen can be linked and tested, but the live payment mode remains locked to the classic API key until these credentials are removed.') . '</p>';
   }
   else {
-    $help[] = '<p class="description">' . E::ts("Aucune clé API live n'est enregistrée sur ce processeur. Vous pouvez donc activer le mode mire production sur ce processeur si la liaison OAuth a été validée.") . '</p>';
+    $help[] = '<p class="description">' . E::ts("No live API key is stored on this processor. You can therefore enable production authorization-screen mode on this processor once the OAuth link has been validated.") . '</p>';
   }
   if ($liveLink) {
-    $help[] = '<p class="status success">' . E::ts('Organisation production liée : %1', [1 => htmlspecialchars((string) $liveLink['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+    $help[] = '<p class="status success">' . E::ts('Production organization linked: %1', [1 => htmlspecialchars((string) $liveLink['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
     if ($liveLinkedAtLabel !== '') {
-      $help[] = '<p class="description">' . E::ts('Liée le : %1', [1 => htmlspecialchars($liveLinkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts('Linked on: %1', [1 => htmlspecialchars($liveLinkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($liveAccessExpiresAtLabel !== '') {
-      $help[] = '<p class="description">' . E::ts("Jeton d'accès valable jusqu'au : %1", [1 => htmlspecialchars($liveAccessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts("Access token valid until: %1", [1 => htmlspecialchars($liveAccessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($liveRefreshExpiresAtLabel !== '') {
-      $help[] = '<p class="description">' . E::ts("Liaison d'autorisation valable jusqu'au : %1", [1 => htmlspecialchars($liveRefreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts("Authorization link valid until: %1", [1 => htmlspecialchars($liveRefreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($liveWebhookRegistration) {
-      $help[] = '<p class="description">' . E::ts('Gestion du webhook : %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($liveWebhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($liveWebhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
       if (!empty($liveWebhookRegistration['url'])) {
-        $help[] = '<p class="description">' . E::ts('URL webhook enregistrée : %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $help[] = '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if (!empty($liveWebhookRegistration['signatureKey'])) {
-        $help[] = '<p class="description">' . E::ts('Clé de signature webhook enregistrée : %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $help[] = '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $liveWebhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
     }
   }
   else {
-    $help[] = '<p class="status">' . E::ts("Aucune organisation HelloAsso production n'est encore liée à ce processeur.") . '</p>';
+    $help[] = '<p class="status">' . E::ts("No HelloAsso production organization is linked to this processor yet.") . '</p>';
   }
   if ($livePluginPublicConfigured) {
     $help[] = '<p>' . $liveConnectButton . '</p>';
   }
   else {
-    $help[] = '<p><button class="button" type="button" disabled="disabled">' . E::ts('Connecter la production à HelloAsso') . '</button> ';
-    $help[] = '<span class="description">' . E::ts("Renseignez d'abord le client ID et le client secret partagés sur la page de réglages de la mire, puis revenez lancer la connexion.") . '</span></p>';
+    $help[] = '<p><button class="button" type="button" disabled="disabled">' . E::ts('Connect production to HelloAsso') . '</button> ';
+    $help[] = '<span class="description">' . E::ts("Enter the shared client ID and client secret on the authorization-screen settings page first, then return to start the connection.") . '</span></p>';
   }
-  $help[] = '<p><a class="button" href="' . htmlspecialchars($liveConnectUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Ouvrir les réglages de la mire production') . '</a></p>';
+  $help[] = '<p><a class="button" href="' . htmlspecialchars($liveConnectUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open production authorization-screen settings') . '</a></p>';
   $help[] = '</div></fieldset>';
 
-  $help[] = '<fieldset id="helloasso-sandbox-auth-block"><legend>' . E::ts('Connexion HelloAsso sandbox') . '</legend>';
+  $help[] = '<fieldset id="helloasso-sandbox-auth-block"><legend>' . E::ts('HelloAsso sandbox connection') . '</legend>';
   $help[] = '<div class="crm-block crm-form-block"><table class="form-layout-compressed">';
-  $help[] = '<tr><td>' . E::ts('ID du processeur sandbox') . '</td><td><code>' . $sandboxProcessorId . '</code></td></tr>';
-  $help[] = '<tr><td><label for="helloasso_test_connection_mode">' . E::ts('Mode de connexion sandbox') . '</label></td><td><select id="helloasso_test_connection_mode" name="helloasso_test_connection_mode">' . implode('', $modeOptions) . '</select></td></tr>';
-  $help[] = '<tr><td><label for="helloasso_test_webhook_auto_manage">' . E::ts('Activer automatiquement le webhook') . '</label></td><td><input type="checkbox" id="helloasso_test_webhook_auto_manage" name="helloasso_test_webhook_auto_manage" value="1"' . ($webhookAutoManaged ? ' checked="checked"' : '') . '> <span class="description">' . E::ts("Active par défaut l'enregistrement automatique du webhook HelloAsso pour cette instance CiviCRM. Décochez seulement si plusieurs instances CiviCRM partagent la même organisation HelloAsso et que vous voulez gérer le webhook manuellement.") . '</span></td></tr>';
+  $help[] = '<tr><td>' . E::ts('Sandbox payment processor ID') . '</td><td><code>' . $sandboxProcessorId . '</code></td></tr>';
+  $help[] = '<tr><td><label for="helloasso_test_connection_mode">' . E::ts('Sandbox connection mode') . '</label></td><td><select id="helloasso_test_connection_mode" name="helloasso_test_connection_mode">' . implode('', $modeOptions) . '</select></td></tr>';
+  $help[] = '<tr><td><label for="helloasso_test_webhook_auto_manage">' . E::ts('Automatically enable the webhook') . '</label></td><td><input type="checkbox" id="helloasso_test_webhook_auto_manage" name="helloasso_test_webhook_auto_manage" value="1"' . ($webhookAutoManaged ? ' checked="checked"' : '') . '> <span class="description">' . E::ts("Enable automatic registration of the HelloAsso webhook for this CiviCRM instance by default. Uncheck only if multiple CiviCRM instances share the same HelloAsso organization and you want to manage the webhook manually.") . '</span></td></tr>';
   $help[] = '</table>';
   if ($hasClassicSandboxCredentials) {
-    $help[] = '<p class="description">' . E::ts("Des identifiants API sandbox sont déjà présents sur ce processeur. Le mode par clé API reste le choix le plus prudent tant que vous ne basculez pas explicitement.") . '</p>';
+    $help[] = '<p class="description">' . E::ts("Sandbox API credentials are already present on this processor. API key mode remains the safest choice until you explicitly switch.") . '</p>';
   }
   else {
-    $help[] = '<p class="description">' . E::ts("Aucune clé API sandbox n'est enregistrée sur ce processeur. La mire HelloAsso sandbox est donc proposée par défaut.") . '</p>';
+    $help[] = '<p class="description">' . E::ts("No sandbox API key is stored on this processor. The HelloAsso sandbox authorization screen is therefore offered by default.") . '</p>';
   }
 
   if ($link) {
-    $help[] = '<p class="status success">' . E::ts('Organisation sandbox liée : %1', [1 => htmlspecialchars((string) $link['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+    $help[] = '<p class="status success">' . E::ts('Sandbox organization linked: %1', [1 => htmlspecialchars((string) $link['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
     if ($linkedAtLabel !== '') {
-      $help[] = '<p class="description">' . E::ts('Liée le : %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts('Linked on: %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($accessExpiresAtLabel !== '') {
-      $help[] = '<p class="description">' . E::ts("Jeton d'accès valable jusqu'au : %1", [1 => htmlspecialchars($accessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts("Access token valid until: %1", [1 => htmlspecialchars($accessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($refreshExpiresAtLabel !== '') {
-      $help[] = '<p class="description">' . E::ts("Liaison d'autorisation valable jusqu'au : %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts("Authorization link valid until: %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($webhookRegistration) {
-      $help[] = '<p class="description">' . E::ts('Gestion du webhook : %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $help[] = '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
       if (!empty($webhookRegistration['url'])) {
-        $help[] = '<p class="description">' . E::ts('URL webhook enregistrée : %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $help[] = '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       if (!empty($webhookRegistration['signatureKey'])) {
-        $help[] = '<p class="description">' . E::ts('Clé de signature webhook enregistrée : %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+        $help[] = '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
     }
   }
   else {
-    $help[] = '<p class="status">' . E::ts("Aucune organisation HelloAsso sandbox n'est encore liée à ce processeur.") . '</p>';
+    $help[] = '<p class="status">' . E::ts("No HelloAsso sandbox organization is linked to this processor yet.") . '</p>';
   }
 
   if ($sandboxPluginPublicConfigured) {
     $help[] = '<p>' . $sandboxConnectButton . '</p>';
     $help[] = '<p>';
-    $help[] = '<a class="button" href="' . htmlspecialchars($connectUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Ouvrir les réglages de la mire') . '</a></p>';
+    $help[] = '<a class="button" href="' . htmlspecialchars($connectUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open authorization-screen settings') . '</a></p>';
   }
   else {
-    $help[] = '<p><button class="button" type="button" disabled="disabled">' . E::ts('Connecter le sandbox à HelloAsso') . '</button> ';
-    $help[] = '<span class="description">' . E::ts('Ce bouton reste désactivé tant que le client ID et le client secret partagés de la mire HelloAsso ne sont pas configurés.') . '</span></p>';
-    $help[] = '<p><a class="button" href="' . htmlspecialchars($connectUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Ouvrir les réglages de la mire') . '</a></p>';
+    $help[] = '<p><button class="button" type="button" disabled="disabled">' . E::ts('Connect sandbox to HelloAsso') . '</button> ';
+    $help[] = '<span class="description">' . E::ts('This button remains disabled until the shared HelloAsso authorization-screen client ID and client secret are configured.') . '</span></p>';
+    $help[] = '<p><a class="button" href="' . htmlspecialchars($connectUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open authorization-screen settings') . '</a></p>';
   }
   $help[] = '</div></fieldset>';
 
@@ -359,13 +369,13 @@ function helloasso_payment_processor_get_authorize_button_html(string $href, str
 }
 
 function helloasso_payment_processor_get_partner_required_notice(): string {
-  return E::ts('HelloAsso aide les associations à collecter des paiements en ligne et propose ses services gratuitement. Elle prend à sa charge tous les frais de transaction pour que vous puissiez bénéficier de la totalité des sommes versées par vos publics, sans frais. Les contributions volontaires laissées par ces derniers sont leur unique source de revenus.');
+  return E::ts('HelloAsso helps associations collect online payments and provides its services free of charge. It covers all transaction fees so that you can receive the full amount paid by your supporters, without fees. Voluntary contributions left by them are its only source of revenue.');
 }
 
 function helloasso_payment_processor_describe_webhook_ownership(?string $ownership): string {
   return $ownership === 'manual'
-    ? E::ts('manuel / autre instance maîtresse')
-    : E::ts('géré par cette instance CiviCRM');
+    ? E::ts('manual / another instance in control')
+    : E::ts('managed by this CiviCRM instance');
 }
 
 function helloasso_payment_processor_get_primary_processor(bool $isTest): ?array {
@@ -414,7 +424,7 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
 ): string {
   if (!$processor || empty($processor['id'])) {
     return '<fieldset class="helloasso-mire-settings-card"><legend>' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</legend>'
-      . '<p class="description">' . E::ts("Aucun processeur HelloAsso correspondant n'a été trouvé sur cette instance.") . '</p>'
+      . '<p class="description">' . E::ts("No matching HelloAsso payment processor was found on this instance.") . '</p>'
       . '</fieldset>';
   }
 
@@ -424,7 +434,7 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
   $webhookOwnership = $processorAuthConfig->getWebhookOwnership($processorId);
   $settingsUrl = helloasso_payment_processor_get_partner_page_url('reset=1&processor_id=' . $processorId);
   $connectUrl = helloasso_payment_processor_get_partner_page_url('reset=1&processor_id=' . $processorId . '&ha_action=connect');
-  $connectLabel = !empty($processor['is_test']) ? E::ts('Connecter le sandbox à HelloAsso') : E::ts('Connecter la production à HelloAsso');
+  $connectLabel = !empty($processor['is_test']) ? E::ts('Connect sandbox to HelloAsso') : E::ts('Connect production to HelloAsso');
   $linkedAtLabel = helloasso_payment_processor_format_datetime($organizationLink['linked_at'] ?? NULL);
   $accessExpiresAtLabel = helloasso_payment_processor_format_datetime($organizationLink['expires_at'] ?? NULL);
   $refreshExpiresAtLabel = helloasso_payment_processor_format_datetime($organizationLink['refresh_expires_at'] ?? NULL);
@@ -432,49 +442,49 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
   $processorTitle = trim((string) ($processor['title'] ?? $processor['name'] ?? ''));
 
   $html = '<fieldset class="helloasso-mire-settings-card"><legend>' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</legend>';
-  $html .= '<p class="description">' . E::ts('Le choix opérationnel entre clé API et mire reste sur la fiche du processeur. Cette page sert à activer le parcours mire, expliquer son fonctionnement et lancer la connexion.') . '</p>';
-  $html .= '<p><strong>' . E::ts('Processeur ciblé :') . '</strong> '
+  $html .= '<p class="description">' . E::ts('The operational choice between API key and authorization screen remains on the processor record. This page enables the authorization-screen flow, explains how it works and starts the connection.') . '</p>';
+  $html .= '<p><strong>' . E::ts('Target processor:') . '</strong> '
     . htmlspecialchars($processorTitle !== '' ? sprintf('%s (#%d)', $processorTitle, $processorId) : sprintf('#%d', $processorId), ENT_QUOTES, 'UTF-8')
     . '</p>';
 
   if ($organizationLink) {
-    $html .= '<p class="status success">' . E::ts('Organisation liée : %1', [1 => htmlspecialchars((string) $organizationLink['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+    $html .= '<p class="status success">' . E::ts('Organization linked: %1', [1 => htmlspecialchars((string) $organizationLink['organization_slug'], ENT_QUOTES, 'UTF-8')]) . '</p>';
     if (($organizationLink['refresh_status'] ?? '') === 'reconnect_required') {
       $httpStatus = !empty($organizationLink['last_refresh_http_status']) ? ' HTTP ' . (int) $organizationLink['last_refresh_http_status'] : '';
       $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
-      $html .= '<p class="status warning">' . E::ts("La liaison HelloAsso ne peut plus être renouvelée%1%2. Reconnectez l'organisation avant d'accepter de nouveaux paiements par la mire.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+      $html .= '<p class="status warning">' . E::ts("The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
     }
     elseif (($organizationLink['refresh_status'] ?? '') === 'refresh_failed') {
-      $html .= '<p class="status warning">' . E::ts("Le dernier renouvellement de la liaison HelloAsso a échoué. Vérifiez le prochain job de maintenance ou reconnectez l'organisation si le problème persiste.") . '</p>';
+      $html .= '<p class="status warning">' . E::ts("The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
     }
     if ($linkedAtLabel !== '') {
-      $html .= '<p class="description">' . E::ts('Liée le : %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $html .= '<p class="description">' . E::ts('Linked on: %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($accessExpiresAtLabel !== '') {
-      $html .= '<p class="description">' . E::ts("Jeton d'accès valable jusqu'au : %1", [1 => htmlspecialchars($accessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $html .= '<p class="description">' . E::ts("Access token valid until: %1", [1 => htmlspecialchars($accessExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
     if ($refreshExpiresAtLabel !== '') {
-      $html .= '<p class="description">' . E::ts("Liaison d'autorisation valable jusqu'au : %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      $html .= '<p class="description">' . E::ts("Authorization link valid until: %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
     }
   }
   else {
-    $html .= '<p class="status">' . E::ts("Aucune organisation n'est encore liée sur ce rail.") . '</p>';
+    $html .= '<p class="status">' . E::ts("No organization is linked on this rail yet.") . '</p>';
   }
 
-  $html .= '<p class="description">' . E::ts('Gestion du webhook : %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
+  $html .= '<p class="description">' . E::ts('Webhook management: %1', [1 => htmlspecialchars(helloasso_payment_processor_describe_webhook_ownership($webhookOwnership), ENT_QUOTES, 'UTF-8')]) . '</p>';
   if (!empty($webhookRegistration['url'])) {
-    $html .= '<p class="description">' . E::ts('URL webhook enregistrée : %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+    $html .= '<p class="description">' . E::ts('Registered webhook URL: %1', [1 => htmlspecialchars((string) $webhookRegistration['url'], ENT_QUOTES, 'UTF-8')]) . '</p>';
   }
   if (!empty($webhookRegistration['signatureKey'])) {
-    $html .= '<p class="description">' . E::ts('Clé de signature webhook enregistrée : %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
+    $html .= '<p class="description">' . E::ts('Stored webhook signature key: %1', [1 => htmlspecialchars((string) $webhookRegistration['signatureKey'], ENT_QUOTES, 'UTF-8')]) . '</p>';
   }
 
-  $html .= '<p><a class="button" href="' . htmlspecialchars($settingsUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Ouvrir les réglages de cette mire') . '</a></p>';
+  $html .= '<p><a class="button" href="' . htmlspecialchars($settingsUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Open this authorization-screen settings page') . '</a></p>';
   if (!$enabled) {
-    $html .= '<p class="description">' . E::ts("Activez d'abord le switch mire ci-dessous puis enregistrez la page avant de lancer la connexion.") . '</p>';
+    $html .= '<p class="description">' . E::ts("Enable the authorization-screen switch below and save the page before starting the connection.") . '</p>';
   }
   elseif (!$credentialsConfigured) {
-    $html .= '<p class="description">' . E::ts("Ouvrez d'abord les réglages de cette mire pour saisir le client ID et le client secret partagés, puis revenez lancer la connexion.") . '</p>';
+    $html .= '<p class="description">' . E::ts("Open this authorization-screen settings page first to enter the shared client ID and client secret, then return to start the connection.") . '</p>';
   }
   else {
     $html .= '<p>' . helloasso_payment_processor_get_authorize_button_html($connectUrl, $connectLabel) . '</p>';
@@ -495,26 +505,26 @@ function helloasso_payment_processor_inject_settings_page_panel(): void {
 
   $panel = [];
   $panel[] = '<div id="helloasso-mire-settings-panel" class="crm-block crm-form-block">';
-  $panel[] = '<fieldset><legend>' . E::ts('Parcours mire HelloAsso') . '</legend>';
+  $panel[] = '<fieldset><legend>' . E::ts('HelloAsso authorization-screen flow') . '</legend>';
   $panel[] = '<p>' . helloasso_payment_processor_get_partner_required_notice() . '</p>';
-  $panel[] = '<p class="description">' . E::ts("Le switch ci-dessous active ou masque l'interface mire sur les processeurs HelloAsso. Les identifiants client partagés et le lancement de la connexion restent gérés depuis les écrans mire dédiés.") . '</p>';
-  $panel[] = '<p class="description">' . E::ts("Pour une première configuration : activez la mire ici, enregistrez la page, puis ouvrez le rail sandbox ou production pour saisir le client ID et le client secret avant de lancer la connexion.") . '</p>';
+  $panel[] = '<p class="description">' . E::ts("The switch below enables or hides the authorization-screen interface on HelloAsso processors. Shared client credentials and connection startup remain managed from the dedicated authorization-screen pages.") . '</p>';
+  $panel[] = '<p class="description">' . E::ts("For an initial configuration: enable the authorization screen here, save the page, then open the sandbox or production rail to enter the client ID and client secret before starting the connection.") . '</p>';
   $panel[] = helloasso_payment_processor_render_settings_page_launch_panel(
-    E::ts('Mire HelloAsso sandbox'),
+    E::ts('HelloAsso sandbox authorization screen'),
     $sandboxProcessor,
     $processorAuthConfig,
     $enabled,
     $sandboxCredentialsConfigured
   );
   $panel[] = helloasso_payment_processor_render_settings_page_launch_panel(
-    E::ts('Mire HelloAsso production'),
+    E::ts('HelloAsso production authorization screen'),
     $liveProcessor,
     $processorAuthConfig,
     $enabled,
     $liveCredentialsConfigured
   );
-  $panel[] = '<p class="description">' . E::ts("Le bouton officiel ci-dessus ouvre la connexion HelloAsso. Si vous avez besoin d'ajuster les identifiants client ou de vérifier l'état de liaison, utilisez d'abord le lien d'ouverture des réglages.") . '</p>';
-  $panel[] = '<p class="description"><a href="' . htmlspecialchars($settingsUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Actualiser cette page de réglages HelloAsso') . '</a></p>';
+  $panel[] = '<p class="description">' . E::ts("The official button above opens the HelloAsso connection. If you need to adjust client credentials or check the link status, use the settings link first.") . '</p>';
+  $panel[] = '<p class="description"><a href="' . htmlspecialchars($settingsUrl, ENT_QUOTES, 'UTF-8') . '">' . E::ts('Refresh this HelloAsso settings page') . '</a></p>';
   $panel[] = '</fieldset></div>';
   $panelHtml = implode('', $panel);
 
@@ -1017,7 +1027,7 @@ function helloasso_payment_processor_protect_test_processor_edit(CRM_Core_Form $
   }
 
   CRM_Core_Session::setStatus(
-    E::ts("Vous avez ouvert directement le processeur de test HelloAsso. CiviCRM enregistre les valeurs live et test ensemble sur cet écran. Pour éviter d'écraser la production, vous allez être redirigé vers la fiche principale du processeur live associé."),
+    E::ts("You opened the HelloAsso test processor directly. CiviCRM stores the live and test values together on this screen. To avoid overwriting production, you will be redirected to the associated live processor record."),
     E::ts('HelloAsso'),
     'warning'
   );
@@ -1211,17 +1221,17 @@ function helloasso_payment_processor_civicrm_validateForm($formName, &$fields, &
     $val_no_accents = mb_strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $value));
 
     if (mb_strlen($value, 'UTF-8') < 3) {
-      $errors[$field_key] = ts('Le nom/prénom doit contenir au moins 3 caractères (règle HelloAsso).');
+      $errors[$field_key] = ts('First/last name must contain at least 3 characters (HelloAsso rule).');
     } elseif (preg_match('/(.)\1\1/u', $val_lower)) {
-      $errors[$field_key] = ts('Le nom/prénom ne doit pas contenir 3 caractères répétitifs (règle HelloAsso).');
+      $errors[$field_key] = ts('First/last name must not contain 3 repeated characters (HelloAsso rule).');
     } elseif (preg_match('/[0-9]/', $value)) {
-      $errors[$field_key] = ts('Le nom/prénom ne doit pas contenir de chiffres (règle HelloAsso).');
+      $errors[$field_key] = ts('First/last name must not contain numbers (HelloAsso rule).');
     } elseif (!preg_match('/[aeiouyAEIOUYéèêëàâäùûüîïôö]/u', $value)) {
-      $errors[$field_key] = ts('Le nom/prénom doit contenir au moins une voyelle (règle HelloAsso).');
+      $errors[$field_key] = ts('First/last name must contain at least one vowel (HelloAsso rule).');
     } elseif (in_array($val_lower, $forbidden_values) || in_array($val_no_accents, $forbidden_values) || in_array(str_replace('_', ' ', $val_lower), $forbidden_values)) {
-      $errors[$field_key] = ts('Cette valeur n\'est pas autorisée par HelloAsso.');
+      $errors[$field_key] = ts('This value is not allowed by HelloAsso.');
     } elseif (!preg_match('/^[\p{Latin}\s\'\-]+$/u', $value)) {
-      $errors[$field_key] = ts('Le nom/prénom contient des caractères spéciaux non autorisés (règle HelloAsso).');
+      $errors[$field_key] = ts('First/last name contains unauthorized special characters (HelloAsso rule).');
     }
   };
 
@@ -1233,7 +1243,7 @@ function helloasso_payment_processor_civicrm_validateForm($formName, &$fields, &
   }
 
   if ($first_name && $last_name && mb_strtolower(trim($first_name), 'UTF-8') === mb_strtolower(trim($last_name), 'UTF-8')) {
-    $errors[$last_name_key] = ts('Le nom et le prénom ne doivent pas être identiques (règle HelloAsso).');
+    $errors[$last_name_key] = ts('First name and last name must not be identical (HelloAsso rule).');
   }
 }
 

@@ -19,8 +19,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Pont d'intégration standard (mjwshared)"),
-    'description' => E::ts("Active l'intégration frontend standard HelloAsso basée sur CRM.payment et mjwshared."),
+    'title' => E::ts("Standard frontend bridge (mjwshared)"),
+    'description' => E::ts("Enable the standard HelloAsso frontend integration based on CRM.payment and mjwshared."),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -35,8 +35,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Gestion sécurisée des URL d'échec et d'annulation"),
-    'description' => E::ts("Évite de renvoyer les utilisateurs vers des URL CiviCRM ou AJAX fragiles lorsqu'un paiement est annulé ou échoue."),
+    'title' => E::ts("Secure handling of failure and cancellation URLs"),
+    'description' => E::ts("Avoid redirecting users to fragile CiviCRM or AJAX URLs when a payment is cancelled or fails."),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -51,8 +51,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("File d'attente pour le traitement des webhooks"),
-    'description' => E::ts('Place les webhooks HelloAsso dans la file PaymentprocessorWebhook au lieu de les traiter immédiatement.'),
+    'title' => E::ts("Webhook processing queue"),
+    'description' => E::ts('Place HelloAsso webhooks in the PaymentprocessorWebhook queue instead of processing them immediately.'),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -67,8 +67,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Fiabilisation du statut pour les automatisations (T+5 / T+15 min)"),
-    'description' => E::ts("Active les contrôles automatiques à T+5 puis T+15 après création d'un checkout HelloAsso. Le suivi long des changements ultérieurs, notamment les remboursements, reste indépendant."),
+    'title' => E::ts("Payment status reliability for automations (T+5 / T+15 min)"),
+    'description' => E::ts("Enable automatic checks at T+5 and T+15 after creation of a HelloAsso checkout. Long-term monitoring of later changes, including refunds, remains independent."),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -83,8 +83,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Intégration Afform / Form Builder"),
-    'description' => E::ts("Publie une Checkout Option HelloAsso pour Afform / Form Builder en s'appuyant sur le mécanisme de checkout du core CiviCRM."),
+    'title' => E::ts("Afform / Form Builder integration"),
+    'description' => E::ts("Publish a HelloAsso Checkout Option for Afform / Form Builder based on the CiviCRM core checkout mechanism."),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -99,8 +99,8 @@ return [
     'default' => 15,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Taille maximale des lots de traitement (Cron)"),
-    'description' => E::ts('Nombre maximum de contributions HelloAsso traitées par processeur pendant une exécution normale du cron.'),
+    'title' => E::ts("Maximum processing batch size (Cron)"),
+    'description' => E::ts('Maximum number of HelloAsso contributions processed per payment processor during a normal cron execution.'),
     'html_attributes' => ['size' => 6],
     'settings_pages' => [
       'helloasso' => [
@@ -115,8 +115,8 @@ return [
     'default' => 0,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Vérification stricte de la signature historique"),
-    'description' => E::ts('Refuse les webhooks HelloAsso dont la signature legacy invoiceID/sig est absente ou invalide.'),
+    'title' => E::ts("Strict legacy signature verification"),
+    'description' => E::ts('Reject HelloAsso webhooks whose legacy invoiceID/sig signature is missing or invalid.'),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -131,8 +131,8 @@ return [
     'default' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Vérification stricte de la signature partenaire"),
-    'description' => E::ts('Refuse les webhooks partenaire HelloAsso dont le header x-ha-signature est absent ou invalide quand une clé de signature webhook est enregistrée pour ce processeur.'),
+    'title' => E::ts("Strict partner signature verification"),
+    'description' => E::ts('Reject HelloAsso partner webhooks whose x-ha-signature header is missing or invalid when a webhook signature key is stored for this processor.'),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -147,8 +147,8 @@ return [
     'default' => 0,
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts('Mire HelloAsso : activer la connexion partagée'),
-    'description' => E::ts("Active la mire OAuth HelloAsso partagée. Quand ce réglage est désactivé, l'interface mire n'est plus proposée sur les pages processeur HelloAsso."),
+    'title' => E::ts('HelloAsso authorization screen: enable shared connection'),
+    'description' => E::ts("Enable the shared HelloAsso OAuth authorization screen. When this setting is disabled, the authorization-screen interface is no longer offered on HelloAsso processor pages."),
     'html_attributes' => [],
     'settings_pages' => [
       'helloasso' => [
@@ -163,8 +163,8 @@ return [
     'default' => '',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Mire HelloAsso : client ID partagé"),
-    'description' => E::ts("Client ID fourni par HelloAsso pour la mire partagée. Ne pas versionner cette valeur dans un dépôt public."),
+    'title' => E::ts("HelloAsso authorization screen: shared client ID"),
+    'description' => E::ts("Client ID provided by HelloAsso for the shared authorization screen. Do not commit this value to a public repository."),
     'html_attributes' => ['size' => 48],
   ],
   'helloasso_partner_client_id_live' => [
@@ -174,8 +174,8 @@ return [
     'default' => '',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts('Mire HelloAsso : client ID production'),
-    'description' => E::ts('Client ID dédié à la mire HelloAsso production.'),
+    'title' => E::ts('HelloAsso authorization screen: production client ID'),
+    'description' => E::ts('Client ID dedicated to the HelloAsso production authorization screen.'),
     'html_attributes' => ['size' => 48],
   ],
   'helloasso_partner_client_id_test' => [
@@ -185,8 +185,8 @@ return [
     'default' => '',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts('Mire HelloAsso : client ID sandbox'),
-    'description' => E::ts('Client ID dédié à la mire HelloAsso sandbox.'),
+    'title' => E::ts('HelloAsso authorization screen: sandbox client ID'),
+    'description' => E::ts('Client ID dedicated to the HelloAsso sandbox authorization screen.'),
     'html_attributes' => ['size' => 48],
   ],
   'helloasso_partner_client_secret' => [
@@ -196,8 +196,8 @@ return [
     'default' => '',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Mire HelloAsso : client secret partagé"),
-    'description' => E::ts("Client secret fourni par HelloAsso pour la mire partagée. À conserver localement sur l'instance CiviCRM."),
+    'title' => E::ts("HelloAsso authorization screen: shared client secret"),
+    'description' => E::ts("Client secret provided by HelloAsso for the shared authorization screen. Keep this value locally on the CiviCRM instance."),
     'html_attributes' => ['size' => 48],
   ],
   'helloasso_partner_client_secret_live' => [
@@ -207,8 +207,8 @@ return [
     'default' => '',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts('Mire HelloAsso : client secret production'),
-    'description' => E::ts('Client secret dédié à la mire HelloAsso production.'),
+    'title' => E::ts('HelloAsso authorization screen: production client secret'),
+    'description' => E::ts('Client secret dedicated to the HelloAsso production authorization screen.'),
     'html_attributes' => ['size' => 48],
   ],
   'helloasso_partner_client_secret_test' => [
@@ -218,8 +218,8 @@ return [
     'default' => '',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts('Mire HelloAsso : client secret sandbox'),
-    'description' => E::ts('Client secret dédié à la mire HelloAsso sandbox.'),
+    'title' => E::ts('HelloAsso authorization screen: sandbox client secret'),
+    'description' => E::ts('Client secret dedicated to the HelloAsso sandbox authorization screen.'),
     'html_attributes' => ['size' => 48],
   ],
   'helloasso_partner_authorize_url' => [
@@ -229,8 +229,8 @@ return [
     'default' => 'https://auth.helloasso.com/authorize',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts("Mire HelloAsso : URL d'autorisation"),
-    'description' => E::ts("URL de l'écran d'autorisation HelloAsso. En production, la valeur par défaut est https://auth.helloasso.com/authorize."),
+    'title' => E::ts("HelloAsso authorization screen: authorization URL"),
+    'description' => E::ts("HelloAsso authorization screen URL. In production, the default value is https://auth.helloasso.com/authorize."),
     'html_attributes' => ['size' => 64],
   ],
   'helloasso_partner_token_url' => [
@@ -240,8 +240,8 @@ return [
     'default' => 'https://api.helloasso.com/oauth2/token',
     'is_domain' => 1,
     'is_contact' => 0,
-    'title' => E::ts('Mire HelloAsso : URL du token'),
-    'description' => E::ts("Endpoint HelloAsso utilisé pour échanger le code d'autorisation et rafraîchir les jetons OAuth."),
+    'title' => E::ts('HelloAsso authorization screen: token URL'),
+    'description' => E::ts("HelloAsso endpoint used to exchange the authorization code and refresh OAuth tokens."),
     'html_attributes' => ['size' => 64],
   ],
   'helloasso_partner_link_json' => [

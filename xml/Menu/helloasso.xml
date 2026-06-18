@@ -4,6 +4,7 @@
     <path>civicrm/admin/setting/helloasso</path>
     <page_callback>CRM_Admin_Form_Generic</page_callback>
     <title>HelloAsso settings</title>
+    <desc>HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation.</desc>
     <access_arguments>administer CiviCRM</access_arguments>
     <adminGroup>System Settings</adminGroup>
   </item>
@@ -11,6 +12,7 @@
     <path>civicrm/admin/setting/preferences/helloasso</path>
     <page_callback>CRM_Admin_Form_Generic</page_callback>
     <title>HelloAsso settings</title>
+    <desc>HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation.</desc>
     <access_arguments>administer CiviCRM</access_arguments>
     <adminGroup>System Settings</adminGroup>
   </item>

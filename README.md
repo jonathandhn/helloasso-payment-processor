@@ -192,9 +192,48 @@ Les réglages principaux sont disponibles sur la page **HelloAsso settings** :
 | Vérification stricte de la signature partenaire | Activée | Contrôle `x-ha-signature` lorsqu'une clé est disponible. |
 | Mire HelloAsso : activer la connexion partagée | Désactivée | Affiche et autorise le parcours de connexion partenaire. |
 
-## Documentation Technique
-
-Les détails d'architecture, de test et d'exploitation V2 sont documentés dans
-[V2.md](V2.md).
-
 ## Contributions Et Intégrations Spécifiques
+
+Le processeur doit conserver un coeur générique, mais il a également vocation
+à servir de point d'appui à des intégrations plus spécialisées.
+
+Deux formes d'intégration sont déjà utilisées sur le terrain :
+
+- La façade `CRM_HelloassoPaymentProcessor_Service` permet à une extension
+  tierce de consulter les données HelloAsso en lecture seule, sans exposer les
+  secrets du processeur ni ouvrir de méthode d'écriture. Ce point d'entrée est
+  particulièrement important avec la mire : une même instance CiviCRM ne doit
+  pas multiplier les clients actifs concurrents pour une même organisation et
+  un même environnement. La liaison HelloAsso et ses tokens restent portés par
+  le processeur ; les extensions complémentaires réutilisent cette connexion
+  via la façade.
+- Une extension Drupal peut s'insérer pleinement dans le flux de paiement
+  CiviCRM / HelloAsso, par exemple pour porter un parcours Webform métier tout
+  en laissant ce processeur gérer le checkout, les webhooks et la
+  réconciliation.
+
+Les propositions de fonctions helper ou de points d'extension facilitant ce
+type d'intégration sont bienvenues, notamment pour Webform, Services ou
+d'autres parcours métier. Elles doivent rester isolées et documentées, afin
+de ne pas imposer un comportement spécifique aux parcours CiviCRM standards.
+
+## Crédits
+
+L'extension originale a été initiée par civiuser (Sidney) et Pierre Morvan :
+[dépôt historique](https://github.com/ryarnyah/helloasso-payment-processor).
+
+La version publiée par Makoa a été développée par Antoine Breheret et Dewy
+Mercerais.
+
+La branche V2, ses intégrations multi-CMS et ses mécanismes de fiabilisation
+ont été développés et validés par Jonathan Dahan
+([jonathan.dhn.one](https://jonathan.dhn.one), `jonathan@dhn.one`).
+
+Contributions historiques : Guillaume Sorel / All In Appli et
+[Symbiotic](https://symbiotic.coop).
+
+## Licence
+
+HelloAsso Payment Processor for CiviCRM est un logiciel libre distribué sous
+licence [AGPL-3.0](LICENSE.txt). Ce projet n'est pas une publication officielle
+de HelloAsso.

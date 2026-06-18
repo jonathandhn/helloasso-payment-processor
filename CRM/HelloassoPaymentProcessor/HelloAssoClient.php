@@ -121,7 +121,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
-            throw new PaymentProcessorException(E::ts('HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement.'));
+            throw new PaymentProcessorException(E::ts('HelloAsso: unable to obtain the payment processor OAuth token.'));
         }
         $token = json_decode($oauth_response->getBody());
         $token->not_after = time() + ($token->expires_in ?? 0);
@@ -146,7 +146,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
         if ($oauth_response->getStatusCode() != 200) {
             Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
-            throw new PaymentProcessorException(E::ts('HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement.'));
+            throw new PaymentProcessorException(E::ts('HelloAsso: unable to obtain the payment processor OAuth token.'));
         }
         $token = json_decode($oauth_response->getBody());
         $token->not_after = time() + ($token->expires_in ?? 0);
@@ -286,7 +286,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             return (string) $decoded['message'];
         }
 
-        return E::ts('Erreur API HelloAsso (%1)', [1 => $statusCode]);
+        return E::ts('HelloAsso API error (%1)', [1 => $statusCode]);
     }
 
     private function assertSslVerificationEnabled($is_test): void

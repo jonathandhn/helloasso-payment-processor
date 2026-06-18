@@ -96,7 +96,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             $processorMode = $this->_is_test ? E::ts('sandbox') : E::ts('production');
 
             return E::ts(
-                'Configuration du processeur HelloAsso %1 (%2) invalide :',
+                'Invalid HelloAsso processor configuration for %1 (%2):',
                 [1 => htmlspecialchars($processorReference, ENT_QUOTES, 'UTF-8'), 2 => $processorMode]
             ) . '<p>' . implode('<p>', $error);
         } else {
@@ -146,7 +146,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return $this->setStatusPaymentCompleted($result);
         }
 
-        $backUrl = $params['cancel_url'] ?? $this->getGoBackUrl($params['qfKey'] ?? null);
+        $backUrl = $params['cancel_url']
+            ?? (isset($this->cancelUrl)
+                ? $this->getCancelUrl($params['qfKey'] ?? null)
+                : $this->getGoBackUrl($params['qfKey'] ?? null));
         $errorUrl = $params['cancel_url'] ?? $this->getCancelUrl($params['qfKey'] ?? null);
         $returnUrl = $params['return_url'] ?? $this->getReturnSuccessUrl($params['qfKey'] ?? null);
 
@@ -210,6 +213,13 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         return (string) $response['redirectUrl'];
     }
 
+    public function cancelHostedCheckoutFollowUps(int $contributionId): void
+    {
+        // The browser explicitly left this checkout; a later payment from an
+        // already-open gateway tab must be reconciled by its webhook.
+        $this->stopContributionFollowUps($contributionId);
+    }
+
     public function synchronizeContributionForHostedCheckout(int $contributionId): array
     {
         $this->processScheduledSynchronization([
@@ -219,7 +229,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         $contribution = $this->loadContributionById($contributionId);
         if (!$contribution) {
-            throw new PaymentProcessorException(E::ts('Impossible de recharger la contribution %1.', [1 => $contributionId]));
+            throw new PaymentProcessorException(E::ts('Unable to reload contribution %1.', [1 => $contributionId]));
         }
 
         $metadata = $this->loadMetadataForContribution($contributionId);
@@ -259,7 +269,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         if (!$contributionId) {
-            throw new PaymentProcessorException(E::ts("Impossible de retrouver la contribution à mettre à jour pour le checkout HelloAsso."));
+            throw new PaymentProcessorException(E::ts("Unable to find the contribution to update for the HelloAsso checkout."));
         }
 
         $payer = $this->buildPayerFromPropertyBag($propertyBag);
@@ -272,7 +282,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $request = [
             'totalAmount' => (int) round(((float) $propertyBag->getAmount()) * 100),
             'initialAmount' => (int) round(((float) $propertyBag->getAmount()) * 100),
-            'itemName' => (string) ($options['item_name'] ?? E::ts('Contribution en ligne')),
+            'itemName' => (string) ($options['item_name'] ?? E::ts('Online contribution')),
             'backUrl' => (string) ($options['back_url'] ?? ''),
             'errorUrl' => (string) ($options['error_url'] ?? ''),
             'returnUrl' => (string) ($options['return_url'] ?? ''),
@@ -285,12 +295,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             ->createCheckoutIntent($this->getPaymentProcessorConfig(), $this->_is_test, $request);
 
         if (empty($response['redirectUrl']) || empty($response['id'])) {
-            throw new PaymentProcessorException(E::ts("Erreur inconnue lors de la préparation de la redirection HelloAsso."));
+            throw new PaymentProcessorException(E::ts("Unknown error while preparing the HelloAsso redirect."));
         }
 
         $contribution = $this->loadContributionById($contributionId);
         if (!$contribution) {
-            throw new PaymentProcessorException(E::ts("Impossible de mettre à jour la contribution %1.", [1 => $contributionId]));
+            throw new PaymentProcessorException(E::ts("Unable to update contribution %1.", [1 => $contributionId]));
         }
 
         if (empty($contribution->invoice_id)) {
@@ -351,7 +361,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     private function validateHelloAssoPayerNames(string $firstName, string $lastName): void
     {
         $throwError = function ($msg) {
-            CRM_Core_Session::setStatus($msg, E::ts('Erreur HelloAsso'), 'error');
+            CRM_Core_Session::setStatus($msg, E::ts('HelloAsso error'), 'error');
             throw new PaymentProcessorException($msg);
         };
 
@@ -370,29 +380,29 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             }
 
             if (mb_strlen($value, 'UTF-8') < 3) {
-                $throwError(E::ts('Le %1 doit contenir au moins 3 caractères (règle HelloAsso).', [1 => $fieldLabel]));
+                $throwError(E::ts('The %1 must contain at least 3 characters (HelloAsso rule).', [1 => $fieldLabel]));
             }
             elseif (preg_match('/(.)\1\1/u', $valLower)) {
-                $throwError(E::ts('Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso).', [1 => $fieldLabel]));
+                $throwError(E::ts('The %1 must not contain 3 repeated characters (HelloAsso rule).', [1 => $fieldLabel]));
             }
             elseif (preg_match('/[0-9]/', $value)) {
-                $throwError(E::ts('Le %1 ne doit pas contenir de chiffres (règle HelloAsso).', [1 => $fieldLabel]));
+                $throwError(E::ts('The %1 must not contain numbers (HelloAsso rule).', [1 => $fieldLabel]));
             }
             elseif (!preg_match('/[aeiouyAEIOUYéèêëàâäùûüîïôö]/u', $value)) {
-                $throwError(E::ts('Le %1 doit contenir au moins une voyelle (règle HelloAsso).', [1 => $fieldLabel]));
+                $throwError(E::ts('The %1 must contain at least one vowel (HelloAsso rule).', [1 => $fieldLabel]));
             }
             elseif (in_array($valLower, $forbiddenValues, TRUE) || in_array($valNoAccents, $forbiddenValues, TRUE) || in_array(str_replace('_', ' ', $valLower), $forbiddenValues, TRUE)) {
-                $throwError(E::ts('La valeur du %1 n\'est pas autorisée par HelloAsso.', [1 => $fieldLabel]));
+                $throwError(E::ts('The value of %1 is not allowed by HelloAsso.', [1 => $fieldLabel]));
             }
             elseif (!preg_match('/^[\p{Latin}\s\'\-]+$/u', $value)) {
-                $throwError(E::ts('Le %1 contient des caractères non autorisés (règle HelloAsso).', [1 => $fieldLabel]));
+                $throwError(E::ts('The %1 contains unauthorized characters (HelloAsso rule).', [1 => $fieldLabel]));
             }
         };
 
-        $validateName($firstName, 'prénom');
-        $validateName($lastName, 'nom');
+        $validateName($firstName, E::ts('first name'));
+        $validateName($lastName, E::ts('last name'));
         if ($firstName && $lastName && mb_strtolower(trim($firstName), 'UTF-8') === mb_strtolower(trim($lastName), 'UTF-8')) {
-            $throwError(E::ts('Le nom et le prénom ne doivent pas être identiques (règle HelloAsso).'));
+            $throwError(E::ts('First name and last name must not be identical (HelloAsso rule).'));
         }
     }
 
@@ -416,7 +426,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         if ($email === '') {
-            throw new PaymentProcessorException(E::ts("Aucune adresse email principale n'est disponible pour lancer le checkout HelloAsso de la contribution %1.", [1 => $contributionId]));
+            throw new PaymentProcessorException(E::ts("No primary email address is available to start the HelloAsso checkout for contribution %1.", [1 => $contributionId]));
         }
 
         $contact = civicrm_api3('Contact', 'getsingle', [
@@ -486,10 +496,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         $invoiceId = trim((string) ($contribution['invoice_id'] ?? ''));
         if ($invoiceId !== '') {
-            return mb_substr(E::ts('Contribution en ligne : %1', [1 => $invoiceId]), 0, 250);
+            return mb_substr(E::ts('Online contribution: %1', [1 => $invoiceId]), 0, 250);
         }
 
-        return E::ts('Contribution en ligne');
+        return E::ts('Online contribution');
     }
 
 
@@ -674,7 +684,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
                     ->addWhere('id', '=', $webhookEvent['id'])
                     ->addValue('status', 'error')
-                    ->addValue('message', E::ts("Webhook dupliqué ignoré."))
+                    ->addValue('message', E::ts("Duplicate webhook ignored."))
                     ->addValue('processed_date', 'now')
                     ->execute();
                 return FALSE;
@@ -682,7 +692,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
             $payload = json_decode((string) $webhookEvent['data'], TRUE);
             if (!is_array($payload)) {
-                throw new PaymentProcessorException(E::ts('Payload webhook HelloAsso invalide dans la file.'));
+                throw new PaymentProcessorException(E::ts('Invalid HelloAsso webhook payload in the queue.'));
             }
 
             $invoiceId = $payload['metadata']['invoiceID'] ?? NULL;
@@ -693,7 +703,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
                     ->addWhere('id', '=', $webhookEvent['id'])
                     ->addValue('status', 'success')
-                    ->addValue('message', E::ts("Aucune contribution correspondante. Webhook ignoré."))
+                    ->addValue('message', E::ts("No matching contribution. Webhook ignored."))
                     ->addValue('processed_date', 'now')
                     ->execute();
                 return TRUE;
@@ -861,7 +871,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             catch (Exception $e) {
                 if ($this->isHelloAssoNotFoundException($e)) {
                     $this->stopContributionFollowUps((int) $dao->contribution_id);
-                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("Objet HelloAsso introuvable (404). Les révérifications courte et longue ont été désactivées pour éviter des appels répétés.");
+                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("HelloAsso object not found (404). Short and long follow-up checks have been disabled to avoid repeated calls.");
                     Civi::log()->warning('HelloAsso cron sync stopped after 404 for contribution ' . $dao->contribution_id . ': ' . $e->getMessage());
                     continue;
                 }
@@ -1073,7 +1083,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             catch (Exception $e) {
                 if ($this->isHelloAssoNotFoundException($e)) {
                     $this->stopContributionFollowUps((int) $dao->contribution_id);
-                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("Objet HelloAsso introuvable (404). Les révérifications courte et longue ont été désactivées pour éviter des appels répétés.");
+                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("HelloAsso object not found (404). Short and long follow-up checks have been disabled to avoid repeated calls.");
                     Civi::log()->warning('HelloAsso long cron sync stopped after 404 for contribution ' . $dao->contribution_id . ': ' . $e->getMessage());
                     continue;
                 }
@@ -1263,7 +1273,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     private function logDonRecStatusMismatch(int $contributionId, string $gatewayStatus): void
     {
         Civi::log()->warning(E::ts(
-            "La contribution %1 est verrouillée par DonRec. Le statut pris en compte pour le reçu fiscal diffère du statut actuel de la passerelle de paiement HelloAsso (%2). Les métadonnées ont été synchronisées, mais le statut de la contribution n'a pas été modifié.",
+            "Contribution %1 is locked by DonRec. The status used for the tax receipt differs from the current HelloAsso payment gateway status (%2). Metadata has been synchronized, but the contribution status has not been changed.",
             [
                 1 => $contributionId,
                 2 => $gatewayStatus,
