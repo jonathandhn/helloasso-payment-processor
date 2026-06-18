@@ -22,7 +22,6 @@
 
       CRM.payment.form.dataset.submitted = 'false';
       CRM.payment.form.dataset.submitdontprocess = 'false';
-      this.removePreservedSubmitAction();
       if (CRM.payment.submitButtons !== null) {
         for (let i = 0; i < CRM.payment.submitButtons.length; ++i) {
           CRM.payment.submitButtons[i].removeAttribute('disabled');
@@ -54,32 +53,6 @@
       if (newPaymentProcessorID !== this.paymentProcessorID) {
         this.cleanupState();
       }
-    },
-
-    removePreservedSubmitAction: function() {
-      if (typeof CRM.payment === 'undefined' || CRM.payment.form === null) {
-        return;
-      }
-
-      var preservedActions = CRM.payment.form.querySelectorAll('input[data-helloasso-submit-action="true"]');
-      for (let i = 0; i < preservedActions.length; ++i) {
-        preservedActions[i].parentNode.removeChild(preservedActions[i]);
-      }
-    },
-
-    preserveSubmitAction: function(button) {
-      this.removePreservedSubmitAction();
-
-      if (!button || !button.name || CRM.payment.getIsDrupalWebform()) {
-        return;
-      }
-
-      var submitAction = document.createElement('input');
-      submitAction.setAttribute('type', 'hidden');
-      submitAction.setAttribute('name', button.name);
-      submitAction.setAttribute('value', button.value || '');
-      submitAction.dataset.helloassoSubmitAction = 'true';
-      CRM.payment.form.appendChild(submitAction);
     },
 
     handleSubmit: function(event) {
@@ -114,15 +87,15 @@
         return false;
       }
 
-      this.preserveSubmitAction(event.currentTarget);
+      if (CRM.payment.getIsDrupalWebform()) {
+        if (event.currentTarget && event.currentTarget.value) {
+          CRM.payment.addDrupalWebformActionElement(event.currentTarget.value);
+        }
 
-      if (CRM.payment.getIsDrupalWebform() && event.currentTarget && event.currentTarget.value) {
-        CRM.payment.addDrupalWebformActionElement(event.currentTarget.value);
-      }
-
-      if (CRM.payment.submitButtons !== null) {
-        for (let i = 0; i < CRM.payment.submitButtons.length; ++i) {
-          CRM.payment.submitButtons[i].setAttribute('disabled', true);
+        if (CRM.payment.submitButtons !== null) {
+          for (let i = 0; i < CRM.payment.submitButtons.length; ++i) {
+            CRM.payment.submitButtons[i].setAttribute('disabled', true);
+          }
         }
       }
 
