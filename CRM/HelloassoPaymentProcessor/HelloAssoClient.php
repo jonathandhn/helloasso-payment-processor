@@ -197,7 +197,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
-    public function refundPayment(array $paymentProcessor, $isTest, int $paymentId, array $query = []): array
+    public function refundPayment(array $paymentProcessor, $isTest, int $paymentId): array
     {
         if (!(bool) Civi::settings()->get('helloasso_enable_refunds')) {
             throw new PaymentProcessorException(E::ts('HelloAsso refunds are disabled by this extension.'));
@@ -207,8 +207,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
             $paymentProcessor,
             $isTest,
             'POST',
-            '/v5/payments/' . $paymentId . '/refund',
-            ['query' => $query]
+            '/v5/payments/' . $paymentId . '/refund'
         );
     }
 

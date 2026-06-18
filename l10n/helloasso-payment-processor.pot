@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"POT-Creation-Date: 2026-05-29 08:57+0000\n"
-"PO-Revision-Date: 2026-05-29 08:57+0000\n"
+"POT-Creation-Date: 2026-05-29 09:45+0000\n"
+"PO-Revision-Date: 2026-05-29 09:45+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -249,6 +249,9 @@ msgstr ""
 msgid "HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation."
 msgstr ""
 
+msgid "HelloAsso only supports full refunds through this integration. Partial refunds must be handled manually in HelloAsso."
+msgstr ""
+
 msgid "HelloAsso organization %1 is now linked."
 msgstr ""
 
@@ -340,6 +343,9 @@ msgid "HelloAsso production authorization screen"
 msgstr ""
 
 msgid "HelloAsso production connection"
+msgstr ""
+
+msgid "HelloAsso refund cannot be requested because the original CiviCRM payment could not be found."
 msgstr ""
 
 msgid "HelloAsso refund cannot be requested without a payment ID and a positive amount."
