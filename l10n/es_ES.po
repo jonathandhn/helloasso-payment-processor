@@ -16,6 +16,22 @@ msgid "%1 monthly installments"
 msgstr "%1 mensualidades"
 
 #. Public-facing string in checkout or validation flow
+msgid "HelloAsso authorization-screen setup"
+msgstr "Configuración de la pantalla de autorización de HelloAsso"
+
+#. Public-facing string in checkout or validation flow
+msgid "This HelloAsso processor can be saved a first time without API credentials when the authorization screen is enabled."
+msgstr "Este procesador HelloAsso puede guardarse una primera vez sin credenciales API cuando la pantalla de autorización está activada."
+
+#. Public-facing string in checkout or validation flow
+msgid "Enter the processor name, save once, then return to this processor to configure the live and sandbox authorization-screen connections."
+msgstr "Introduzca el nombre del procesador, guarde una primera vez y vuelva después a este procesador para configurar las conexiones de la pantalla de autorización en producción y sandbox."
+
+#. Public-facing string in checkout or validation flow
+msgid "Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments handled by HelloAsso."
+msgstr "Pague de una vez o divida este pago en un calendario fijo de 2 a 12 mensualidades gestionado por HelloAsso."
+
+#. Public-facing string in checkout or validation flow
 msgid "A recurring HelloAsso payment is missing its order or installment identity."
 msgstr "Falta el identificador del pedido o de la cuota en un pago recurrente de HelloAsso."
 
@@ -202,4 +218,3 @@ msgstr "Este valor no está permitido por HelloAsso."
 #. Public-facing string in checkout or validation flow
 msgid "You will be redirected to HelloAsso to complete your payment."
 msgstr "Será redirigido a HelloAsso para realizar el pago."
-
