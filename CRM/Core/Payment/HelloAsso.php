@@ -1000,7 +1000,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 return FALSE;
             }
 
-            $payload = json_decode((string) $webhookEvent['data'], TRUE);
+            $rawPayload = (string) ($webhookEvent['data'] ?? '');
+            $payload = json_decode($rawPayload, TRUE);
             if (!is_array($payload)) {
                 throw new PaymentProcessorException(E::ts('Invalid HelloAsso webhook payload in the queue.'));
             }
