@@ -247,7 +247,11 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
 
     if ($statusCode < 200 || $statusCode >= 300) {
       $errorMessage = $this->buildApiErrorMessage($decoded, $statusCode);
-      if ($this->isCheckoutInitializationRequest($method, $path) && $statusCode === 409) {
+      if (CRM_HelloassoPaymentProcessor_ApiErrorClassifier::isOrganizationPaymentBlocked(
+        $method,
+        $path,
+        $statusCode
+      )) {
         $this->recordOrganizationPaymentBlock($errorMessage, $statusCode);
         throw new PaymentProcessorException($this->getOrganizationPaymentBlockedMessage());
       }
@@ -255,7 +259,10 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
       throw new PaymentProcessorException($errorMessage);
     }
 
-    if ($this->isCheckoutInitializationRequest($method, $path)) {
+    if (CRM_HelloassoPaymentProcessor_ApiErrorClassifier::isCheckoutInitializationRequest(
+      $method,
+      $path
+    )) {
       $this->clearOrganizationPaymentBlock();
     }
 
@@ -448,11 +455,6 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
 
   private function getOrganizationPaymentBlockedMessage(): string {
     return E::ts('HelloAsso payment is temporarily unavailable: the linked organization is not currently allowed by HelloAsso to receive online payments.');
-  }
-
-  private function isCheckoutInitializationRequest(string $method, string $path): bool {
-    return strtoupper($method) === 'POST'
-      && (bool) preg_match('#^/v5/organizations/[^/]+/checkout-intents$#', $path);
   }
 
   private function recordOrganizationPaymentBlock(string $message, int $statusCode): void {

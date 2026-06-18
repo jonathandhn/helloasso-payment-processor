@@ -273,7 +273,7 @@ class CRM_HelloassoPaymentProcessor_IsoCountryAlpha3
         return isset(self::COUNTRY_ALPHA2_TO_ALPHA3[$type]);
     }
 
-    public function get(string $type): string
+    public function get(string $type): ?string
     {
         return $this->support($type) ? self::COUNTRY_ALPHA2_TO_ALPHA3[$type] : NULL;
     }

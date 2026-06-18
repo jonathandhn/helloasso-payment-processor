@@ -244,27 +244,35 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         }
 
         if ($statusCode < 200 || $statusCode >= 300) {
-            $errorMessage = $this->buildApiErrorMessage($decoded, $statusCode);
-            if ($this->isCheckoutInitializationRequest($method, $path) && $statusCode === 409) {
-                Civi::log()->error(sprintf(
-                    'HelloAsso organization cannot receive payments for payment processor %s (HTTP %d): %s',
-                    $paymentProcessor['id'] ?? 'unknown',
-                    $statusCode,
-                    $errorMessage
-                ));
-                throw new PaymentProcessorException($this->getOrganizationPaymentBlockedMessage());
-            }
-
-            throw new PaymentProcessorException($errorMessage);
+            $this->throwApiError($paymentProcessor, $method, $path, $statusCode, $decoded);
         }
 
         return is_array($decoded) ? $decoded : [];
     }
 
-    private function isCheckoutInitializationRequest(string $method, string $path): bool
-    {
-        return strtoupper($method) === 'POST'
-            && (bool) preg_match('#^/v5/organizations/[^/]+/checkout-intents$#', $path);
+    private function throwApiError(
+        array $paymentProcessor,
+        string $method,
+        string $path,
+        int $statusCode,
+        $decoded
+    ): void {
+        $errorMessage = $this->buildApiErrorMessage($decoded, $statusCode);
+        if (CRM_HelloassoPaymentProcessor_ApiErrorClassifier::isOrganizationPaymentBlocked(
+            $method,
+            $path,
+            $statusCode
+        )) {
+            Civi::log()->error(sprintf(
+                'HelloAsso organization cannot receive payments for payment processor %s (HTTP %d): %s',
+                $paymentProcessor['id'] ?? 'unknown',
+                $statusCode,
+                $errorMessage
+            ));
+            throw new PaymentProcessorException($this->getOrganizationPaymentBlockedMessage());
+        }
+
+        throw new PaymentProcessorException($errorMessage);
     }
 
     private function getOrganizationPaymentBlockedMessage(): string

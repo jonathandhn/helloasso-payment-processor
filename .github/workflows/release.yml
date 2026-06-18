@@ -18,32 +18,13 @@ jobs:
       - name: Set version env
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-      - name: Inject production keys and package zip
+      - name: Build and validate release archive
         env:
           HELLOASSO_LIVE_CLIENT_ID: ${{ secrets.HELLOASSO_LIVE_CLIENT_ID }}
           HELLOASSO_LIVE_CLIENT_SECRET: ${{ secrets.HELLOASSO_LIVE_CLIENT_SECRET }}
           HELLOASSO_SANDBOX_CLIENT_ID: ${{ secrets.HELLOASSO_SANDBOX_CLIENT_ID }}
           HELLOASSO_SANDBOX_CLIENT_SECRET: ${{ secrets.HELLOASSO_SANDBOX_CLIENT_SECRET }}
-        run: |
-          # 1. Replace placeholders in PartnerCredentials.php with secrets
-          sed -i "s|%%HELLOASSO_LIVE_CLIENT_ID%%|${HELLOASSO_LIVE_CLIENT_ID}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
-          sed -i "s|%%HELLOASSO_LIVE_CLIENT_SECRET%%|${HELLOASSO_LIVE_CLIENT_SECRET}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
-          sed -i "s|%%HELLOASSO_SANDBOX_CLIENT_ID%%|${HELLOASSO_SANDBOX_CLIENT_ID}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
-          sed -i "s|%%HELLOASSO_SANDBOX_CLIENT_SECRET%%|${HELLOASSO_SANDBOX_CLIENT_SECRET}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
-          
-          # 2. Setup release directory structure
-          mkdir -p build/helloasso-payment-processor
-          cp -R * build/helloasso-payment-processor/ || true
-          rm -rf build/helloasso-payment-processor/build
-          rm -rf build/helloasso-payment-processor/.git
-          rm -rf build/helloasso-payment-processor/.github
-          rm -rf build/helloasso-payment-processor/.gitlab-ci.yml
-          rm -rf build/helloasso-payment-processor/.gitignore
-          
-          # 3. Create CiviCRM extension package
-          cd build
-          zip -r ../helloasso-payment-processor-${{ env.VERSION }}.zip helloasso-payment-processor
-          cd ..
+        run: bash scripts/build_release.sh "${VERSION}"
 
       - name: Create GitHub Release and Upload Artifact
         uses: softprops/action-gh-release@v2
