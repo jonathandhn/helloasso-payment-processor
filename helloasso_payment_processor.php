@@ -389,7 +389,7 @@ function helloasso_payment_processor_add_quickform_checkout_controls(
     'installmentsValue' => $submittedInstallments ?: '',
     'installmentsLabel' => E::ts('Number of installments'),
     'oneTimeLabel' => E::ts('One-time payment'),
-    'installmentsDescription' => E::ts('Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments.'),
+    'installmentsDescription' => E::ts('Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments handled by HelloAsso.'),
   ]);
   Civi::resources()->addScriptFile(E::LONG_NAME, 'js/quickform-checkout.js');
 }
@@ -639,15 +639,15 @@ function helloasso_payment_processor_render_settings_page_launch_panel(
     if (($organizationLink['refresh_status'] ?? '') === 'reconnect_required') {
       $httpStatus = !empty($organizationLink['last_refresh_http_status']) ? ' HTTP ' . (int) $organizationLink['last_refresh_http_status'] : '';
       $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
-      $html .= '<p class="status warning">' . E::ts("The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+      $html .= '<p class="status warning">' . E::ts("The HelloAsso authorization link on this rail can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
     }
     elseif (($organizationLink['refresh_status'] ?? '') === 'organization_blocked') {
       $httpStatus = !empty($organizationLink['last_refresh_http_status']) ? ' HTTP ' . (int) $organizationLink['last_refresh_http_status'] : '';
       $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
-      $html .= '<p class="status warning">' . E::ts("The linked HelloAsso organization is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+      $html .= '<p class="status warning">' . E::ts("The HelloAsso organization linked on this rail is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
     }
     elseif (($organizationLink['refresh_status'] ?? '') === 'refresh_failed') {
-      $html .= '<p class="status warning">' . E::ts("The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
+      $html .= '<p class="status warning">' . E::ts("The latest HelloAsso authorization-link renewal failed on this rail. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
     }
     if ($linkedAtLabel !== '') {
       $html .= '<p class="description">' . E::ts('Linked on: %1', [1 => htmlspecialchars($linkedAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
@@ -976,7 +976,7 @@ function helloasso_payment_processor_civicrm_check(mixed &$messages): void {
     if ($reconnectRequired) {
       $messages[] = new CRM_Utils_Check_Message(
         'helloasso_payment_processor_oauth_reconnect_required',
-        E::ts('A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1', [1 => implode('; ', $reconnectRequired)]),
+        E::ts('One or more HelloAsso authorization links can no longer be renewed. Reconnect them before accepting new payments through the authorization screen: %1', [1 => implode('; ', $reconnectRequired)]),
         E::ts('HelloAsso: Reconnection Required'),
         \Psr\Log\LogLevel::ERROR,
         'fa-unlink'
@@ -986,7 +986,7 @@ function helloasso_payment_processor_civicrm_check(mixed &$messages): void {
     if ($organizationBlocked) {
       $messages[] = new CRM_Utils_Check_Message(
         'helloasso_payment_processor_organization_blocked',
-        E::ts('One or more HelloAsso linked organizations are not currently allowed by HelloAsso to receive online payments. Check their administrative status before accepting new payments through the authorization screen: %1', [1 => implode('; ', $organizationBlocked)]),
+        E::ts('One or more HelloAsso organizations linked on this instance are not currently allowed by HelloAsso to receive online payments. Check their administrative status before accepting new payments through the authorization screen: %1', [1 => implode('; ', $organizationBlocked)]),
         E::ts('HelloAsso: Organization Cannot Receive Payments'),
         \Psr\Log\LogLevel::ERROR,
         'fa-ban'
@@ -996,7 +996,7 @@ function helloasso_payment_processor_civicrm_check(mixed &$messages): void {
     if ($refreshFailed) {
       $messages[] = new CRM_Utils_Check_Message(
         'helloasso_payment_processor_oauth_refresh_failed',
-        E::ts('The last HelloAsso authorization renewal failed for: %1. The maintenance job will retry; reconnect if the failure continues.', [1 => implode('; ', $refreshFailed)]),
+        E::ts('The last HelloAsso authorization-link renewal failed for: %1. The maintenance job will retry; reconnect if the failure continues.', [1 => implode('; ', $refreshFailed)]),
         E::ts('HelloAsso: Authorization Renewal Failed'),
         \Psr\Log\LogLevel::WARNING,
         'fa-exclamation-triangle'
