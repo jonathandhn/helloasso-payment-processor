@@ -1,0 +1,53 @@
+# Translation file
+
+msgid ""
+msgstr ""
+"Project-Id-Version: helloasso-payment-processor 2.0.0\n"
+"PO-Revision-Date: 2026-05-26 22:52+0000\n"
+"Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
+"Language-Team: es_ES\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Public-facing string in checkout or validation flow
+msgid "Contribution en ligne"
+msgstr "Contribución en línea"
+
+#. Public-facing string in checkout or validation flow
+msgid "Contribution en ligne : %1"
+msgstr "Contribución en línea: %1"
+
+#. Public-facing string in checkout or validation flow
+msgid "La valeur du %1 n'est pas autorisée par HelloAsso."
+msgstr "El valor de %1 no está permitido por HelloAsso."
+
+#. Public-facing string in checkout or validation flow
+msgid "Le %1 contient des caractères non autorisés (règle HelloAsso)."
+msgstr "El %1 contiene caracteres no permitidos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Le %1 doit contenir au moins 3 caractères (règle HelloAsso)."
+msgstr "El %1 debe contener al menos 3 caracteres (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Le %1 doit contenir au moins une voyelle (règle HelloAsso)."
+msgstr "El %1 debe contener al menos una vocal (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso)."
+msgstr "El %1 no debe contener 3 caracteres repetitivos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Le %1 ne doit pas contenir de chiffres (règle HelloAsso)."
+msgstr "El %1 no debe contener números (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Le nom et le prénom ne doivent pas être identiques (règle HelloAsso)."
+msgstr "El nombre y el apellido no deben ser idénticos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Vous serez redirigé vers HelloAsso pour effectuer le paiement."
+msgstr "Será redirigido a HelloAsso para realizar el pago."
+

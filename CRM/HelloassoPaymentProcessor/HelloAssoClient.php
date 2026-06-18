@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Payment\Exception\PaymentProcessorException;
+use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 
 class CRM_HelloassoPaymentProcessor_HelloAssoClient
 {
@@ -8,6 +9,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
     // Refresh token will be valid only for 30 days.
     // https://dev.helloasso.com/docs/getting-started
     private const REFRESH_TOKEN_EXP = '30 days';
+    private const ACCESS_TOKEN_EXP_MARGIN = 30;
     private static $instance = null;
 
     /**
@@ -44,34 +46,66 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         return self::$instance;
     }
 
-    public function getToken($is_test, $oauthUrl, $clientId, $clientSecret)
+    public function getToken($is_test, array $paymentProcessor, $oauthUrl, $clientId, $clientSecret)
     {
-        if (!Civi::cache('long')->has('helloasso-token' . ($is_test ? '-test' : ''))) {
-            $this->accessToken($is_test, $oauthUrl, $clientId, $clientSecret);
+        if (Civi::cache('long')->has($this->getCacheKey($is_test, $paymentProcessor))
+            && !$this->isAccessTokenExpired($is_test, $paymentProcessor)) {
+            return Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
         }
-        // Check if access_token is expired
-        if (self::$instance->isAccessTokenExpired($is_test)) {
-            self::$instance->refreshToken($is_test, $oauthUrl, $clientId);
+
+        $lock = Civi::lockManager()->acquire($this->getTokenLockName($is_test, $paymentProcessor), 10);
+        if (!$lock->isAcquired()) {
+            if (Civi::cache('long')->has($this->getCacheKey($is_test, $paymentProcessor))
+                && !$this->isAccessTokenExpired($is_test, $paymentProcessor)) {
+                return Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
+            }
+            throw new PaymentProcessorException(E::ts('HelloAsso authentication is currently being refreshed. Please retry the payment.'));
         }
-        return Civi::cache('long')->get('helloasso-token' . ($is_test ? '-test' : ''));
+
+        try {
+            if (!Civi::cache('long')->has($this->getCacheKey($is_test, $paymentProcessor))) {
+                $this->accessToken($is_test, $paymentProcessor, $oauthUrl, $clientId, $clientSecret);
+            }
+            elseif ($this->isAccessTokenExpired($is_test, $paymentProcessor)) {
+                $cachedToken = Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
+                if (!empty($cachedToken->refresh_token)) {
+                    $this->refreshToken($is_test, $paymentProcessor, $oauthUrl);
+                }
+                else {
+                    $this->accessToken($is_test, $paymentProcessor, $oauthUrl, $clientId, $clientSecret);
+                }
+            }
+        }
+        finally {
+            $lock->release();
+        }
+
+        return Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
     }
 
-    public function invalidateToken($is_test)
+    public function invalidateToken($is_test, array $paymentProcessor)
     {
-        Civi::cache('long')->delete('helloasso-token' . ($is_test ? '-test' : ''));
+        Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
     }
 
-    private function isAccessTokenExpired($is_test)
+    private function isAccessTokenExpired($is_test, array $paymentProcessor)
     {
-        // Get a 30s margin.
-        if ((time() + 30) > Civi::cache('long')->get('helloasso-token' . ($is_test ? '-test' : ''))->not_after) {
+        $token = Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor));
+        if (empty($token) || empty($token->not_after)) {
             return TRUE;
         }
+
+        if ((time() + self::ACCESS_TOKEN_EXP_MARGIN) > $token->not_after) {
+            return TRUE;
+        }
+
         return FALSE;
     }
 
-    private function accessToken($is_test, $oauthUrl, $clientId, $clientSecret)
+    private function accessToken($is_test, array $paymentProcessor, $oauthUrl, $clientId, $clientSecret)
     {
+        $this->assertSslVerificationEnabled($is_test);
+
         $oauth_response = $this->getGuzzleClient()->request('POST', $oauthUrl, [
             'form_params' => [
                 'grant_type' => 'client_credentials',
@@ -86,21 +120,22 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         ]);
 
         if ($oauth_response->getStatusCode() != 200) {
-            Civi::cache('long')->delete('helloasso-token' . ($is_test ? '-test' : ''));
-            throw new PaymentProcessorException('HelloAsso: Could not get OAuth token for Payment Processor');
+            Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
+            throw new PaymentProcessorException(E::ts('HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement.'));
         }
         $token = json_decode($oauth_response->getBody());
         $token->not_after = time() + ($token->expires_in ?? 0);
-        Civi::cache('long')->set('helloasso-token' . ($is_test ? '-test' : ''), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
+        Civi::cache('long')->set($this->getCacheKey($is_test, $paymentProcessor), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
     }
 
-    private function refreshToken($is_test, $oauthUrl, $clientId)
+    private function refreshToken($is_test, array $paymentProcessor, $oauthUrl)
     {
+        $this->assertSslVerificationEnabled($is_test);
+
         $oauth_response = $this->getGuzzleClient()->request('POST', $oauthUrl, [
             'form_params' => [
                 'grant_type' => 'refresh_token',
-                'client_id' => $clientId,
-                'refresh_token' => Civi::cache('long')->get('helloasso-token' . ($is_test ? '-test' : ''))->refresh_token
+                'refresh_token' => Civi::cache('long')->get($this->getCacheKey($is_test, $paymentProcessor))->refresh_token
             ],
             'curl' => [
                 CURLOPT_RETURNTRANSFER => TRUE,
@@ -110,11 +145,194 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         ]);
 
         if ($oauth_response->getStatusCode() != 200) {
-            Civi::cache('long')->delete('helloasso-token' . ($is_test ? '-test' : ''));
-            throw new PaymentProcessorException('HelloAsso: Could not get OAuth token for Payment Processor');
+            Civi::cache('long')->delete($this->getCacheKey($is_test, $paymentProcessor));
+            throw new PaymentProcessorException(E::ts('HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement.'));
         }
         $token = json_decode($oauth_response->getBody());
         $token->not_after = time() + ($token->expires_in ?? 0);
-        Civi::cache('long')->set('helloasso-token' . ($is_test ? '-test' : ''), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
+        Civi::cache('long')->set($this->getCacheKey($is_test, $paymentProcessor), $token, DateInterval::createFromDateString(self::REFRESH_TOKEN_EXP));
+    }
+
+    public function createCheckoutIntent(array $paymentProcessor, $isTest, array $request): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'POST',
+            '/v5/organizations/' . $this->getOrganizationSlug($paymentProcessor, $isTest) . '/checkout-intents',
+            ['json' => $request]
+        );
+    }
+
+    public function getCheckoutIntent(array $paymentProcessor, $isTest, int $checkoutIntentId, array $query = []): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'GET',
+            '/v5/organizations/' . $this->getOrganizationSlug($paymentProcessor, $isTest) . '/checkout-intents/' . $checkoutIntentId,
+            ['query' => $query]
+        );
+    }
+
+    public function getPayment(array $paymentProcessor, $isTest, int $paymentId, array $query = []): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'GET',
+            '/v5/payments/' . $paymentId,
+            ['query' => $query]
+        );
+    }
+
+    public function listOrganizationPayments(array $paymentProcessor, $isTest, array $query = []): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'GET',
+            '/v5/organizations/' . $this->getOrganizationSlug($paymentProcessor, $isTest) . '/payments',
+            ['query' => $query]
+        );
+    }
+
+    public function refundPayment(array $paymentProcessor, $isTest, int $paymentId, array $query = []): array
+    {
+        if (!(bool) Civi::settings()->get('helloasso_enable_refunds')) {
+            throw new PaymentProcessorException(E::ts('HelloAsso refunds are disabled by this extension.'));
+        }
+
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'POST',
+            '/v5/payments/' . $paymentId . '/refund',
+            ['query' => $query]
+        );
+    }
+
+    private function requestHelloAsso(array $paymentProcessor, $is_test, string $method, string $path, array $options = [], bool $retryOnUnauthorized = TRUE): array
+    {
+        $this->assertSslVerificationEnabled($is_test);
+
+        if ($this->shouldUsePluginPublic($paymentProcessor, $is_test)) {
+            return $this->requestHelloAssoViaPluginPublic($paymentProcessor, $method, $path, $options);
+        }
+
+        $baseUrl = rtrim($paymentProcessor['url_site'], '/');
+        $oauthUrl = $baseUrl . '/oauth2/token';
+        $token = $this->getToken($is_test, $paymentProcessor, $oauthUrl, $paymentProcessor['user_name'], $paymentProcessor['password']);
+
+        $requestOptions = $options + [
+            'headers' => [],
+            'http_errors' => FALSE,
+            'curl' => [
+                CURLOPT_RETURNTRANSFER => TRUE,
+                CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+            ],
+        ];
+        $requestOptions['headers']['Authorization'] = 'Bearer ' . $token->access_token;
+
+        $response = $this->getGuzzleClient()->request($method, $baseUrl . $path, $requestOptions);
+        $statusCode = $response->getStatusCode();
+        $body = (string) $response->getBody();
+        $decoded = $body === '' ? [] : json_decode($body, TRUE);
+
+        if ($statusCode === 401 && $retryOnUnauthorized) {
+            $this->invalidateToken($is_test, $paymentProcessor);
+            return $this->requestHelloAsso($paymentProcessor, $is_test, $method, $path, $options, FALSE);
+        }
+
+        if ($statusCode < 200 || $statusCode >= 300) {
+            throw new PaymentProcessorException($this->buildApiErrorMessage($decoded, $statusCode));
+        }
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function requestHelloAssoViaPluginPublic(array $paymentProcessor, string $method, string $path, array $options = []): array
+    {
+        $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
+        if (!$paymentProcessorId) {
+            throw new PaymentProcessorException(E::ts('HelloAsso plugin-public mode requires a saved payment processor ID.'));
+        }
+
+        return (new CRM_HelloassoPaymentProcessor_PartnerAuth($paymentProcessorId))->requestApi($method, $path, $options);
+    }
+
+    private function buildApiErrorMessage($decoded, int $statusCode): string
+    {
+        if (is_array($decoded) && !empty($decoded['errors']) && is_array($decoded['errors'])) {
+            $messages = [];
+            foreach ($decoded['errors'] as $error) {
+                if (is_array($error) && !empty($error['message'])) {
+                    $messages[] = $error['message'];
+                }
+                elseif (is_string($error)) {
+                    $messages[] = $error;
+                }
+                elseif (is_array($error)) {
+                    $messages[] = implode(', ', array_filter($error, 'is_scalar'));
+                }
+            }
+
+            if ($messages) {
+                return implode('; ', $messages);
+            }
+        }
+
+        if (is_array($decoded) && !empty($decoded['message'])) {
+            return (string) $decoded['message'];
+        }
+
+        return E::ts('Erreur API HelloAsso (%1)', [1 => $statusCode]);
+    }
+
+    private function assertSslVerificationEnabled($is_test): void
+    {
+        if (!$is_test && !Civi::settings()->get('verifySSL')) {
+            throw new PaymentProcessorException(E::ts('HelloAsso live API calls require SSL verification to be enabled.'));
+        }
+    }
+
+    private function getCacheKey($is_test, array $paymentProcessor): string
+    {
+        $processorIdentifier = $paymentProcessor['id']
+            ?? sha1(implode('|', [
+                (string) ($paymentProcessor['url_site'] ?? ''),
+                (string) ($paymentProcessor['user_name'] ?? ''),
+                (string) ($paymentProcessor['subject'] ?? ''),
+            ]));
+
+        return 'helloasso-token-' . $processorIdentifier . ($is_test ? '-test' : '-live');
+    }
+
+    private function getTokenLockName($is_test, array $paymentProcessor): string
+    {
+        return 'data.helloasso.api.refresh.' . sha1($this->getCacheKey($is_test, $paymentProcessor));
+    }
+
+    private function shouldUsePluginPublic(array $paymentProcessor, $is_test): bool
+    {
+        $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
+        if (!$paymentProcessorId) {
+            return FALSE;
+        }
+
+        return (new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig())->shouldUsePluginPublic($paymentProcessorId, $paymentProcessor);
+    }
+
+    private function getOrganizationSlug(array $paymentProcessor, $is_test): string
+    {
+        if ($this->shouldUsePluginPublic($paymentProcessor, $is_test)) {
+            $paymentProcessorId = (int) ($paymentProcessor['id'] ?? 0);
+            $linked = (new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig())->getLinkedOrganization($paymentProcessorId);
+            if (!empty($linked['organization_slug'])) {
+                return (string) $linked['organization_slug'];
+            }
+        }
+
+        return (string) $paymentProcessor['subject'];
     }
 }

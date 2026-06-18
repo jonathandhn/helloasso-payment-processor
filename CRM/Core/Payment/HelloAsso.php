@@ -1,9 +1,17 @@
 <?php
 
 use Civi\Payment\Exception\PaymentProcessorException;
+use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 
 class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 {
+    private const SHORT_FOLLOWUP_MAX_ATTEMPTS = 2;
+    private const LONG_FOLLOWUP_MAX_ATTEMPTS = 3;
+    private const TECHNICAL_ERROR_MAX_ATTEMPTS = 5;
+    private const TECHNICAL_ERROR_BACKOFF_MINUTES = [5, 15, 30, 60, 120];
+    private const LONG_FOLLOWUP_CARD_DAYS = [14, 45, 90];
+    private const LONG_FOLLOWUP_SEPA_DAYS = [30, 90, 180];
+
     /**
      * @var GuzzleHttp\Client
      */
@@ -61,19 +69,36 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     function checkConfig()
     {
         $error = array();
+        $processorAuthConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
+        $paymentProcessorId = $this->getPaymentProcessorId();
+        $usesPluginPublic = $paymentProcessorId
+            && $processorAuthConfig->shouldUsePluginPublic($paymentProcessorId, $this->getPaymentProcessorConfig());
 
-        if (empty($this->_paymentProcessor['user_name'])) {
-            $error[] = ts('Client Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        if (!$usesPluginPublic && empty($this->_paymentProcessor['user_name'])) {
+            $error[] = E::ts('Client Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
         }
-        if (empty($this->_paymentProcessor['password'])) {
-            $error[] = ts('Client Secret Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        if (!$usesPluginPublic && empty($this->_paymentProcessor['password'])) {
+            $error[] = E::ts('Client Secret Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
         }
-        if (empty($this->_paymentProcessor['subject'])) {
-            $error[] = ts('HelloAsso Organization Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        if (empty($this->_paymentProcessor['subject']) && !$usesPluginPublic) {
+            $error[] = E::ts('HelloAsso Organization Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        }
+        if ($usesPluginPublic && !$processorAuthConfig->getLinkedOrganization($paymentProcessorId)) {
+            $error[] = E::ts('HelloAsso authorization screen is selected for this processor, but no linked HelloAsso organization is stored yet.');
         }
 
         if (!empty($error)) {
-            return implode('<p>', $error);
+            $processorTitle = trim((string) ($this->_paymentProcessor['title'] ?? $this->_paymentProcessor['name'] ?? 'HelloAsso'));
+            $processorTitle = $processorTitle !== '' ? $processorTitle : 'HelloAsso';
+            $processorReference = $paymentProcessorId
+                ? E::ts('%1 (#%2)', [1 => $processorTitle, 2 => $paymentProcessorId])
+                : $processorTitle;
+            $processorMode = $this->_is_test ? E::ts('sandbox') : E::ts('production');
+
+            return E::ts(
+                'Configuration du processeur HelloAsso %1 (%2) invalide :',
+                [1 => htmlspecialchars($processorReference, ENT_QUOTES, 'UTF-8'), 2 => $processorMode]
+            ) . '<p>' . implode('<p>', $error);
         } else {
             return NULL;
         }
@@ -121,19 +146,178 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return $this->setStatusPaymentCompleted($result);
         }
 
-        // Make Oauth2 login
-        $oauth_uri = $this->_paymentProcessor['url_site'] . '/oauth2/token';
-        $client_id = $this->_paymentProcessor['user_name'];
-        $client_secret = $this->_paymentProcessor['password'];
+        $backUrl = $params['cancel_url'] ?? $this->getGoBackUrl($params['qfKey'] ?? null);
+        $errorUrl = $params['cancel_url'] ?? $this->getCancelUrl($params['qfKey'] ?? null);
+        $returnUrl = $params['return_url'] ?? $this->getReturnSuccessUrl($params['qfKey'] ?? null);
 
-        $token = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getToken($this->_is_test, $oauth_uri, $client_id, $client_secret);
+        if ($this->isSafeAbortUrlsEnabled() && $this->shouldUseSafeAbortUrl($backUrl, $errorUrl)) {
+            $safeAbortUrl = $this->getSafeAbortUrl($params);
+            $backUrl = $safeAbortUrl;
+            $errorUrl = $safeAbortUrl;
+        }
 
-        // Init Cart
-        $api_uri = $this->_paymentProcessor['url_site'] . '/v5/organizations/' . $this->_paymentProcessor['subject'] . '/checkout-intents';
-
-        $payer = array(
-            'email' => $propertyBag->getEmail(),
+        $response = $this->createCheckoutIntentAndStore(
+            $propertyBag,
+            [
+                'item_name' => $this->getPaymentDescription($params, 250),
+                'back_url' => $backUrl,
+                'error_url' => $errorUrl,
+                'return_url' => $returnUrl,
+            ]
         );
+
+        // Check if it's a Drupal AJAX request (Webform)
+        if ($this->isDrupalAjaxRequest()) {
+            $ajaxResponse = [
+                [
+                    'command' => 'helloassoRedirect',
+                    'url' => $response['redirectUrl']
+                ]
+            ];
+            header('Content-Type: application/json');
+            echo json_encode($ajaxResponse);
+            CRM_Utils_System::civiExit();
+        }
+
+        // then redirect to HelloAsso (standard CiviCRM way)
+        CRM_Core_Config::singleton()->userSystem->prePostRedirect();
+        CRM_Utils_System::redirect($response['redirectUrl']);
+
+        // exit called before
+
+        return $result;
+    }
+
+    public function startHostedCheckoutForContribution(int $contributionId, array $urls = []): string
+    {
+        $propertyBag = $this->buildPropertyBagFromContribution($contributionId);
+        $landingUrl = (string) ($urls['landing_url'] ?? '');
+        $backUrl = (string) ($urls['cancel_url'] ?? ($landingUrl !== '' ? $landingUrl : CRM_Utils_System::baseCMSURL()));
+        $errorUrl = (string) ($urls['error_url'] ?? $backUrl);
+        $returnUrl = (string) ($urls['return_url'] ?? ($landingUrl !== '' ? $landingUrl : $backUrl));
+
+        $response = $this->createCheckoutIntentAndStore(
+            $propertyBag,
+            [
+                'contribution_id' => $contributionId,
+                'item_name' => $this->buildContributionCheckoutLabel($contributionId),
+                'back_url' => $backUrl,
+                'error_url' => $errorUrl,
+                'return_url' => $returnUrl,
+            ]
+        );
+
+        return (string) $response['redirectUrl'];
+    }
+
+    public function synchronizeContributionForHostedCheckout(int $contributionId): array
+    {
+        $this->processScheduledSynchronization([
+            'contribution_id' => $contributionId,
+            'limit' => 1,
+        ]);
+
+        $contribution = $this->loadContributionById($contributionId);
+        if (!$contribution) {
+            throw new PaymentProcessorException(E::ts('Impossible de recharger la contribution %1.', [1 => $contributionId]));
+        }
+
+        $metadata = $this->loadMetadataForContribution($contributionId);
+        $statusName = CRM_Core_PseudoConstant::getName(
+            'CRM_Contribute_BAO_Contribution',
+            'contribution_status_id',
+            (int) $contribution->contribution_status_id
+        );
+
+        $checkoutStatus = 'pending';
+        if ((string) $statusName === 'Completed' || in_array((string) ($metadata->state ?? ''), ['Authorized', 'Registered'], TRUE)) {
+            $checkoutStatus = 'success';
+        }
+        elseif ((string) $statusName === 'Cancelled' || in_array((string) ($metadata->state ?? ''), ['Canceled', 'Abandoned'], TRUE)) {
+            $checkoutStatus = 'cancel';
+        }
+        elseif ((string) $statusName === 'Failed' || in_array((string) ($metadata->state ?? ''), ['Refused', 'Error', 'Refunded'], TRUE)) {
+            $checkoutStatus = 'fail';
+        }
+
+        return [
+            'checkout_status' => $checkoutStatus,
+            'contribution_status_name' => (string) $statusName,
+            'gateway_state' => (string) ($metadata->state ?? ''),
+        ];
+    }
+
+    private function createCheckoutIntentAndStore(\Civi\Payment\PropertyBag $propertyBag, array $options): array
+    {
+        $contributionId = !empty($options['contribution_id']) ? (int) $options['contribution_id'] : (int) $propertyBag->getContributionID();
+        if (!$contributionId) {
+            $contribution = new CRM_Contribute_BAO_Contribution();
+            $contribution->invoice_id = $propertyBag->getInvoiceID();
+            if ($contribution->find(TRUE)) {
+                $contributionId = (int) $contribution->id;
+            }
+        }
+
+        if (!$contributionId) {
+            throw new PaymentProcessorException(E::ts("Impossible de retrouver la contribution à mettre à jour pour le checkout HelloAsso."));
+        }
+
+        $payer = $this->buildPayerFromPropertyBag($propertyBag);
+        $key = hash('sha256', random_bytes(64));
+        $metadata = [
+            'invoiceID' => $propertyBag->getInvoiceID(),
+            'sig' => hash_hmac('sha256', $propertyBag->getInvoiceID(), $key),
+        ];
+
+        $request = [
+            'totalAmount' => (int) round(((float) $propertyBag->getAmount()) * 100),
+            'initialAmount' => (int) round(((float) $propertyBag->getAmount()) * 100),
+            'itemName' => (string) ($options['item_name'] ?? E::ts('Contribution en ligne')),
+            'backUrl' => (string) ($options['back_url'] ?? ''),
+            'errorUrl' => (string) ($options['error_url'] ?? ''),
+            'returnUrl' => (string) ($options['return_url'] ?? ''),
+            'containsDonation' => FALSE,
+            'payer' => $payer,
+            'metadata' => $metadata,
+        ];
+
+        $response = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
+            ->createCheckoutIntent($this->getPaymentProcessorConfig(), $this->_is_test, $request);
+
+        if (empty($response['redirectUrl']) || empty($response['id'])) {
+            throw new PaymentProcessorException(E::ts("Erreur inconnue lors de la préparation de la redirection HelloAsso."));
+        }
+
+        $contribution = $this->loadContributionById($contributionId);
+        if (!$contribution) {
+            throw new PaymentProcessorException(E::ts("Impossible de mettre à jour la contribution %1.", [1 => $contributionId]));
+        }
+
+        if (empty($contribution->invoice_id)) {
+            $contribution->invoice_id = $propertyBag->getInvoiceID();
+        }
+        $contribution->trxn_id = $response['id'];
+        $contribution->save();
+
+        $helloAssoMetadata = $this->loadMetadataForContribution($contribution->id);
+        $helloAssoMetadata->contribution_id = $contribution->id;
+        $helloAssoMetadata->signing_key = $key;
+        $helloAssoMetadata->checkout_intent_id = $response['id'];
+        if ($this->hasHelloAssoMetadataColumn('payment_processor_id')) {
+            $helloAssoMetadata->payment_processor_id = $this->getPaymentProcessorId();
+        }
+        $helloAssoMetadata->save();
+        $this->armContributionFollowUp($contribution->id, $helloAssoMetadata);
+        $this->armLongFollowUp($contribution->id, $helloAssoMetadata);
+
+        return $response;
+    }
+
+    private function buildPayerFromPropertyBag(\Civi\Payment\PropertyBag $propertyBag): array
+    {
+        $payer = [
+            'email' => $propertyBag->getEmail(),
+        ];
         if ($propertyBag->has('firstName')) {
             $payer['firstName'] = $propertyBag->getFirstName();
         }
@@ -155,97 +339,157 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         ) {
             $payer['country'] = CRM_HelloassoPaymentProcessor_IsoCountryAlpha3::getInstance()->get($propertyBag->getBillingCountry());
         }
-        $key = random_bytes(64);
-        $key = hash('sha256', $key);
-        $sig = hash_hmac('sha256', $propertyBag->getInvoiceID(), $key);
-        $metadata = array(
-            'invoiceID' => $propertyBag->getInvoiceID(),
-            'sig' => hash_hmac('sha256', $propertyBag->getInvoiceID(), $key) //N'est plus utilisé mais garder pour ceux qui ont lancienne version
+
+        $this->validateHelloAssoPayerNames(
+            $propertyBag->has('firstName') ? (string) $propertyBag->getFirstName() : '',
+            $propertyBag->has('lastName') ? (string) $propertyBag->getLastName() : ''
         );
 
-        $backUrl = $this->getGoBackUrl($params['qfKey']);
-        $errorUrl = $this->getCancelUrl($params['qfKey']);
-        $returnUrl = $this->getReturnSuccessUrl($params['qfKey']);
-        // Civi::log()->debug(' > backUrl : '. print_r($backUrl,1));
-        // Civi::log()->debug(' > errorUrl : '. print_r($errorUrl,1));
-        // Civi::log()->debug(' > returnUrl : '. print_r($returnUrl,1));
+        return $payer;
+    }
 
-        // // https://antoine2-dev.fhp.makoa.net/civicrm/contribute/transact?_qf_ThankYou_display=1&qfKey=CRMContributeControllerContributionldprdsvtf1ckw84sc00w440gggkcgkk80cs4s0sw400g4sgw4_735
-        // $returnUrl =  str_replace("civicrm/contribute/transact?_qf_ThankYou_display=1","civicrm/payment/ipn/3?_qf_ThankYou_display=1", $returnUrl);   // 'https://antoine2-dev.fhp.makoa.net/civicrm/payment/ipn/3';
-        //  Civi::log()->debug(' > returnUrl2 : '. print_r($returnUrl,1));
-        
-        $request = [
-            'totalAmount' => round(intval($this->getAmount($params)) * 100),
-            'initialAmount' => round(intval($this->getAmount($params)) * 100),
-            'itemName' => $this->getPaymentDescription($params, 250),
-            'backUrl' => $backUrl,
-            'errorUrl' => $errorUrl,
-            'returnUrl' => $returnUrl,
-            'containsDonation' => FALSE,
-            'payer' => $payer,
-            'metadata' => $metadata
-        ];
-        $response = $this->getGuzzleClient()->request('POST', $api_uri, [
-            'json' => $request,
-            'curl' => [
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-            ],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token->access_token
-            ],
-            'http_errors' => FALSE,
+    private function validateHelloAssoPayerNames(string $firstName, string $lastName): void
+    {
+        $throwError = function ($msg) {
+            CRM_Core_Session::setStatus($msg, E::ts('Erreur HelloAsso'), 'error');
+            throw new PaymentProcessorException($msg);
+        };
+
+        $forbiddenValues = ['firstname', 'lastname', 'unknown', 'first name', 'user', 'admin', 'name', 'nom', 'prénom', 'test', 'last name', 'anonyme'];
+        $validateName = function ($value, $fieldLabel) use ($forbiddenValues, $throwError) {
+            if (empty($value)) {
+                return;
+            }
+            $valLower = mb_strtolower(trim($value), 'UTF-8');
+            $valNoAccents = @iconv('UTF-8', 'ASCII//TRANSLIT', $value);
+            if ($valNoAccents !== false) {
+                $valNoAccents = mb_strtolower($valNoAccents);
+            }
+            else {
+                $valNoAccents = $valLower;
+            }
+
+            if (mb_strlen($value, 'UTF-8') < 3) {
+                $throwError(E::ts('Le %1 doit contenir au moins 3 caractères (règle HelloAsso).', [1 => $fieldLabel]));
+            }
+            elseif (preg_match('/(.)\1\1/u', $valLower)) {
+                $throwError(E::ts('Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso).', [1 => $fieldLabel]));
+            }
+            elseif (preg_match('/[0-9]/', $value)) {
+                $throwError(E::ts('Le %1 ne doit pas contenir de chiffres (règle HelloAsso).', [1 => $fieldLabel]));
+            }
+            elseif (!preg_match('/[aeiouyAEIOUYéèêëàâäùûüîïôö]/u', $value)) {
+                $throwError(E::ts('Le %1 doit contenir au moins une voyelle (règle HelloAsso).', [1 => $fieldLabel]));
+            }
+            elseif (in_array($valLower, $forbiddenValues, TRUE) || in_array($valNoAccents, $forbiddenValues, TRUE) || in_array(str_replace('_', ' ', $valLower), $forbiddenValues, TRUE)) {
+                $throwError(E::ts('La valeur du %1 n\'est pas autorisée par HelloAsso.', [1 => $fieldLabel]));
+            }
+            elseif (!preg_match('/^[\p{Latin}\s\'\-]+$/u', $value)) {
+                $throwError(E::ts('Le %1 contient des caractères non autorisés (règle HelloAsso).', [1 => $fieldLabel]));
+            }
+        };
+
+        $validateName($firstName, 'prénom');
+        $validateName($lastName, 'nom');
+        if ($firstName && $lastName && mb_strtolower(trim($firstName), 'UTF-8') === mb_strtolower(trim($lastName), 'UTF-8')) {
+            $throwError(E::ts('Le nom et le prénom ne doivent pas être identiques (règle HelloAsso).'));
+        }
+    }
+
+    private function buildPropertyBagFromContribution(int $contributionId): \Civi\Payment\PropertyBag
+    {
+        $contribution = \Civi\Api4\Contribution::get(FALSE)
+            ->addWhere('id', '=', $contributionId)
+            ->addSelect('id', 'contact_id', 'total_amount', 'currency', 'invoice_id', 'source')
+            ->execute()
+            ->single();
+
+        $email = '';
+        try {
+            $email = (string) civicrm_api3('Email', 'getvalue', [
+                'contact_id' => $contribution['contact_id'],
+                'is_primary' => 1,
+                'return' => 'email',
+            ]);
+        }
+        catch (Exception $e) {
+        }
+
+        if ($email === '') {
+            throw new PaymentProcessorException(E::ts("Aucune adresse email principale n'est disponible pour lancer le checkout HelloAsso de la contribution %1.", [1 => $contributionId]));
+        }
+
+        $contact = civicrm_api3('Contact', 'getsingle', [
+            'id' => $contribution['contact_id'],
+            'return' => ['first_name', 'last_name'],
         ]);
-        $status_code = $response->getStatusCode();
-        $response = json_decode($response->getBody());
-        if ($status_code != 200) {
-            if ($status_code == 401) {
-                CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->invalidateToken($this->_is_test);
-            }
-            if (isset($response->errors)) {
-                throw new PaymentProcessorException(implode(", ", array_map(function ($entry) {
-                    return $entry->message;
-                }, $response->errors)));
-            } else if (isset($response->message)) {
-                throw new PaymentProcessorException($response->message);
-            } else {
-                throw new PaymentProcessorException('Unknown error append');
-            }
+
+        $address = [];
+        try {
+            $address = civicrm_api3('Address', 'getsingle', [
+                'contact_id' => $contribution['contact_id'],
+                'is_primary' => 1,
+                'return' => ['street_address', 'city', 'postal_code', 'country_id'],
+            ]);
         }
-        if (isset($response->redirectUrl)) {
-            // We can store checkout id somewhere
-            $contribution = new CRM_Contribute_BAO_Contribution();
-            $contribution->invoice_id = $propertyBag->getInvoiceID();
-            if ($contribution->find(TRUE)) {
-                $contribution->trxn_id = $response->id;
-                $contribution->save();
-
-                /** Inserer une ligne dans les metada entity */
-                $metadata = new CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata();
-                $metadata->contribution_id = $contribution->id;
-                $metadata->signing_key = $key;
-                $metadata->insert();
-                // // // [SV] ça semble crasher parfois - est-ce que c'est le fait qu'il n'y a pas d'id auto increment ?
-                // // $contributionKey = new CRM_HelloassoPaymentProcessor_BAO_HelloAssoContributionKey();
-                // // $contributionKey->contribution_id = $contribution->id;
-                // // $contributionKey->signing_key = $key;
-                // // $contributionKey->insert();
-                // // // Error -> DB Error: constraint violation
-                
-            } else {
-                throw new PaymentProcessorException('Unable to update invoice.');
-            }
-
-            // then redirect to HelloAsso
-            CRM_Core_Config::singleton()->userSystem->prePostRedirect();
-            CRM_Utils_System::redirect($response->redirectUrl);
-
-            // exit called before
-
-            return $result;
-        } else {
-            throw new PaymentProcessorException('Unknown error append');
+        catch (Exception $e) {
         }
+
+        $invoiceId = (string) ($contribution['invoice_id'] ?? '');
+        if ($invoiceId === '') {
+            $invoiceId = hash('sha256', random_bytes(32));
+            \Civi\Api4\Contribution::update(FALSE)
+                ->addWhere('id', '=', $contributionId)
+                ->addValue('invoice_id', $invoiceId)
+                ->execute();
+        }
+
+        $params = [
+            'amount' => (float) $contribution['total_amount'],
+            'currency' => (string) $contribution['currency'],
+            'invoiceID' => $invoiceId,
+            'contributionID' => $contributionId,
+            'contactID' => (int) $contribution['contact_id'],
+            'email' => $email,
+            'firstName' => (string) ($contact['first_name'] ?? ''),
+            'lastName' => (string) ($contact['last_name'] ?? ''),
+        ];
+
+        if (!empty($address['street_address'])) {
+            $params['billingStreetAddress'] = (string) $address['street_address'];
+        }
+        if (!empty($address['city'])) {
+            $params['billingCity'] = (string) $address['city'];
+        }
+        if (!empty($address['postal_code'])) {
+            $params['billingPostalCode'] = (string) $address['postal_code'];
+        }
+        if (!empty($address['country_id'])) {
+            $params['billingCountry'] = (int) $address['country_id'];
+        }
+
+        return \Civi\Payment\PropertyBag::cast($params);
+    }
+
+    private function buildContributionCheckoutLabel(int $contributionId): string
+    {
+        $contribution = \Civi\Api4\Contribution::get(FALSE)
+            ->addWhere('id', '=', $contributionId)
+            ->addSelect('source', 'invoice_id')
+            ->execute()
+            ->single();
+
+        $source = trim((string) ($contribution['source'] ?? ''));
+        if ($source !== '') {
+            return mb_substr($source, 0, 250);
+        }
+
+        $invoiceId = trim((string) ($contribution['invoice_id'] ?? ''));
+        if ($invoiceId !== '') {
+            return mb_substr(E::ts('Contribution en ligne : %1', [1 => $invoiceId]), 0, 250);
+        }
+
+        return E::ts('Contribution en ligne');
     }
 
 
@@ -318,112 +562,1534 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         return $params;
     }
 
+    /**
+     * Add lightweight frontend handling on top of the existing redirect flow.
+     *
+     * We keep the PHP redirect/overlay as the source of truth, but use CRM.payment
+     * to reduce double-submits and cope better with AJAX reloads/processor switching.
+     *
+     * @param \CRM_Core_Form $form
+     */
+    public function buildForm(&$form): void
+    {
+        if (!$this->isStandardFrontendBridgeEnabled()) {
+            return;
+        }
+
+        $jsVars = [
+            'id' => $form->_paymentProcessor['id'],
+            'name' => 'helloasso',
+            'v2' => [
+                'standardFrontendBridge' => $this->isStandardFrontendBridgeEnabled(),
+                'safeAbortUrls' => $this->isSafeAbortUrlsEnabled(),
+            ],
+        ];
+
+        \Civi::resources()->addVars('helloassoPayment', $jsVars);
+        $form->assign('helloassoJSVars', $jsVars);
+
+        CRM_Core_Region::instance('billing-block')->add([
+            'scriptUrl' => \Civi::resources()->getUrl(E::LONG_NAME, 'js/civicrmHelloAsso.js'),
+            'weight' => 110,
+        ]);
+
+        if (in_array(CRM_Core_Config::singleton()->userFramework, ['Drupal', 'Drupal8'])) {
+            CRM_Core_Region::instance('billing-block')->add([
+                'template' => E::path('templates/CRM/Core/Payment/HelloAsso/JSVars.tpl'),
+                'weight' => -1,
+            ]);
+        }
+    }
+
 
     public function handlePaymentNotification()
     {
-        // Civi::log()->debug('-- handlePaymentNotification -- ');
-        $params = json_decode(file_get_contents('php://input'), true);
-        // Civi::log()->debug(' > params : '. print_r($params,1));
-        if ($params) {
-            $event_type = $params['eventType'] ?? NULL;
-            // https://dev.helloasso.com/docs/les-notifications#type-de-notification
-            if ($event_type === 'Payment' && $params['metadata']) {
-                $invoice_id = $params['metadata']['invoiceID'] ?? NULL;
-                $sig = $params['metadata']['sig'] ?? NULL;
-                if ($invoice_id && $params['data']) {
-                    // TODO : si un payment HelloAsso traite plus d'une contribution
+        http_response_code(200);
+        $rawData = file_get_contents('php://input');
+        $params = json_decode($rawData, true);
 
-                    $contribution = new CRM_Contribute_BAO_Contribution();
-                    $contribution->invoice_id = $invoice_id;
-                    if ($contribution->find(TRUE)) {
-                        $state = $params['data']['state']; 
-                        $helloasso_command_id = $params['data']['order']['id']; 
-                        if($helloasso_command_id){
-                            $metadata = new CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata();
-                            $metadata->contribution_id = $contribution->id;
-                            if($metadata->find(TRUE)){
-                                // AJouter l'identifiant de reference HElloAsso
-                                $metadata->helloasso_ref_cmd_id = $helloasso_command_id;
-                                $metadata->event_type = $event_type;
-                                $metadata->state = $state;
-                                $metadata->update();
-                            }
-                        }
+        if (!is_array($params)) {
+            Civi::log()->warning('HelloAsso webhook ignored: invalid JSON payload.');
+            http_response_code(400);
+            CRM_Utils_System::civiExit();
+        }
 
-                        switch ( $state) {
-                            case 'Authorized':
-                            case 'Registered':
-                                $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-                                if (
-                                    // $contribution['contribution_status_id'] == $completedStatusId
-                                    $contribution->contribution_status_id == $completedStatusId
-                                ) {
-                                    Civi::log()->debug('HelloAsso: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
-                                    echo 'Success: Contribution has already been handled<p>';
-                                    return;
-                                }
-                                civicrm_api3('Payment', 'create', [
-                                    'trxn_id' =>  $params['data']['id'], // $contribution->trxn_id,
-                                    'payment_processor_id' => $this->_paymentProcessor->id,
-                                    'contribution_id' => $contribution->id,
-                                    'total_amount' => $contribution->total_amount,
-                                ]);
+        $eventType = $params['eventType'] ?? NULL;
+        if ($eventType !== 'Payment' || empty($params['data']) || !is_array($params['data'])) {
+            Civi::log()->debug('HelloAsso webhook ignored: unsupported event type or missing data.');
+            CRM_Utils_System::civiExit();
+        }
 
-                                break;
-                            case 'Refused':
-                                $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed');
-                                if (
-                                    $contribution->contribution_status_id == $completedStatusId
-                                ) {
-                                    Civi::log()->debug('HelloAsso: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
-                                    echo 'Success: Contribution has already been handled<p>';
-                                    return;
-                                }
-                                \Civi\Api4\Contribution::update(FALSE)
-                                    ->addValue('contribution_status_id:name', 'Failed')
-                                    ->addValue('cancel_date', 'now')
-                                    ->addWhere('id', '=', $contribution->id)
-                                    ->execute();
-                                break;
-                            case 'Refunding':
-                                $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending refund');
-                                if (
-                                    $contribution->contribution_status_id == $completedStatusId
-                                ) {
-                                    Civi::log()->debug('HelloAsso: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
-                                    echo 'Success: Contribution has already been handled<p>';
-                                    return;
-                                }
-                                \Civi\Api4\Contribution::update(FALSE)
-                                    ->addValue('contribution_status_id:name', 'Pending refund')
-                                    ->addValue('cancel_date', 'now')
-                                    ->addWhere('id', '=', $contribution->id)
-                                    ->execute();
-                                break;
-                            case 'Refunded':
-                                $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
-                                if (
-                                    $contribution->contribution_status_id == $completedStatusId
-                                ) {
-                                    Civi::log()->debug('HelloAsso: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
-                                    echo 'Success: Contribution has already been handled<p>';
-                                    return;
-                                }
-                                \Civi\Api4\Contribution::update(FALSE)
-                                    ->addValue('contribution_status_id:name', 'Refunded')
-                                    ->addValue('cancel_date', 'now')
-                                    ->addWhere('id', '=', $contribution->id)
-                                    ->execute();
-                                break;
-                            // Do nothing on pending approvals
-                            default:
-                                // checked dans 5 jours les contribution non traité ?
-                                break;
-                        }
-            
+        try {
+            $this->validatePartnerWebhookSignature((string) $rawData);
+
+            if ($this->isWebhookQueueEnabled()) {
+                $this->queueWebhookPayload($params, (string) $rawData);
+                CRM_Utils_System::civiExit();
+            }
+
+            $invoiceId = $params['metadata']['invoiceID'] ?? NULL;
+            $sig = $params['metadata']['sig'] ?? NULL;
+            $contribution = $this->findContributionFromWebhookPayload($params);
+
+            if (!$contribution) {
+                Civi::log()->debug('HelloAsso webhook not matched to a contribution. Ignored.');
+                CRM_Utils_System::civiExit();
+            }
+
+            if ($invoiceId) {
+                $this->validateNotificationSignature($contribution->id, $invoiceId, $sig);
+            }
+
+            $this->applyHelloAssoPaymentState(
+                $contribution,
+                $params['data'],
+                $params['data']['order'] ?? [],
+                $eventType
+            );
+        }
+        catch (PaymentProcessorException $e) {
+            Civi::log()->error('HelloAsso webhook validation failed: ' . $e->getMessage());
+            http_response_code(400);
+        }
+        catch (Throwable $e) {
+            Civi::log()->error('HelloAsso webhook processing failed: ' . $e->getMessage());
+            http_response_code(500);
+        }
+
+        CRM_Utils_System::civiExit();
+    }
+
+    public function processWebhookEvent(array $webhookEvent): bool
+    {
+        try {
+            $duplicates = \Civi\Api4\PaymentprocessorWebhook::get(FALSE)
+                ->selectRowCount()
+                ->addWhere('event_id', '=', $webhookEvent['event_id'])
+                ->addWhere('id', '<', $webhookEvent['id'])
+                ->execute()
+                ->count();
+
+            if ($duplicates) {
+                \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+                    ->addWhere('id', '=', $webhookEvent['id'])
+                    ->addValue('status', 'error')
+                    ->addValue('message', E::ts("Webhook dupliqué ignoré."))
+                    ->addValue('processed_date', 'now')
+                    ->execute();
+                return FALSE;
+            }
+
+            $payload = json_decode((string) $webhookEvent['data'], TRUE);
+            if (!is_array($payload)) {
+                throw new PaymentProcessorException(E::ts('Payload webhook HelloAsso invalide dans la file.'));
+            }
+
+            $invoiceId = $payload['metadata']['invoiceID'] ?? NULL;
+            $sig = $payload['metadata']['sig'] ?? NULL;
+            $contribution = $this->findContributionFromWebhookPayload($payload);
+
+            if (!$contribution) {
+                \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+                    ->addWhere('id', '=', $webhookEvent['id'])
+                    ->addValue('status', 'success')
+                    ->addValue('message', E::ts("Aucune contribution correspondante. Webhook ignoré."))
+                    ->addValue('processed_date', 'now')
+                    ->execute();
+                return TRUE;
+            }
+
+            if ($invoiceId) {
+                $this->validateNotificationSignature($contribution->id, $invoiceId, $sig);
+            }
+
+            $this->applyHelloAssoPaymentState(
+                $contribution,
+                $payload['data'],
+                $payload['data']['order'] ?? [],
+                $payload['eventType'] ?? NULL
+            );
+
+            \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+                ->addWhere('id', '=', $webhookEvent['id'])
+                ->addValue('status', 'success')
+                ->addValue('message', E::ts('OK'))
+                ->addValue('processed_date', 'now')
+                ->execute();
+            return TRUE;
+        }
+        catch (Throwable $e) {
+            \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+                ->addWhere('id', '=', $webhookEvent['id'])
+                ->addValue('status', 'error')
+                ->addValue('message', preg_replace('/^(.{250}).*/su', '$1 ...', $e->getMessage()))
+                ->addValue('processed_date', 'now')
+                ->execute();
+            Civi::log()->error('HelloAsso queued webhook processing failed: ' . $e->getMessage());
+            return FALSE;
+        }
+    }
+
+    public function synchronizePendingContributions(int $limit = 30, array $filters = []): array
+    {
+        $results = [
+            'checked' => 0,
+            'updated' => 0,
+            'errors' => [],
+        ];
+
+        $refundedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+        $where = [
+            '(
+                c.contribution_status_id <> %1
+                OR m.helloasso_payment_id IS NOT NULL
+                OR m.checkout_intent_id IS NOT NULL
+            )',
+        ];
+        $params = [
+            1 => [$refundedStatusId, 'Integer'],
+        ];
+        $paramIndex = 2;
+
+        if ($this->hasHelloAssoMetadataColumn('payment_processor_id')) {
+            $where[] = "(m.payment_processor_id = %{$paramIndex} OR m.payment_processor_id IS NULL)";
+            $params[$paramIndex++] = [$this->getPaymentProcessorId(), 'Integer'];
+        }
+
+        if (!empty($filters['contribution_id'])) {
+            $where[] = "c.id = %{$paramIndex}";
+            $params[$paramIndex++] = [(int) $filters['contribution_id'], 'Integer'];
+        }
+
+        if (!empty($filters['status_names']) && is_array($filters['status_names'])) {
+            $statusIds = [];
+            foreach ($filters['status_names'] as $statusName) {
+                $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusName);
+                if ($statusId) {
+                    $statusIds[] = (int) $statusId;
+                }
+            }
+            if ($statusIds) {
+                $statusPlaceholders = [];
+                foreach ($statusIds as $statusId) {
+                    $statusPlaceholders[] = "%{$paramIndex}";
+                    $params[$paramIndex++] = [$statusId, 'Integer'];
+                }
+                $where[] = 'c.contribution_status_id IN (' . implode(', ', $statusPlaceholders) . ')';
+            }
+        }
+
+        if (!empty($filters['receive_date_from'])) {
+            $where[] = "c.receive_date >= %{$paramIndex}";
+            $params[$paramIndex++] = [$this->normalizeNullableTimestamp($filters['receive_date_from']), 'Timestamp'];
+        }
+
+        if (!empty($filters['receive_date_to'])) {
+            $where[] = "c.receive_date <= %{$paramIndex}";
+            $params[$paramIndex++] = [$this->normalizeNullableTimestamp($filters['receive_date_to']), 'Timestamp'];
+        }
+
+        if (!empty($filters['only_scheduled'])) {
+            $where[] = 'm.sync_next_date IS NOT NULL';
+        }
+
+        if (!empty($filters['due_before'])) {
+            $where[] = "m.sync_next_date IS NOT NULL AND m.sync_next_date <= %{$paramIndex}";
+            $where[] = 'COALESCE(m.sync_attempt_count, 0) < ' . self::SHORT_FOLLOWUP_MAX_ATTEMPTS;
+            $params[$paramIndex++] = [$this->normalizeNullableTimestamp($filters['due_before']), 'Timestamp'];
+        }
+
+        $sql = "
+            SELECT c.id AS contribution_id,
+                   c.trxn_id,
+                   c.contribution_status_id,
+                   m.checkout_intent_id,
+                   m.helloasso_payment_id,
+                   m.state
+            FROM civicrm_contribution c
+            INNER JOIN civicrm_hello_asso_metadata m ON m.contribution_id = c.id
+            WHERE " . implode("\n              AND ", $where) . "
+            ORDER BY COALESCE(m.sync_next_date, c.receive_date) ASC, c.id DESC
+            LIMIT {$limit}
+        ";
+        $dao = CRM_Core_DAO::executeQuery($sql, $params);
+
+        while ($dao->fetch()) {
+            $results['checked']++;
+
+            try {
+                $updated = FALSE;
+                $syncAttempted = FALSE;
+                if (!empty($dao->helloasso_payment_id)) {
+                    $syncAttempted = TRUE;
+                    $payment = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getPayment(
+                        $this->getPaymentProcessorConfig(),
+                        $this->_is_test,
+                        (int) $dao->helloasso_payment_id,
+                        ['withFailedRefundOperation' => 'true']
+                    );
+                    $contribution = $this->loadContributionById((int) $dao->contribution_id);
+                    if ($contribution) {
+                        $updated = $this->applyHelloAssoPaymentState($contribution, $payment, $payment['order'] ?? [], 'CronSyncPayment') || $updated;
                     }
+                }
+                elseif (!empty($dao->checkout_intent_id) || ctype_digit((string) $dao->trxn_id)) {
+                    $syncAttempted = TRUE;
+                    $checkoutIntentId = !empty($dao->checkout_intent_id) ? (int) $dao->checkout_intent_id : (int) $dao->trxn_id;
+                    $checkoutIntent = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getCheckoutIntent(
+                        $this->getPaymentProcessorConfig(),
+                        $this->_is_test,
+                        $checkoutIntentId,
+                        ['withFailedRefundOperation' => 'true']
+                    );
+                    $contribution = $this->loadContributionById((int) $dao->contribution_id);
+                    if ($contribution && !empty($checkoutIntent['order']['payments'])) {
+                        foreach ($checkoutIntent['order']['payments'] as $payment) {
+                            $updated = $this->applyHelloAssoPaymentState($contribution, $payment, $checkoutIntent['order'], 'CronSyncCheckoutIntent') || $updated;
+                        }
+                    }
+                }
+
+                if ($syncAttempted) {
+                    $this->advanceContributionFollowUp((int) $dao->contribution_id);
+                }
+
+                if ($updated) {
+                    $results['updated']++;
+                }
+            }
+            catch (Exception $e) {
+                if ($this->isHelloAssoNotFoundException($e)) {
+                    $this->stopContributionFollowUps((int) $dao->contribution_id);
+                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("Objet HelloAsso introuvable (404). Les révérifications courte et longue ont été désactivées pour éviter des appels répétés.");
+                    Civi::log()->warning('HelloAsso cron sync stopped after 404 for contribution ' . $dao->contribution_id . ': ' . $e->getMessage());
+                    continue;
+                }
+
+                $this->deferTechnicalFollowUpError((int) $dao->contribution_id, 'short', $e);
+                $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . $e->getMessage();
+                Civi::log()->error('HelloAsso cron sync failed: ' . $e->getMessage());
+            }
+        }
+
+        if (!empty($filters['allow_recent_scan']) && $results['checked'] < $limit && empty($filters['contribution_id']) && empty($filters['only_scheduled']) && empty($filters['due_before'])) {
+            $results = $this->mergeSyncResults($results, $this->synchronizeRecentOrganizationPayments());
+        }
+
+        return $results;
+    }
+
+    private function synchronizeRecentOrganizationPayments(): array
+    {
+        $results = [
+            'checked' => 0,
+            'updated' => 0,
+            'errors' => [],
+        ];
+
+        $from = (new DateTimeImmutable('-7 days'))->format(DateTimeInterface::ATOM);
+        $payments = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->listOrganizationPayments(
+            $this->getPaymentProcessorConfig(),
+            $this->_is_test,
+            [
+                'from' => $from,
+                'pageSize' => 100,
+                'sortField' => 'UpdateDate',
+                'sortOrder' => 'Desc',
+            ]
+        );
+
+        foreach ($payments['data'] ?? [] as $payment) {
+            $results['checked']++;
+            $checkoutIntentId = $payment['order']['checkoutIntentId'] ?? NULL;
+            if (!$checkoutIntentId) {
+                continue;
+            }
+
+            $contribution = $this->loadContributionByCheckoutIntentId((int) $checkoutIntentId);
+            if (!$contribution) {
+                continue;
+            }
+
+            try {
+                if ($this->applyHelloAssoPaymentState($contribution, $payment, $payment['order'] ?? [], 'CronSyncOrganizationPayments')) {
+                    $results['updated']++;
+                }
+            }
+            catch (Exception $e) {
+                $results['errors'][] = 'Contribution ' . $contribution->id . ': ' . $e->getMessage();
+                Civi::log()->error('HelloAsso organization payment sync failed: ' . $e->getMessage());
+            }
+        }
+
+        return $results;
+    }
+
+    public function processScheduledSynchronization(array $options = []): array
+    {
+        $filters = [
+            'contribution_id' => !empty($options['contribution_id']) ? (int) $options['contribution_id'] : NULL,
+            'status_names' => !empty($options['status_names']) ? (array) $options['status_names'] : [],
+            'receive_date_from' => $options['receive_date_from'] ?? NULL,
+            'receive_date_to' => $options['receive_date_to'] ?? NULL,
+            'only_scheduled' => !empty($options['only_scheduled']),
+            'due_before' => $options['due_before'] ?? NULL,
+            'allow_recent_scan' => !empty($options['allow_recent_scan']),
+        ];
+
+        if ($filters['only_scheduled'] && empty($filters['due_before'])) {
+            $filters['due_before'] = date('Y-m-d H:i:s');
+        }
+        elseif (!empty($filters['due_before']) && strtolower((string) $filters['due_before']) === 'now') {
+            $filters['due_before'] = date('Y-m-d H:i:s');
+        }
+
+        $limit = !empty($options['limit']) ? (int) $options['limit'] : $this->getFollowUpCronLimit();
+
+        return $this->synchronizePendingContributions($limit, $filters);
+    }
+
+    public function synchronizeLongPendingContributions(int $limit = 30, array $filters = []): array
+    {
+        $results = [
+            'checked' => 0,
+            'updated' => 0,
+            'errors' => [],
+        ];
+
+        if (!$this->hasHelloAssoMetadataColumn('long_sync_next_date')) {
+            return $results;
+        }
+
+        $where = ['m.long_sync_next_date IS NOT NULL'];
+        $where[] = 'COALESCE(m.long_sync_attempt_count, 0) < ' . self::LONG_FOLLOWUP_MAX_ATTEMPTS;
+        $params = [];
+        $paramIndex = 1;
+
+        if ($this->hasHelloAssoMetadataColumn('payment_processor_id')) {
+            $where[] = "(m.payment_processor_id = %{$paramIndex} OR m.payment_processor_id IS NULL)";
+            $params[$paramIndex++] = [$this->getPaymentProcessorId(), 'Integer'];
+        }
+
+        if (!empty($filters['contribution_id'])) {
+            $where[] = "c.id = %{$paramIndex}";
+            $params[$paramIndex++] = [(int) $filters['contribution_id'], 'Integer'];
+        }
+
+        if (!empty($filters['status_names']) && is_array($filters['status_names'])) {
+            $statusIds = [];
+            foreach ($filters['status_names'] as $statusName) {
+                $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusName);
+                if ($statusId) {
+                    $statusIds[] = (int) $statusId;
+                }
+            }
+            if ($statusIds) {
+                $statusPlaceholders = [];
+                foreach ($statusIds as $statusId) {
+                    $statusPlaceholders[] = "%{$paramIndex}";
+                    $params[$paramIndex++] = [$statusId, 'Integer'];
+                }
+                $where[] = 'c.contribution_status_id IN (' . implode(', ', $statusPlaceholders) . ')';
+            }
+        }
+
+        if (!empty($filters['receive_date_from'])) {
+            $where[] = "c.receive_date >= %{$paramIndex}";
+            $params[$paramIndex++] = [$this->normalizeNullableTimestamp($filters['receive_date_from']), 'Timestamp'];
+        }
+
+        if (!empty($filters['receive_date_to'])) {
+            $where[] = "c.receive_date <= %{$paramIndex}";
+            $params[$paramIndex++] = [$this->normalizeNullableTimestamp($filters['receive_date_to']), 'Timestamp'];
+        }
+
+        $dueBefore = $filters['due_before'] ?? date('Y-m-d H:i:s');
+        $where[] = "m.long_sync_next_date <= %{$paramIndex}";
+        $params[$paramIndex++] = [$this->normalizeNullableTimestamp($dueBefore), 'Timestamp'];
+
+        $sql = "
+            SELECT c.id AS contribution_id,
+                   c.trxn_id,
+                   m.checkout_intent_id,
+                   m.helloasso_payment_id,
+                   m.long_sync_scheme
+            FROM civicrm_contribution c
+            INNER JOIN civicrm_hello_asso_metadata m ON m.contribution_id = c.id
+            WHERE " . implode("\n              AND ", $where) . "
+            ORDER BY m.long_sync_next_date ASC, c.id ASC
+            LIMIT {$limit}
+        ";
+        $dao = CRM_Core_DAO::executeQuery($sql, $params);
+
+        while ($dao->fetch()) {
+            $results['checked']++;
+
+            try {
+                $updated = FALSE;
+                $syncAttempted = FALSE;
+                $followUpScheme = !empty($dao->long_sync_scheme) ? (string) $dao->long_sync_scheme : 'card';
+
+                if (!empty($dao->helloasso_payment_id)) {
+                    $syncAttempted = TRUE;
+                    $payment = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getPayment(
+                        $this->getPaymentProcessorConfig(),
+                        $this->_is_test,
+                        (int) $dao->helloasso_payment_id,
+                        ['withFailedRefundOperation' => 'true']
+                    );
+                    $contribution = $this->loadContributionById((int) $dao->contribution_id);
+                    if ($contribution) {
+                        $followUpScheme = $this->detectLongFollowUpScheme($payment, NULL, $followUpScheme);
+                        $updated = $this->applyHelloAssoPaymentState($contribution, $payment, $payment['order'] ?? [], 'LongCronSyncPayment') || $updated;
+                    }
+                }
+                elseif (!empty($dao->checkout_intent_id) || ctype_digit((string) $dao->trxn_id)) {
+                    $syncAttempted = TRUE;
+                    $checkoutIntentId = !empty($dao->checkout_intent_id) ? (int) $dao->checkout_intent_id : (int) $dao->trxn_id;
+                    $checkoutIntent = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()->getCheckoutIntent(
+                        $this->getPaymentProcessorConfig(),
+                        $this->_is_test,
+                        $checkoutIntentId,
+                        ['withFailedRefundOperation' => 'true']
+                    );
+                    $contribution = $this->loadContributionById((int) $dao->contribution_id);
+                    if ($contribution && !empty($checkoutIntent['order']['payments'])) {
+                        foreach ($checkoutIntent['order']['payments'] as $payment) {
+                            $followUpScheme = $this->detectLongFollowUpScheme($payment, NULL, $followUpScheme);
+                            $updated = $this->applyHelloAssoPaymentState($contribution, $payment, $checkoutIntent['order'], 'LongCronSyncCheckoutIntent') || $updated;
+                        }
+                    }
+                }
+
+                if ($syncAttempted) {
+                    $this->advanceLongFollowUp((int) $dao->contribution_id, $followUpScheme);
+                }
+
+                if ($updated) {
+                    $results['updated']++;
+                }
+            }
+            catch (Exception $e) {
+                if ($this->isHelloAssoNotFoundException($e)) {
+                    $this->stopContributionFollowUps((int) $dao->contribution_id);
+                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("Objet HelloAsso introuvable (404). Les révérifications courte et longue ont été désactivées pour éviter des appels répétés.");
+                    Civi::log()->warning('HelloAsso long cron sync stopped after 404 for contribution ' . $dao->contribution_id . ': ' . $e->getMessage());
+                    continue;
+                }
+
+                $this->deferTechnicalFollowUpError((int) $dao->contribution_id, 'long', $e);
+                $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . $e->getMessage();
+                Civi::log()->error('HelloAsso long cron sync failed: ' . $e->getMessage());
+            }
+        }
+
+        return $results;
+    }
+
+    public function processLongScheduledSynchronization(array $options = []): array
+    {
+        $filters = [
+            'contribution_id' => !empty($options['contribution_id']) ? (int) $options['contribution_id'] : NULL,
+            'status_names' => !empty($options['status_names']) ? (array) $options['status_names'] : [],
+            'receive_date_from' => $options['receive_date_from'] ?? NULL,
+            'receive_date_to' => $options['receive_date_to'] ?? NULL,
+            'due_before' => $options['due_before'] ?? NULL,
+        ];
+
+        if (empty($filters['due_before']) || strtolower((string) $filters['due_before']) === 'now') {
+            $filters['due_before'] = date('Y-m-d H:i:s');
+        }
+
+        $limit = !empty($options['limit']) ? (int) $options['limit'] : $this->getFollowUpCronLimit();
+
+        return $this->synchronizeLongPendingContributions($limit, $filters);
+    }
+
+    private function applyHelloAssoPaymentState(CRM_Contribute_BAO_Contribution $contribution, array $paymentData, array $orderData = [], ?string $eventType = NULL): bool
+    {
+        $state = $paymentData['state'] ?? NULL;
+        if (!$state) {
+            return FALSE;
+        }
+
+        $resolved = FALSE;
+        $contributionChanged = FALSE;
+
+        $metadata = $this->loadMetadataForContribution($contribution->id);
+        $metadata->contribution_id = $contribution->id;
+        if (empty($metadata->signing_key)) {
+            $metadata->signing_key = hash('sha256', random_bytes(64));
+        }
+        if (!empty($orderData['id'])) {
+            $metadata->helloasso_ref_cmd_id = $orderData['id'];
+        }
+        if (!empty($orderData['checkoutIntentId'])) {
+            $metadata->checkout_intent_id = $orderData['checkoutIntentId'];
+        }
+        if (!empty($paymentData['id'])) {
+            $metadata->helloasso_payment_id = $paymentData['id'];
+        }
+        if ($this->hasHelloAssoMetadataColumn('payment_processor_id') && empty($metadata->payment_processor_id)) {
+            $metadata->payment_processor_id = $this->getPaymentProcessorId();
+        }
+        if ($eventType) {
+            $metadata->event_type = $eventType;
+        }
+        $metadata->state = $state;
+        $metadata->save();
+        $this->ensureLongFollowUpSchedule($contribution->id, $metadata, $paymentData);
+
+        if (!empty($paymentData['id']) && $contribution->trxn_id !== (string) $paymentData['id']) {
+            $contribution->trxn_id = $paymentData['id'];
+            $contribution->save();
+            $contributionChanged = TRUE;
+        }
+
+        switch ($state) {
+            case 'WaitingBankValidation':
+                // SEPA payments can remain in bank validation for several days.
+                // We keep the contribution unchanged and only sync metadata until
+                // HelloAsso sends a terminal state.
+                break;
+
+            case 'Authorized':
+            case 'Registered':
+                $contributionChanged = $this->markContributionCompleted($contribution, $paymentData) || $contributionChanged;
+                $resolved = TRUE;
+                break;
+
+            case 'Refused':
+            case 'Error':
+            case 'Canceled':
+            case 'Abandoned':
+                $contributionChanged = $this->updateContributionStatus($contribution->id, 'Failed') || $contributionChanged;
+                $resolved = TRUE;
+                break;
+
+            case 'Refunding':
+                // CiviCRM does not allow a direct transition Completed -> Pending refund.
+                // We therefore keep the contribution status unchanged and rely on metadata.state
+                // until HelloAsso confirms the final Refunded state.
+                break;
+
+            case 'Refunded':
+                $contributionChanged = $this->updateContributionStatus($contribution->id, 'Refunded') || $contributionChanged;
+                $resolved = TRUE;
+                break;
+        }
+
+        if ($resolved) {
+            $this->stopContributionFollowUps(
+                (int) $contribution->id,
+                TRUE,
+                $this->isLongFollowUpTerminalState($state)
+            );
+        }
+
+        return $contributionChanged;
+    }
+
+    private function markContributionCompleted(CRM_Contribute_BAO_Contribution $contribution, array $paymentData): bool
+    {
+        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+        if ((int) $contribution->contribution_status_id === (int) $completedStatusId) {
+            return FALSE;
+        }
+
+        if ($this->isContributionStatusLockedByDonRec($contribution, $completedStatusId)) {
+            $this->logDonRecStatusMismatch($contribution->id, (string) ($paymentData['state'] ?? 'Authorized'));
+            return FALSE;
+        }
+
+        civicrm_api3('Payment', 'create', [
+            'trxn_id' => $paymentData['id'],
+            'payment_processor_id' => $this->getPaymentProcessorId(),
+            'contribution_id' => $contribution->id,
+            'total_amount' => $contribution->total_amount,
+        ]);
+
+        return TRUE;
+    }
+
+    private function updateContributionStatus(int $contributionId, string $statusName): bool
+    {
+        $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusName);
+        $contribution = $this->loadContributionById($contributionId);
+        if ($contribution && (int) $contribution->contribution_status_id === (int) $statusId) {
+            return FALSE;
+        }
+
+        if ($contribution && $this->isContributionStatusLockedByDonRec($contribution, (int) $statusId)) {
+            $this->logDonRecStatusMismatch($contributionId, $statusName);
+            return FALSE;
+        }
+
+        $update = \Civi\Api4\Contribution::update(FALSE)
+            ->addValue('contribution_status_id:name', $statusName)
+            ->addWhere('id', '=', $contributionId);
+
+        if (in_array($statusName, ['Failed', 'Pending refund', 'Refunded'], TRUE)) {
+            $update->addValue('cancel_date', 'now');
+        }
+
+        $update->execute();
+
+        return TRUE;
+    }
+
+    private function isContributionStatusLockedByDonRec(CRM_Contribute_BAO_Contribution $contribution, int $newStatusId): bool
+    {
+        if (!class_exists('CRM_Donrec_Logic_Settings')) {
+            return FALSE;
+        }
+
+        try {
+            $errors = CRM_Donrec_Logic_Settings::validateContribution(
+                $contribution->id,
+                ['contribution_status_id' => (int) $contribution->contribution_status_id],
+                ['contribution_status_id' => $newStatusId],
+                FALSE
+            );
+
+            return !empty($errors['contribution_status_id']);
+        }
+        catch (Throwable $e) {
+            Civi::log()->warning('HelloAsso DonRec lock check failed for contribution ' . $contribution->id . ': ' . $e->getMessage());
+            return FALSE;
+        }
+    }
+
+    private function logDonRecStatusMismatch(int $contributionId, string $gatewayStatus): void
+    {
+        Civi::log()->warning(E::ts(
+            "La contribution %1 est verrouillée par DonRec. Le statut pris en compte pour le reçu fiscal diffère du statut actuel de la passerelle de paiement HelloAsso (%2). Les métadonnées ont été synchronisées, mais le statut de la contribution n'a pas été modifié.",
+            [
+                1 => $contributionId,
+                2 => $gatewayStatus,
+            ]
+        ));
+    }
+
+    private function validateNotificationSignature(int $contributionId, string $invoiceId, ?string $signature): void
+    {
+        $strictSignature = $this->isWebhookSignatureRequired();
+        if (empty($signature)) {
+            if ($strictSignature) {
+                throw new PaymentProcessorException(E::ts('HelloAsso notification signature is required but missing.'));
+            }
+            return;
+        }
+
+        $metadata = $this->loadMetadataForContribution($contributionId);
+        if (empty($metadata->signing_key)) {
+            if ($strictSignature) {
+                throw new PaymentProcessorException(E::ts('HelloAsso notification signature cannot be verified because the local signing key is missing.'));
+            }
+            return;
+        }
+
+        $expectedSignature = hash_hmac('sha256', $invoiceId, $metadata->signing_key);
+        if (!hash_equals($expectedSignature, $signature)) {
+            throw new PaymentProcessorException(E::ts('HelloAsso notification signature mismatch.'));
+        }
+    }
+
+    private function validatePartnerWebhookSignature(string $rawData): void
+    {
+        $signature = $this->getPartnerWebhookSignatureHeader();
+        $signatureKey = $this->getPartnerWebhookSignatureKey();
+        $strictSignature = $this->isPartnerWebhookSignatureRequired();
+
+        if ($signature === NULL || $signature === '') {
+            if ($strictSignature && $signatureKey) {
+                throw new PaymentProcessorException(E::ts('HelloAsso partner webhook signature is required but missing.'));
+            }
+            return;
+        }
+
+        if (!$signatureKey) {
+            if ($strictSignature) {
+                throw new PaymentProcessorException(E::ts('HelloAsso partner webhook signature cannot be verified because the local signature key is missing.'));
+            }
+
+            Civi::log()->warning('HelloAsso partner webhook signature received but no local signature key is configured for processor ' . $this->getPaymentProcessorId() . '.');
+            return;
+        }
+
+        $expectedSignature = hash_hmac('sha256', $rawData, $signatureKey);
+        if (!hash_equals($expectedSignature, $signature)) {
+            throw new PaymentProcessorException(E::ts('HelloAsso partner webhook signature mismatch.'));
+        }
+    }
+
+    private function getPartnerWebhookSignatureHeader(): ?string
+    {
+        $candidates = [
+            $_SERVER['HTTP_X_HA_SIGNATURE'] ?? NULL,
+            $_SERVER['REDIRECT_HTTP_X_HA_SIGNATURE'] ?? NULL,
+            $_SERVER['X_HA_SIGNATURE'] ?? NULL,
+        ];
+
+        foreach ($candidates as $candidate) {
+            $candidate = trim((string) $candidate);
+            if ($candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return NULL;
+    }
+
+    private function getPartnerWebhookSignatureKey(): ?string
+    {
+        $registration = (new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig())
+            ->getWebhookRegistration($this->getPaymentProcessorId());
+
+        $signatureKey = trim((string) ($registration['signatureKey'] ?? ''));
+        return $signatureKey !== '' ? $signatureKey : NULL;
+    }
+
+    private function loadMetadataForContribution(int $contributionId): CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata
+    {
+        $metadata = new CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata();
+        $metadata->contribution_id = $contributionId;
+        $metadata->find(TRUE);
+        return $metadata;
+    }
+
+    private function loadContributionById(int $contributionId): ?CRM_Contribute_BAO_Contribution
+    {
+        $contribution = new CRM_Contribute_BAO_Contribution();
+        $contribution->id = $contributionId;
+        return $contribution->find(TRUE) ? $contribution : NULL;
+    }
+
+    private function loadContributionByCheckoutIntentId(int $checkoutIntentId): ?CRM_Contribute_BAO_Contribution
+    {
+        $sql = "
+            SELECT c.id
+            FROM civicrm_contribution c
+            LEFT JOIN civicrm_hello_asso_metadata m ON m.contribution_id = c.id
+            WHERE (m.payment_processor_id = %1 OR m.payment_processor_id IS NULL)
+              AND (
+                m.checkout_intent_id = %2
+                OR c.trxn_id = %3
+              )
+            ORDER BY c.id DESC
+            LIMIT 1
+        ";
+        $dao = CRM_Core_DAO::executeQuery($sql, [
+            1 => [$this->getPaymentProcessorId(), 'Integer'],
+            2 => [$checkoutIntentId, 'Integer'],
+            3 => [(string) $checkoutIntentId, 'String'],
+        ]);
+
+        if ($dao->fetch()) {
+            return $this->loadContributionById((int) $dao->id);
+        }
+
+        return NULL;
+    }
+
+    private function findContributionFromWebhookPayload(array $params): ?CRM_Contribute_BAO_Contribution
+    {
+        $invoiceId = $params['metadata']['invoiceID'] ?? NULL;
+        if ($invoiceId) {
+            $contribution = new CRM_Contribute_BAO_Contribution();
+            $contribution->invoice_id = $invoiceId;
+            if ($contribution->find(TRUE)) {
+                return $contribution;
+            }
+        }
+
+        $paymentId = $params['data']['id'] ?? NULL;
+        if ($paymentId) {
+            $sql = "
+                SELECT contribution_id
+                FROM civicrm_hello_asso_metadata
+                WHERE helloasso_payment_id = %1
+                ORDER BY contribution_id DESC
+                LIMIT 1
+            ";
+            $dao = CRM_Core_DAO::executeQuery($sql, [
+                1 => [(int) $paymentId, 'Integer'],
+            ]);
+            if ($dao->fetch()) {
+                return $this->loadContributionById((int) $dao->contribution_id);
+            }
+        }
+
+        $checkoutIntentId = $params['data']['order']['checkoutIntentId'] ?? NULL;
+        if ($checkoutIntentId) {
+            return $this->loadContributionByCheckoutIntentId((int) $checkoutIntentId);
+        }
+
+        return NULL;
+    }
+
+    private function queueWebhookPayload(array $params, string $rawData = ''): void
+    {
+        $eventId = $this->buildWebhookEventId($params);
+        $identifier = $this->buildWebhookIdentifier($params);
+
+        $existing = \Civi\Api4\PaymentprocessorWebhook::get(FALSE)
+            ->addWhere('payment_processor_id', '=', $this->getPaymentProcessorId())
+            ->addWhere('event_id', '=', $eventId)
+            ->addWhere('processed_date', 'IS NULL')
+            ->execute()
+            ->count();
+
+        if ($existing) {
+            Civi::log()->debug('HelloAsso webhook already queued: ' . $eventId);
+            return;
+        }
+
+        $storedPayload = $rawData !== ''
+            ? $rawData
+            : json_encode($params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (!is_string($storedPayload)) {
+            throw new PaymentProcessorException(E::ts('HelloAsso webhook payload could not be stored in the queue.'));
+        }
+
+        \Civi\Api4\PaymentprocessorWebhook::create(FALSE)
+            ->addValue('payment_processor_id', $this->getPaymentProcessorId())
+            ->addValue('event_id', $eventId)
+            ->addValue('trigger', (string) ($params['eventType'] ?? 'payment'))
+            ->addValue('identifier', $identifier)
+            ->addValue('created_date', 'now')
+            ->addValue('data', $storedPayload)
+            ->addValue('status', 'new')
+            ->execute();
+    }
+
+    private function buildWebhookEventId(array $params): string
+    {
+        $parts = [
+            (string) ($params['eventType'] ?? 'payment'),
+            (string) ($params['data']['id'] ?? ''),
+            (string) ($params['data']['order']['id'] ?? ''),
+            (string) ($params['data']['order']['checkoutIntentId'] ?? ''),
+            (string) ($params['data']['state'] ?? ''),
+        ];
+
+        return implode(':', $parts);
+    }
+
+    private function buildWebhookIdentifier(array $params): string
+    {
+        $parts = array_filter([
+            $params['data']['id'] ?? NULL,
+            $params['data']['order']['checkoutIntentId'] ?? NULL,
+            $params['metadata']['invoiceID'] ?? NULL,
+        ], static function ($value) {
+            return $value !== NULL && $value !== '';
+        });
+
+        if ($parts) {
+            return implode(':', $parts);
+        }
+
+        return sha1(json_encode($params));
+    }
+
+    private function hasHelloAssoMetadataColumn(string $columnName): bool
+    {
+        static $columns = [];
+
+        if (!array_key_exists($columnName, $columns)) {
+            $dao = CRM_Core_DAO::executeQuery(
+                "SHOW COLUMNS FROM civicrm_hello_asso_metadata LIKE %1",
+                [1 => [$columnName, 'String']]
+            );
+            $columns[$columnName] = (bool) $dao->fetch();
+        }
+
+        return $columns[$columnName];
+    }
+
+    private function isFollowUpEnabled(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_v2_followup_enabled');
+    }
+
+    private function getFollowUpCronLimit(): int
+    {
+        $limit = (int) (Civi::settings()->get('helloasso_v2_cron_limit') ?? 15);
+
+        return $limit > 0 ? $limit : 15;
+    }
+
+    private function getShortFollowUpMinutes(): array
+    {
+        return [5, 15];
+    }
+
+    private function getLongFollowUpDays(string $scheme): array
+    {
+        return $scheme === 'sepa' ? self::LONG_FOLLOWUP_SEPA_DAYS : self::LONG_FOLLOWUP_CARD_DAYS;
+    }
+
+    private function detectLongFollowUpScheme(?array $paymentData = NULL, ?CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata = NULL, string $default = 'card'): string
+    {
+        $paymentMeans = strtolower((string) ($paymentData['paymentMeans'] ?? ''));
+        if (strpos($paymentMeans, 'sepa') !== FALSE) {
+            return 'sepa';
+        }
+
+        if (!empty($metadata->state) && (string) $metadata->state === 'WaitingBankValidation') {
+            return 'sepa';
+        }
+
+        if (in_array($default, ['card', 'sepa'], TRUE)) {
+            return $default;
+        }
+
+        return 'card';
+    }
+
+    private function armContributionFollowUp(int $contributionId, ?CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata = NULL): void
+    {
+        if (!$this->isFollowUpEnabled()) {
+            return;
+        }
+
+        $metadata = $metadata ?: $this->loadMetadataForContribution($contributionId);
+        $origin = new DateTimeImmutable('now');
+        $minutes = $this->getShortFollowUpMinutes();
+
+        $metadata->contribution_id = $contributionId;
+        $metadata->sync_origin_date = $origin->format('Y-m-d H:i:s');
+        $metadata->sync_next_date = $origin->modify('+' . $minutes[0] . ' minutes')->format('Y-m-d H:i:s');
+        $metadata->sync_last_date = 'null';
+        $metadata->sync_attempt_count = 0;
+        if ($this->hasHelloAssoMetadataColumn('sync_error_count')) {
+            $metadata->sync_error_count = 0;
+        }
+        $metadata->save();
+    }
+
+    private function armLongFollowUp(int $contributionId, ?CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata = NULL, ?array $paymentData = NULL): void
+    {
+        if (!$this->hasHelloAssoMetadataColumn('long_sync_next_date')) {
+            return;
+        }
+
+        $metadata = $metadata ?: $this->loadMetadataForContribution($contributionId);
+        $scheme = $this->detectLongFollowUpScheme($paymentData, $metadata);
+        $origin = $this->resolveLongFollowUpOriginDate($paymentData);
+        $scheduleDays = $this->getLongFollowUpDays($scheme);
+
+        $metadata->contribution_id = $contributionId;
+        $metadata->long_sync_scheme = $scheme;
+        $metadata->long_sync_origin_date = $origin->format('Y-m-d H:i:s');
+        $metadata->long_sync_next_date = $origin->modify('+' . $scheduleDays[0] . ' days')->format('Y-m-d H:i:s');
+        $metadata->long_sync_last_date = 'null';
+        $metadata->long_sync_attempt_count = 0;
+        if ($this->hasHelloAssoMetadataColumn('long_sync_error_count')) {
+            $metadata->long_sync_error_count = 0;
+        }
+        $metadata->save();
+    }
+
+    private function ensureLongFollowUpSchedule(int $contributionId, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata, ?array $paymentData = NULL): void
+    {
+        if (!$this->hasHelloAssoMetadataColumn('long_sync_next_date')) {
+            return;
+        }
+
+        $contribution = $this->loadContributionById($contributionId);
+        if (!$contribution) {
+            return;
+        }
+
+        if ($this->isLongFollowUpResolved($contribution, $metadata)) {
+            $this->stopContributionFollowUps($contributionId, FALSE, TRUE);
+            return;
+        }
+
+        if (empty($metadata->long_sync_origin_date)) {
+            $this->armLongFollowUp($contributionId, $metadata, $paymentData);
+            return;
+        }
+
+        $scheme = $this->detectLongFollowUpScheme($paymentData, $metadata, (string) ($metadata->long_sync_scheme ?? 'card'));
+        if ((string) $metadata->long_sync_scheme !== $scheme) {
+            $metadata->long_sync_scheme = $scheme;
+            if (empty($metadata->long_sync_last_date) && ((int) ($metadata->long_sync_attempt_count ?? 0) === 0)) {
+                $origin = new DateTimeImmutable((string) $metadata->long_sync_origin_date);
+                $scheduleDays = $this->getLongFollowUpDays($scheme);
+                $metadata->long_sync_next_date = $origin->modify('+' . $scheduleDays[0] . ' days')->format('Y-m-d H:i:s');
+            }
+            $metadata->save();
+        }
+    }
+
+    private function advanceContributionFollowUp(int $contributionId): void
+    {
+        $metadata = $this->loadMetadataForContribution($contributionId);
+        if (empty($metadata->contribution_id)) {
+            return;
+        }
+
+        $contribution = $this->loadContributionById($contributionId);
+        if (!$contribution) {
+            return;
+        }
+
+        $metadata->sync_last_date = date('Y-m-d H:i:s');
+        $metadata->sync_attempt_count = (int) ($metadata->sync_attempt_count ?? 0) + 1;
+        if ($this->hasHelloAssoMetadataColumn('sync_error_count')) {
+            $metadata->sync_error_count = 0;
+        }
+
+        if (!$this->isFollowUpEnabled() || $this->isContributionFollowUpResolved($contribution, $metadata)) {
+            $metadata->save();
+            $this->stopContributionFollowUps($contributionId, TRUE, FALSE);
+            return;
+        }
+
+        $minutes = $this->getShortFollowUpMinutes();
+        $attemptIndex = (int) $metadata->sync_attempt_count;
+        if (!isset($minutes[$attemptIndex])) {
+            $metadata->save();
+            $this->stopContributionFollowUps($contributionId, TRUE, FALSE);
+            return;
+        }
+
+        $origin = !empty($metadata->sync_origin_date) ? new DateTimeImmutable($metadata->sync_origin_date) : new DateTimeImmutable('now');
+        $metadata->sync_next_date = $origin->modify('+' . $minutes[$attemptIndex] . ' minutes')->format('Y-m-d H:i:s');
+        $this->logFollowUpMetadataSnapshot('short', $contributionId, $metadata);
+        $metadata->save();
+    }
+
+    private function advanceLongFollowUp(int $contributionId, ?string $scheme = NULL): void
+    {
+        $metadata = $this->loadMetadataForContribution($contributionId);
+        if (empty($metadata->contribution_id) || !$this->hasHelloAssoMetadataColumn('long_sync_next_date')) {
+            return;
+        }
+
+        $contribution = $this->loadContributionById($contributionId);
+        if (!$contribution) {
+            return;
+        }
+
+        $metadata->long_sync_last_date = date('Y-m-d H:i:s');
+        $metadata->long_sync_attempt_count = (int) ($metadata->long_sync_attempt_count ?? 0) + 1;
+        if ($this->hasHelloAssoMetadataColumn('long_sync_error_count')) {
+            $metadata->long_sync_error_count = 0;
+        }
+
+        if ($this->isLongFollowUpResolved($contribution, $metadata)) {
+            $metadata->save();
+            $this->stopContributionFollowUps($contributionId, FALSE, TRUE);
+            return;
+        }
+
+        $scheme = $this->detectLongFollowUpScheme(NULL, $metadata, $scheme ?: (string) ($metadata->long_sync_scheme ?? 'card'));
+        $metadata->long_sync_scheme = $scheme;
+        $origin = !empty($metadata->long_sync_origin_date) ? new DateTimeImmutable((string) $metadata->long_sync_origin_date) : new DateTimeImmutable('now');
+        $nextDate = $this->computeNextLongFollowUpDate(
+            $origin,
+            $scheme,
+            (int) $metadata->long_sync_attempt_count,
+            new DateTimeImmutable('now')
+        );
+        if (!$nextDate) {
+            $metadata->save();
+            $this->stopContributionFollowUps($contributionId, FALSE, TRUE);
+            return;
+        }
+
+        $metadata->long_sync_next_date = $nextDate->format('Y-m-d H:i:s');
+        $this->logFollowUpMetadataSnapshot('long', $contributionId, $metadata);
+        $metadata->save();
+    }
+
+    private function logFollowUpMetadataSnapshot(string $rail, int $contributionId, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata): void
+    {
+        Civi::log()->debug('HelloAsso follow-up metadata before save', [
+            'rail' => $rail,
+            'contribution_id' => $contributionId,
+            'metadata_id' => $metadata->id ?? NULL,
+            'sync_origin_date' => $metadata->sync_origin_date ?? NULL,
+            'sync_origin_date_type' => gettype($metadata->sync_origin_date ?? NULL),
+            'sync_last_date' => $metadata->sync_last_date ?? NULL,
+            'sync_last_date_type' => gettype($metadata->sync_last_date ?? NULL),
+            'sync_next_date' => $metadata->sync_next_date ?? NULL,
+            'sync_next_date_type' => gettype($metadata->sync_next_date ?? NULL),
+            'long_sync_origin_date' => $metadata->long_sync_origin_date ?? NULL,
+            'long_sync_origin_date_type' => gettype($metadata->long_sync_origin_date ?? NULL),
+            'long_sync_last_date' => $metadata->long_sync_last_date ?? NULL,
+            'long_sync_last_date_type' => gettype($metadata->long_sync_last_date ?? NULL),
+            'long_sync_next_date' => $metadata->long_sync_next_date ?? NULL,
+            'long_sync_next_date_type' => gettype($metadata->long_sync_next_date ?? NULL),
+            'sync_attempt_count' => $metadata->sync_attempt_count ?? NULL,
+            'long_sync_attempt_count' => $metadata->long_sync_attempt_count ?? NULL,
+            'state' => $metadata->state ?? NULL,
+        ]);
+    }
+
+    private function isContributionFollowUpResolved(CRM_Contribute_BAO_Contribution $contribution, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata): bool
+    {
+        $statusName = CRM_Core_PseudoConstant::getName(
+            'CRM_Contribute_BAO_Contribution',
+            'contribution_status_id',
+            (int) $contribution->contribution_status_id
+        );
+        $resolvedStatuses = ['Completed', 'Failed', 'Refunded'];
+        if (in_array((string) $statusName, $resolvedStatuses, TRUE)) {
+            return TRUE;
+        }
+
+        $resolvedStates = ['Authorized', 'Registered', 'Refused', 'Error', 'Canceled', 'Abandoned', 'Refunded'];
+        if (!empty($metadata->state) && in_array((string) $metadata->state, $resolvedStates, TRUE)) {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    private function isLongFollowUpResolved(CRM_Contribute_BAO_Contribution $contribution, CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata): bool
+    {
+        $statusName = CRM_Core_PseudoConstant::getName(
+            'CRM_Contribute_BAO_Contribution',
+            'contribution_status_id',
+            (int) $contribution->contribution_status_id
+        );
+        $resolvedStatuses = ['Failed', 'Refunded'];
+        if (in_array((string) $statusName, $resolvedStatuses, TRUE)) {
+            return TRUE;
+        }
+
+        $resolvedStates = ['Refused', 'Error', 'Canceled', 'Abandoned', 'Refunded'];
+        if (!empty($metadata->state) && in_array((string) $metadata->state, $resolvedStates, TRUE)) {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    private function isLongFollowUpTerminalState(string $state): bool
+    {
+        return in_array($state, ['Refused', 'Error', 'Canceled', 'Abandoned', 'Refunded'], TRUE);
+    }
+
+    private function computeNextLongFollowUpDate(DateTimeImmutable $origin, string $scheme, int $attemptCount, DateTimeImmutable $reference): ?DateTimeImmutable
+    {
+        $scheduleDays = $this->getLongFollowUpDays($scheme);
+        for ($index = max(0, $attemptCount); $index < count($scheduleDays); $index++) {
+            $candidate = $origin->modify('+' . $scheduleDays[$index] . ' days');
+            if ($candidate > $reference) {
+                return $candidate;
+            }
+        }
+
+        return NULL;
+    }
+
+    private function isHelloAssoNotFoundException(Exception $e): bool
+    {
+        return strpos($e->getMessage(), 'Erreur API HelloAsso (404)') !== FALSE;
+    }
+
+    private function stopContributionFollowUps(int $contributionId, bool $stopShort = TRUE, bool $stopLong = TRUE): void
+    {
+        $updates = [];
+        if ($stopShort) {
+            $updates[] = 'sync_next_date = NULL';
+        }
+        if ($stopLong && $this->hasHelloAssoMetadataColumn('long_sync_next_date')) {
+            $updates[] = 'long_sync_next_date = NULL';
+        }
+        if (!$updates) {
+            return;
+        }
+
+        CRM_Core_DAO::executeQuery(
+            'UPDATE civicrm_hello_asso_metadata SET ' . implode(', ', $updates) . ' WHERE contribution_id = %1',
+            [1 => [$contributionId, 'Integer']]
+        );
+    }
+
+    private function deferTechnicalFollowUpError(int $contributionId, string $rail, Exception $exception): void
+    {
+        $isLong = $rail === 'long';
+        $dateColumn = $isLong ? 'long_sync_next_date' : 'sync_next_date';
+        $lastDateColumn = $isLong ? 'long_sync_last_date' : 'sync_last_date';
+        $errorColumn = $isLong ? 'long_sync_error_count' : 'sync_error_count';
+        $stopShort = !$isLong;
+        $stopLong = $isLong;
+
+        if (!$this->hasHelloAssoMetadataColumn($errorColumn)) {
+            $retryDate = (new DateTimeImmutable('+15 minutes'))->format('YmdHis');
+            CRM_Core_DAO::executeQuery(
+                "UPDATE civicrm_hello_asso_metadata SET {$dateColumn} = %1, {$lastDateColumn} = %2 WHERE contribution_id = %3",
+                [
+                    1 => [$retryDate, 'Timestamp'],
+                    2 => [date('YmdHis'), 'Timestamp'],
+                    3 => [$contributionId, 'Integer'],
+                ]
+            );
+            return;
+        }
+
+        CRM_Core_DAO::executeQuery(
+            "UPDATE civicrm_hello_asso_metadata SET {$errorColumn} = COALESCE({$errorColumn}, 0) + 1, {$lastDateColumn} = %1 WHERE contribution_id = %2",
+            [
+                1 => [date('YmdHis'), 'Timestamp'],
+                2 => [$contributionId, 'Integer'],
+            ]
+        );
+        $errorCount = (int) CRM_Core_DAO::singleValueQuery(
+            "SELECT {$errorColumn} FROM civicrm_hello_asso_metadata WHERE contribution_id = %1",
+            [1 => [$contributionId, 'Integer']]
+        );
+
+        if ($errorCount >= self::TECHNICAL_ERROR_MAX_ATTEMPTS) {
+            $this->stopContributionFollowUps($contributionId, $stopShort, $stopLong);
+            Civi::log()->warning(sprintf(
+                'HelloAsso %s follow-up disabled for contribution %d after %d technical errors. Last error: %s',
+                $rail,
+                $contributionId,
+                $errorCount,
+                $exception->getMessage()
+            ));
+            return;
+        }
+
+        $backoffIndex = min($errorCount - 1, count(self::TECHNICAL_ERROR_BACKOFF_MINUTES) - 1);
+        $retryDate = (new DateTimeImmutable('+' . self::TECHNICAL_ERROR_BACKOFF_MINUTES[$backoffIndex] . ' minutes'))->format('YmdHis');
+        CRM_Core_DAO::executeQuery(
+            "UPDATE civicrm_hello_asso_metadata SET {$dateColumn} = %1 WHERE contribution_id = %2",
+            [
+                1 => [$retryDate, 'Timestamp'],
+                2 => [$contributionId, 'Integer'],
+            ]
+        );
+    }
+
+    private function resolveLongFollowUpOriginDate(?array $paymentData = NULL): DateTimeImmutable
+    {
+        $candidates = [
+            $paymentData['meta']['createdAt'] ?? NULL,
+            $paymentData['date'] ?? NULL,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (!empty($candidate)) {
+                try {
+                    return new DateTimeImmutable((string) $candidate);
+                }
+                catch (Exception $e) {
                 }
             }
         }
+
+        return new DateTimeImmutable('now');
+    }
+
+    private function getPaymentProcessorConfig(): array
+    {
+        return (array) $this->_paymentProcessor;
+    }
+
+    private function getPaymentProcessorId(): ?int
+    {
+        if (is_array($this->_paymentProcessor)) {
+            return isset($this->_paymentProcessor['id']) ? (int) $this->_paymentProcessor['id'] : NULL;
+        }
+
+        return isset($this->_paymentProcessor->id) ? (int) $this->_paymentProcessor->id : NULL;
+    }
+
+    private function mergeSyncResults(array $left, array $right): array
+    {
+        return [
+            'checked' => $left['checked'] + $right['checked'],
+            'updated' => $left['updated'] + $right['updated'],
+            'errors' => array_merge($left['errors'], $right['errors']),
+        ];
+    }
+
+    private function shouldUseSafeAbortUrl(?string $backUrl, ?string $errorUrl): bool
+    {
+        if ($this->isDrupalAjaxRequest()) {
+            return TRUE;
+        }
+
+        if ($this->isUnsafeAbortUrl($backUrl) || $this->isUnsafeAbortUrl($errorUrl)) {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    private function getSafeAbortUrl(array $params): string
+    {
+        $candidates = [
+            $_SERVER['HTTP_REFERER'] ?? NULL,
+            $params['source_url'] ?? NULL,
+            $params['cancel_url'] ?? NULL,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (!$this->isUnsafeAbortUrl($candidate)) {
+                return (string) $this->sanitizeAbortUrl($candidate);
+            }
+        }
+
+        return CRM_Utils_System::baseCMSURL();
+    }
+
+    private function isUnsafeAbortUrl(?string $url): bool
+    {
+        if (empty($url)) {
+            return TRUE;
+        }
+
+        $url = $this->sanitizeAbortUrl($url);
+
+        $unsafePatterns = [
+            'ajax',
+            '_wrapper_format=drupal_ajax',
+            'civicrm/contact/view/contribution',
+            'civicrm/contact/view/participant',
+            'civicrm/contact/view/membership',
+            'civicrm/contribute/transact',
+            'civicrm/payment',
+            'wp-admin/admin-ajax.php',
+            'wc-ajax=',
+            'wp-json/',
+            'rest_route=',
+            'option=com_ajax',
+            'format=raw',
+            'tmpl=component',
+            'task=ajax',
+        ];
+
+        foreach ($unsafePatterns as $pattern) {
+            if (stripos($url, $pattern) !== FALSE) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+    }
+
+    private function sanitizeAbortUrl(?string $url): ?string
+    {
+        if (empty($url)) {
+            return $url;
+        }
+
+        $parts = parse_url($url);
+        if ($parts === FALSE) {
+            return $url;
+        }
+
+        $query = [];
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $query);
+            foreach ([
+                '_wrapper_format',
+                '_drupal_ajax',
+                'ajax_form',
+                'snippet',
+                'format',
+                'tmpl',
+                'task',
+                'rest_route',
+            ] as $key) {
+                unset($query[$key]);
+            }
+        }
+
+        $rebuilt = '';
+        if (!empty($parts['scheme'])) {
+            $rebuilt .= $parts['scheme'] . '://';
+        }
+        if (!empty($parts['user'])) {
+            $rebuilt .= $parts['user'];
+            if (!empty($parts['pass'])) {
+                $rebuilt .= ':' . $parts['pass'];
+            }
+            $rebuilt .= '@';
+        }
+        if (!empty($parts['host'])) {
+            $rebuilt .= $parts['host'];
+        }
+        if (!empty($parts['port'])) {
+            $rebuilt .= ':' . $parts['port'];
+        }
+        $rebuilt .= $parts['path'] ?? '';
+        if ($query) {
+            $rebuilt .= '?' . http_build_query($query);
+        }
+        if (!empty($parts['fragment'])) {
+            $rebuilt .= '#' . $parts['fragment'];
+        }
+
+        return $rebuilt ?: $url;
+    }
+
+    private function isDrupalAjaxRequest(): bool
+    {
+        return !empty($_REQUEST['ajax_form']) || ((string) ($_REQUEST['_wrapper_format'] ?? '') === 'drupal_ajax');
+    }
+
+    private function isStandardFrontendBridgeEnabled(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_v2_standard_frontend_bridge');
+    }
+
+    private function isSafeAbortUrlsEnabled(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_v2_safe_abort_urls');
+    }
+
+    private function isWebhookQueueEnabled(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_v2_queue_webhooks');
+    }
+
+    private function isWebhookSignatureRequired(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_v2_require_webhook_signature');
+    }
+
+    private function isPartnerWebhookSignatureRequired(): bool
+    {
+        return (bool) Civi::settings()->get('helloasso_v2_require_partner_webhook_signature');
+    }
+
+    private function normalizeNullableTimestamp($value): ?string
+    {
+        if ($value === NULL || $value === '') {
+            return NULL;
+        }
+
+        if (is_int($value) || (is_string($value) && ctype_digit($value))) {
+            $digits = (string) $value;
+            if (strlen($digits) === 14 || strlen($digits) === 8) {
+                return $digits;
+            }
+            if (strlen($digits) === 10) {
+                return gmdate('YmdHis', (int) $digits);
+            }
+        }
+
+        try {
+            return (new DateTimeImmutable((string) $value))->format('YmdHis');
+        }
+        catch (Exception $e) {
+            return (string) $value;
+        }
+    }
+
+    public function getWebhookPath(): string
+    {
+        return CRM_HelloassoPaymentProcessor_Webhook::getWebhookPath($this->getPaymentProcessorId());
     }
 }

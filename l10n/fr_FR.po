@@ -1,0 +1,1060 @@
+# Translation file
+
+msgid ""
+msgstr ""
+"Project-Id-Version: helloasso-payment-processor 2.0.0\n"
+"PO-Revision-Date: 2026-05-26 22:52+0000\n"
+"Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
+"Language-Team: fr_FR\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%1 (#%2)"
+msgstr ""
+
+msgid "A HelloAsso authorization link could not be renewed. Reconnect it before accepting new payments through the authorization screen: %1"
+msgstr ""
+
+#. Corrected from old msgid: Active l intégration frontend standard HelloAsso basée sur CRM.payment et mjwshared.
+#: settings/helloasso_payment_processor.setting.php:23
+msgid "Active l'intégration frontend standard HelloAsso basée sur CRM.payment et mjwshared."
+msgstr ""
+
+#. Corrected from old msgid: Active la mire OAuth HelloAsso partagée. Quand ce réglage est désactivé, l interface mire n est plus proposée sur les pages processeur HelloAsso.
+#: settings/helloasso_payment_processor.setting.php:151
+msgid "Active la mire OAuth HelloAsso partagée. Quand ce réglage est désactivé, l'interface mire n'est plus proposée sur les pages processeur HelloAsso."
+msgstr ""
+
+msgid "Active les contrôles automatiques à T+5 puis T+15 après création d'un checkout HelloAsso. Le suivi long des changements ultérieurs, notamment les remboursements, reste indépendant."
+msgstr "Active les contrôles automatiques à T+5 puis T+15 après création d'un checkout HelloAsso. Le suivi long des changements ultérieurs, notamment les remboursements, reste indépendant."
+
+#. Corrected from old msgid: Active par défaut l enregistrement automatique du webhook HelloAsso live pour cette instance CiviCRM. Décochez seulement si une autre instance garde la maîtrise de l URL webhook.
+#: helloasso_payment_processor.php:141
+msgid "Active par défaut l'enregistrement automatique du webhook HelloAsso live pour cette instance CiviCRM. Décochez seulement si une autre instance garde la maîtrise de l'URL webhook."
+msgstr ""
+
+#. Corrected from old msgid: Active par defaut l enregistrement automatique du webhook HelloAsso pour cette instance CiviCRM. Decochez seulement si plusieurs instances CiviCRM partagent la meme organisation HelloAsso et que vous voulez gerer le webhook manuellement.
+#: helloasso_payment_processor.php:189
+msgid "Active par défaut l'enregistrement automatique du webhook HelloAsso pour cette instance CiviCRM. Décochez seulement si plusieurs instances CiviCRM partagent la même organisation HelloAsso et que vous voulez gérer le webhook manuellement."
+msgstr ""
+
+#: helloasso_payment_processor.php:141 helloasso_payment_processor.php:189
+msgid "Activer automatiquement le webhook"
+msgstr "Activer automatiquement le webhook"
+
+#. Corrected from old msgid: Activez d abord le switch mire ci-dessous puis enregistrez la page avant de lancer la connexion.
+#: helloasso_payment_processor.php:470
+msgid "Activez d'abord le switch mire ci-dessous puis enregistrez la page avant de lancer la connexion."
+msgstr ""
+
+#: helloasso_payment_processor.php:512
+msgid "Actualiser cette page de réglages HelloAsso"
+msgstr "Actualiser cette page de réglages HelloAsso"
+
+#. Corrected from old msgid: Aucun processeur HelloAsso correspondant n a été trouvé sur cette instance.
+#: helloasso_payment_processor.php:422
+msgid "Aucun processeur HelloAsso correspondant n'a été trouvé sur cette instance."
+msgstr ""
+
+#. Corrected from old msgid: Aucune adresse email principale n est disponible pour lancer le checkout HelloAsso de la contribution %1.
+#: CRM/Core/Payment/HelloAsso.php:405
+msgid "Aucune adresse email principale n'est disponible pour lancer le checkout HelloAsso de la contribution %1."
+msgstr ""
+
+#. Corrected from old msgid: Aucune clé API live n est enregistrée sur ce processeur. Vous pouvez donc activer le mode mire production sur ce processeur si la liaison OAuth a été validée.
+#: helloasso_payment_processor.php:149
+msgid "Aucune clé API live n'est enregistrée sur ce processeur. Vous pouvez donc activer le mode mire production sur ce processeur si la liaison OAuth a été validée."
+msgstr ""
+
+#. Corrected from old msgid: Aucune cle API sandbox n est enregistree sur ce processeur. La mire HelloAsso sandbox est donc proposee par defaut.
+#: helloasso_payment_processor.php:195
+msgid "Aucune clé API sandbox n'est enregistrée sur ce processeur. La mire HelloAsso sandbox est donc proposée par défaut."
+msgstr ""
+
+#. Corrected from old msgid: Aucune connexion HelloAsso active n est disponible pour cette Checkout Option.
+#: Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php:94
+msgid "Aucune connexion HelloAsso active n'est disponible pour cette Checkout Option."
+msgstr ""
+
+#. Corrected from old msgid: Aucune contribution correspondante. Webhook ignore.
+#: CRM/Core/Payment/HelloAsso.php:682
+msgid "Aucune contribution correspondante. Webhook ignoré."
+msgstr "Aucune contribution correspondante. Webhook ignoré."
+
+#. Corrected from old msgid: Aucune organisation HelloAsso n est encore liée.
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:171
+msgid "Aucune organisation HelloAsso n'est encore liée."
+msgstr "Aucune organisation HelloAsso n'est encore liée."
+
+#. Corrected from old msgid: Aucune organisation HelloAsso production n est encore liée à ce processeur.
+#: helloasso_payment_processor.php:173
+msgid "Aucune organisation HelloAsso production n'est encore liée à ce processeur."
+msgstr ""
+
+#. Corrected from old msgid: Aucune organisation HelloAsso sandbox n est encore liée à ce processeur.
+#: helloasso_payment_processor.php:220
+msgid "Aucune organisation HelloAsso sandbox n'est encore liée à ce processeur."
+msgstr ""
+
+#. Corrected from old msgid: Aucune organisation n est encore liée sur ce rail.
+#: helloasso_payment_processor.php:457
+msgid "Aucune organisation n'est encore liée sur ce rail."
+msgstr "Aucune organisation n'est encore liée sur ce rail."
+
+#: helloasso_payment_processor.php:252
+msgid "Base HelloAsso API URL for live payments. Keep the default production URL unless HelloAsso explicitly instructs otherwise."
+msgstr ""
+
+#: helloasso_payment_processor.php:256
+msgid "Base HelloAsso API URL for sandbox payments. Keep the sandbox default unless HelloAsso explicitly instructs otherwise."
+msgstr ""
+
+#. Corrected from old msgid: Ce bloc permet de connecter la mire HelloAsso production sur ce processeur live : liaison OAuth, organisation liée, webhook et clé de signature. Le rail de paiement live ne peut basculer sur la mire que si ce processeur n utilise plus de clés API classiques.
+#: helloasso_payment_processor.php:144
+msgid "Ce bloc permet de connecter la mire HelloAsso production sur ce processeur live : liaison OAuth, organisation liée, webhook et clé de signature. Le rail de paiement live ne peut basculer sur la mire que si ce processeur n'utilise plus de clés API classiques."
+msgstr ""
+
+#: helloasso_payment_processor.php:230
+msgid "Ce bouton reste désactivé tant que le client ID et le client secret partagés de la mire HelloAsso ne sont pas configurés."
+msgstr ""
+
+#. Corrected from old msgid: Cette page sert à renseigner le client partagé, afficher l état de liaison et lancer la connexion HelloAsso. Le switch général d activation de la mire se règle depuis les paramètres HelloAsso.
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:120
+msgid "Cette page sert à renseigner le client partagé, afficher l'état de liaison et lancer la connexion HelloAsso. Le switch général d'activation de la mire se règle depuis les paramètres HelloAsso."
+msgstr ""
+
+msgid "Client ID dédié à la mire HelloAsso production."
+msgstr "Client ID dédié à la mire HelloAsso production."
+
+msgid "Client ID dédié à la mire HelloAsso sandbox."
+msgstr "Client ID dédié à la mire HelloAsso sandbox."
+
+#. Corrected from old msgid: Client ID fourni par HelloAsso pour la mire partagee. Ne pas versionner cette valeur dans un depot public.
+#: settings/helloasso_payment_processor.setting.php:167
+msgid "Client ID fourni par HelloAsso pour la mire partagée. Ne pas versionner cette valeur dans un dépôt public."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:105
+msgid "Client ID partagé"
+msgstr "Client ID partagé"
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:105
+msgid "Client ID partagé sandbox"
+msgstr "Client ID partagé sandbox"
+
+#: CRM/Core/Payment/HelloAsso.mgd.php:20
+msgid "Client Id"
+msgstr "Client ID"
+
+#: CRM/Core/Payment/HelloAsso.php:74
+msgid "Client Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.mgd.php:21
+msgid "Client Secret"
+msgstr "Client Secret"
+
+#: CRM/Core/Payment/HelloAsso.php:77
+msgid "Client Secret Id is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
+msgstr ""
+
+msgid "Client secret dédié à la mire HelloAsso production."
+msgstr "Client secret dédié à la mire HelloAsso production."
+
+msgid "Client secret dédié à la mire HelloAsso sandbox."
+msgstr "Client secret dédié à la mire HelloAsso sandbox."
+
+#. Corrected from old msgid: Client secret fourni par HelloAsso pour la mire partagee. A conserver localement sur l instance CiviCRM.
+#: settings/helloasso_payment_processor.setting.php:178
+msgid "Client secret fourni par HelloAsso pour la mire partagée. À conserver localement sur l'instance CiviCRM."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:106
+msgid "Client secret partagé"
+msgstr "Client secret partagé"
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:106
+msgid "Client secret partagé sandbox"
+msgstr "Client secret partagé sandbox"
+
+#: helloasso_payment_processor.php:122 helloasso_payment_processor.php:125
+msgid "Clé API classique"
+msgstr "Clé API classique"
+
+#: helloasso_payment_processor.php:168 helloasso_payment_processor.php:215
+#: helloasso_payment_processor.php:465
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:145
+msgid "Clé de signature webhook enregistrée : %1"
+msgstr "Clé de signature webhook enregistrée : %1"
+
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:82
+msgid "Comma-separated contribution status names to include, for example \"Completed,Pending\"."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:83
+msgid "Comma-separated contribution status names to include, for example \"Pending,Failed\"."
+msgstr ""
+
+msgid "Configuration du processeur HelloAsso %1 (%2) invalide :"
+msgstr ""
+
+#: helloasso_payment_processor.php:129 helloasso_payment_processor.php:179
+#: helloasso_payment_processor.php:432
+msgid "Connecter la production à HelloAsso"
+msgstr "Connecter la production à HelloAsso"
+
+#: helloasso_payment_processor.php:133 helloasso_payment_processor.php:229
+#: helloasso_payment_processor.php:432
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:107
+msgid "Connecter le sandbox à HelloAsso"
+msgstr "Connecter le sandbox à HelloAsso"
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:107
+msgid "Connecter à HelloAsso"
+msgstr "Connecter à HelloAsso"
+
+#: helloasso_payment_processor.php:137
+msgid "Connexion HelloAsso production"
+msgstr "Connexion HelloAsso production"
+
+#: helloasso_payment_processor.php:185
+msgid "Connexion HelloAsso sandbox"
+msgstr "Connexion HelloAsso sandbox"
+
+#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:217
+#: api/v3/Job/ProcessHelloasso.php:77
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:76
+msgid "Contribution ID"
+msgstr "ID de la contribution"
+
+#: CRM/Core/Payment/HelloAsso.php:261 CRM/Core/Payment/HelloAsso.php:478
+msgid "Contribution en ligne"
+msgstr "Contribution en ligne"
+
+#: CRM/Core/Payment/HelloAsso.php:475
+msgid "Contribution en ligne : %1"
+msgstr "Contribution en ligne : %1"
+
+#: api/v3/Job/ProcessHelloasso.php:82
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:81
+msgid "Contribution statuses"
+msgstr "Statuts de contribution"
+
+#: helloasso_payment_processor.php:146
+msgid "Des identifiants API live sont encore présents sur ce processeur. La mire production peut être reliée et testée, mais le mode de paiement live reste bloqué sur la clé API classique tant que ces identifiants ne sont pas retirés."
+msgstr ""
+
+#. Corrected from old msgid: Des identifiants API sandbox sont deja presents sur ce processeur. Le mode par cle API reste le choix le plus prudent tant que vous ne basculez pas explicitement.
+#: helloasso_payment_processor.php:192
+msgid "Des identifiants API sandbox sont déjà présents sur ce processeur. Le mode par clé API reste le choix le plus prudent tant que vous ne basculez pas explicitement."
+msgstr ""
+
+#. Converted from French to English in source code
+msgid "Domain mismatch detected: this CiviCRM instance runs on a different host than the one authorized for the HelloAsso link: %1. OAuth callbacks will not function correctly on this staging/dev instance."
+msgstr "Un décalage de domaine a été détecté : cette instance CiviCRM tourne sur un hôte différent de celui utilisé pour la liaison HelloAsso de : %1. Les redirections et retours OAuth ne fonctionneront pas correctement sur cette instance de test/staging."
+
+#: api/v3/Job/ProcessHelloasso.php:97
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:96
+msgid "Due before"
+msgstr "Dû avant"
+
+#. Corrected from old msgid: Déconnecter l organisation liée
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:167
+msgid "Déconnecter l'organisation liée"
+msgstr "Déconnecter l'organisation liée"
+
+#. Corrected from old msgid: Endpoint HelloAsso utilise pour echanger le code d autorisation et rafraichir les jetons OAuth.
+#: settings/helloasso_payment_processor.setting.php:200
+msgid "Endpoint HelloAsso utilisé pour échanger le code d'autorisation et rafraîchir les jetons OAuth."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:136
+msgid "Enregistrer les réglages de la mire"
+msgstr "Enregistrer les réglages de la mire"
+
+#: helloasso_payment_processor.php:249
+msgid "Enter the HelloAsso client ID used by this payment processor for the selected environment. Keep the live and test values aligned with the matching HelloAsso application."
+msgstr ""
+
+#: helloasso_payment_processor.php:250
+msgid "Enter the HelloAsso client secret paired with the client ID above. Store the live and sandbox secrets separately."
+msgstr ""
+
+#: helloasso_payment_processor.php:251
+msgid "Enter the HelloAsso organization slug or organization name expected by this processor when building API calls and payment links."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:447
+#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:272
+msgid "Erreur API HelloAsso (%1)"
+msgstr "Erreur API HelloAsso (%1)"
+
+#: CRM/Core/Payment/HelloAsso.php:340
+msgid "Erreur HelloAsso"
+msgstr "Erreur HelloAsso"
+
+#. Corrected from old msgid: Erreur inconnue lors de la preparation de la redirection HelloAsso.
+#: CRM/Core/Payment/HelloAsso.php:274
+msgid "Erreur inconnue lors de la préparation de la redirection HelloAsso."
+msgstr "Erreur inconnue lors de la préparation de la redirection HelloAsso."
+
+msgid "Fiabilisation du statut pour les automatisations (T+5 / T+15 min)"
+msgstr ""
+
+msgid "File d'attente pour le traitement des webhooks"
+msgstr "File d'attente pour le traitement des webhooks"
+
+#: api/v3/Job/ProcessHelloasso.php:78
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:77
+msgid "Force processing for a specific contribution."
+msgstr "Forcer le traitement pour une contribution spécifique."
+
+#: helloasso_payment_processor.php:163 helloasso_payment_processor.php:210
+#: helloasso_payment_processor.php:460
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:140
+msgid "Gestion du webhook : %1"
+msgstr "Gestion du webhook : %1"
+
+msgid "Gestion sécurisée des URL d'échec et d'annulation"
+msgstr "Gestion sécurisée des URL d'échec et d'annulation"
+
+#: helloasso_payment_processor.php:893
+#: Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php:23
+#: Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php:27
+#: CRM/Core/Payment/HelloAsso.mgd.php:15
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:49
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:66
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:82
+msgid "HelloAsso"
+msgstr "HelloAsso"
+
+#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:106
+#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:132
+msgid "HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement."
+msgstr ""
+
+#. Converted from French to English in source code
+msgid "HelloAsso API error (%1)"
+msgstr "Erreur API HelloAsso (%1)"
+
+#: CRM/Core/Payment/HelloAsso.php:80
+msgid "HelloAsso Organization Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.mgd.php:16
+msgid "HelloAsso Payments Processor"
+msgstr "Processeur de paiement HelloAsso"
+
+#: helloasso_payment_processor.php:367
+msgid "HelloAsso aide les associations à collecter des paiements en ligne et propose ses services gratuitement. Elle prend à sa charge tous les frais de transaction pour que vous puissiez bénéficier de la totalité des sommes versées par vos publics, sans frais. Les contributions volontaires laissées par ces derniers sont leur unique source de revenus."
+msgstr ""
+
+msgid "HelloAsso authentication is currently being refreshed. Please retry the payment."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.php:83
+msgid "HelloAsso authorization screen is selected for this processor, but no linked HelloAsso organization is stored yet."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:65
+msgid "HelloAsso linked organization has been disconnected."
+msgstr "L'organisation liée HelloAsso a été déconnectée."
+
+#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:278
+msgid "HelloAsso live API calls require SSL verification to be enabled."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.php:1269
+msgid "HelloAsso notification signature cannot be verified because the local signing key is missing."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.php:1261
+msgid "HelloAsso notification signature is required but missing."
+msgstr "La signature de notification HelloAsso est requise mais manquante."
+
+#: CRM/Core/Payment/HelloAsso.php:1276
+msgid "HelloAsso notification signature mismatch."
+msgstr "Incohérence de la signature de notification HelloAsso."
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:48
+msgid "HelloAsso organization %1 is now linked."
+msgstr "L'organisation HelloAsso %1 est désormais liée."
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:30
+msgid "HelloAsso partner authorization"
+msgstr "Autorisation partenaire HelloAsso"
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:239
+msgid "HelloAsso partner authorization cannot be refreshed."
+msgstr "L'autorisation partenaire HelloAsso ne peut pas être rafraîchie."
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:265
+msgid "HelloAsso partner authorization could not be refreshed locally."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:112
+msgid "HelloAsso partner authorization could not be stored locally."
+msgstr "L'autorisation partenaire HelloAsso n'a pas pu être stockée localement."
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:89
+msgid "HelloAsso partner authorization did not return an organization slug."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:40
+msgid "HelloAsso partner authorization failed: %1"
+msgstr "L'autorisation partenaire HelloAsso a échoué : %1"
+
+msgid "HelloAsso partner authorization is currently being refreshed. Please retry the payment."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:331
+msgid "HelloAsso partner authorization is disabled."
+msgstr "L'autorisation partenaire HelloAsso est désactivée."
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:226
+msgid "HelloAsso partner authorization is not linked to an organization."
+msgstr "L'autorisation partenaire HelloAsso n'est pas liée à une organisation."
+
+msgid "HelloAsso partner authorization refresh token has expired."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:341
+msgid "HelloAsso partner authorization requires SSL verification to be enabled."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:301
+msgid "HelloAsso partner authorization response is missing OAuth tokens."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:64
+msgid "HelloAsso partner authorization state is invalid or expired."
+msgstr "L'état d'autorisation partenaire HelloAsso est invalide ou expiré."
+
+#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:334
+msgid "HelloAsso partner client ID and secret must be configured before connecting an organization."
+msgstr ""
+
+#: settings/helloasso_payment_processor.setting.php:210
+msgid "HelloAsso partner linked organization token"
+msgstr "Jeton d'organisation liée partenaire HelloAsso"
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:81
+msgid "HelloAsso partner settings have been saved on this page."
+msgstr "Les paramètres partenaire HelloAsso ont été enregistrés sur cette page."
+
+#: CRM/Core/Payment/HelloAsso.php:1295
+msgid "HelloAsso partner webhook signature cannot be verified because the local signature key is missing."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.php:1288
+msgid "HelloAsso partner webhook signature is required but missing."
+msgstr "La signature du webhook partenaire HelloAsso est requise mais manquante."
+
+#: CRM/Core/Payment/HelloAsso.php:1304
+msgid "HelloAsso partner webhook signature mismatch."
+msgstr "Incohérence de la signature du webhook partenaire HelloAsso."
+
+#. Converted from French to English in source code
+msgid "HelloAsso payment is temporarily unavailable: HelloAsso connection must be restored by an administrator."
+msgstr "Le paiement HelloAsso est temporairement indisponible : la connexion HelloAsso doit être rétablie par un administrateur."
+
+#: CRM/HelloassoPaymentProcessor/Service.php:187
+msgid "HelloAsso payment processor not found: %1"
+msgstr "Processeur de paiement HelloAsso introuvable : %1"
+
+#: settings/helloasso_payment_processor.setting.php:221
+msgid "HelloAsso per-processor authorization state"
+msgstr "État d'autorisation par processeur HelloAsso"
+
+#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:241
+msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:40
+#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:58
+msgid "HelloAsso processor authorization state could not be encoded."
+msgstr "L'état d'autorisation du processeur HelloAsso n'a pas pu être encodé."
+
+#: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:186
+msgid "HelloAsso refunds are disabled by this extension."
+msgstr "Les remboursements HelloAsso sont désactivés par cette extension."
+
+#: CRM/Core/Payment/HelloAsso.php:1434
+msgid "HelloAsso webhook payload could not be stored in the queue."
+msgstr ""
+
+#: helloasso_payment_processor.php:761
+msgid "HelloAsso: API Key Authentication Failed"
+msgstr "HelloAsso : Échec de l'authentification par clé API"
+
+#: helloasso_payment_processor.php:771
+msgid "HelloAsso: API Key Check Failed"
+msgstr "HelloAsso : Échec de la vérification de la clé API"
+
+msgid "HelloAsso: Authorization Check Failed"
+msgstr ""
+
+msgid "HelloAsso: Authorization Expired"
+msgstr ""
+
+msgid "HelloAsso: Authorization Expiring Soon"
+msgstr ""
+
+msgid "HelloAsso: Authorization Renewal Failed"
+msgstr ""
+
+#. Converted from French to English in source code
+msgid "HelloAsso: Domain Mismatch (Staging/Dev Instance)"
+msgstr "HelloAsso : Décalage de domaine (Instance de Test/Staging)"
+
+#: helloasso_payment_processor.php:639
+msgid "HelloAsso: Incomplete V2 Upgrade"
+msgstr "HelloAsso : Mise à niveau V2 incomplète"
+
+msgid "HelloAsso: Payment Method Missing"
+msgstr ""
+
+msgid "HelloAsso: Payment Method Requires Review"
+msgstr ""
+
+msgid "HelloAsso: Reconnection Required"
+msgstr ""
+
+#: helloasso_payment_processor.php:649
+msgid "HelloAsso: Schema Check Failed"
+msgstr "HelloAsso : Échec de la vérification du schéma"
+
+#. Converted from French to English in source code
+msgid "HelloAsso: Webhook Domain Mismatch"
+msgstr "HelloAsso : Décalage de domaine du Webhook"
+
+msgid "HelloAsso: Webhook Not Configured"
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Upgrader.php:290
+msgid "HelloAsso: analyser les trxn_id legacy concaténés (%1 cas)"
+msgstr "HelloAsso : analyser les trxn_id legacy concaténés (%1 cas)"
+
+#: CRM/HelloassoPaymentProcessor/Upgrader.php:320
+msgid "HelloAsso: rapport final des trxn_id legacy restants"
+msgstr "HelloAsso : rapport final des trxn_id legacy restants"
+
+#: CRM/HelloassoPaymentProcessor/Upgrader.php:309
+msgid "HelloAsso: réparer les trxn_id legacy (lot %1, contributions %2 à %3)"
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Upgrader.php:297
+msgid "HelloAsso: trop de cas (%1) pour la réparation GUI. Utiliser le mode terminal."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:117
+msgid "ID du processeur de paiement : %1"
+msgstr "ID du processeur de paiement : %1"
+
+#: helloasso_payment_processor.php:139
+msgid "ID du processeur live"
+msgstr "ID du processeur live"
+
+#: helloasso_payment_processor.php:187
+msgid "ID du processeur sandbox"
+msgstr "ID du processeur sandbox"
+
+#. Corrected from old msgid: Impossible de mettre a jour la contribution %1.
+#: CRM/Core/Payment/HelloAsso.php:279
+msgid "Impossible de mettre à jour la contribution %1."
+msgstr "Impossible de mettre à jour la contribution %1."
+
+#: CRM/Core/Payment/HelloAsso.php:208
+msgid "Impossible de recharger la contribution %1."
+msgstr "Impossible de recharger la contribution %1."
+
+#. Corrected from old msgid: Impossible de retrouver la contribution a mettre a jour pour le checkout HelloAsso.
+#: CRM/Core/Payment/HelloAsso.php:248
+msgid "Impossible de retrouver la contribution à mettre à jour pour le checkout HelloAsso."
+msgstr ""
+
+#: settings/helloasso_payment_processor.setting.php:222
+msgid "Internal storage for sandbox authorization-screen state per HelloAsso payment processor. Do not edit manually."
+msgstr ""
+
+#: settings/helloasso_payment_processor.setting.php:211
+msgid "Internal storage for the linked organization OAuth token. Do not edit manually."
+msgstr ""
+
+msgid "Intégration Afform / Form Builder"
+msgstr "Intégration Afform / Form Builder"
+
+#. Corrected from old msgid: Jeton d accès valable jusqu au : %1
+#: helloasso_payment_processor.php:157 helloasso_payment_processor.php:204
+#: helloasso_payment_processor.php:450
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:158
+msgid "Jeton d'accès valable jusqu'au : %1"
+msgstr "Jeton d'accès valable jusqu'au : %1"
+
+msgid "La contribution %1 est verrouillée par DonRec. Le statut pris en compte pour le reçu fiscal diffère du statut actuel de la passerelle de paiement HelloAsso (%2). Les métadonnées ont été synchronisées, mais le statut de la contribution n'a pas été modifié."
+msgstr "La contribution %1 est verrouillée par DonRec. Le statut pris en compte pour le reçu fiscal diffère du statut actuel de la passerelle de paiement HelloAsso (%2). Les métadonnées ont été synchronisées, mais le statut de la contribution n'a pas été modifié."
+
+msgid "La liaison HelloAsso ne peut plus être renouvelée%1%2. Reconnectez l'organisation avant d'accepter de nouveaux paiements par la mire."
+msgstr "La liaison HelloAsso ne peut plus être renouvelée%1%2. Reconnectez l'organisation avant d'accepter de nouveaux paiements par la mire."
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:150
+msgid "La mire est désactivée globalement. Activez-la dans les paramètres HelloAsso puis revenez sur cette page pour connecter une organisation."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.php:371
+msgid "La valeur du %1 n'est pas autorisée par HelloAsso."
+msgstr "La valeur du %1 n'est pas autorisée par HelloAsso."
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:130
+msgid "Laisser vide pour conserver le secret actuel."
+msgstr "Laisser vide pour conserver le secret actuel."
+
+#: CRM/Core/Payment/HelloAsso.php:374
+msgid "Le %1 contient des caractères non autorisés (règle HelloAsso)."
+msgstr "Le %1 contient des caractères non autorisés (règle HelloAsso)."
+
+#: CRM/Core/Payment/HelloAsso.php:359
+msgid "Le %1 doit contenir au moins 3 caractères (règle HelloAsso)."
+msgstr "Le %1 doit contenir au moins 3 caractères (règle HelloAsso)."
+
+#: CRM/Core/Payment/HelloAsso.php:368
+msgid "Le %1 doit contenir au moins une voyelle (règle HelloAsso)."
+msgstr "Le %1 doit contenir au moins une voyelle (règle HelloAsso)."
+
+#: CRM/Core/Payment/HelloAsso.php:362
+msgid "Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso)."
+msgstr "Le %1 ne doit pas contenir 3 caractères répétitifs (règle HelloAsso)."
+
+#: CRM/Core/Payment/HelloAsso.php:365
+msgid "Le %1 ne doit pas contenir de chiffres (règle HelloAsso)."
+msgstr "Le %1 ne doit pas contenir de chiffres (règle HelloAsso)."
+
+#. Corrected from old msgid: Le bouton officiel ci-dessus ouvre la connexion HelloAsso. Si vous avez besoin d ajuster les identifiants client ou de vérifier l état de liaison, utilisez d abord le lien d ouverture des réglages.
+#: helloasso_payment_processor.php:511
+msgid "Le bouton officiel ci-dessus ouvre la connexion HelloAsso. Si vous avez besoin d'ajuster les identifiants client ou de vérifier l'état de liaison, utilisez d'abord le lien d'ouverture des réglages."
+msgstr ""
+
+#: helloasso_payment_processor.php:439
+msgid "Le choix opérationnel entre clé API et mire reste sur la fiche du processeur. Cette page sert à activer le parcours mire, expliquer son fonctionnement et lancer la connexion."
+msgstr ""
+
+msgid "Le dernier renouvellement de la liaison HelloAsso a échoué. Vérifiez le prochain job de maintenance ou reconnectez l'organisation si le problème persiste."
+msgstr "Le dernier renouvellement de la liaison HelloAsso a échoué. Vérifiez le prochain job de maintenance ou reconnectez l'organisation si le problème persiste."
+
+#: helloasso_payment_processor.php:1099 CRM/Core/Payment/HelloAsso.php:381
+msgid "Le nom et le prénom ne doivent pas être identiques (règle HelloAsso)."
+msgstr "Le nom et le prénom ne doivent pas être identiques (règle HelloAsso)."
+
+#. Corrected from old msgid: Le switch ci-dessous active ou masque l interface mire sur les processeurs HelloAsso. Les identifiants client partagés et le lancement de la connexion restent gérés depuis les écrans mire dédiés.
+#: helloasso_payment_processor.php:495
+msgid "Le switch ci-dessous active ou masque l'interface mire sur les processeurs HelloAsso. Les identifiants client partagés et le lancement de la connexion restent gérés depuis les écrans mire dédiés."
+msgstr ""
+
+#. Corrected from old msgid: Liaison d autorisation valable jusqu au : %1
+#: helloasso_payment_processor.php:160 helloasso_payment_processor.php:207
+#: helloasso_payment_processor.php:453
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:161
+msgid "Liaison d'autorisation valable jusqu'au : %1"
+msgstr "Liaison d'autorisation valable jusqu'au : %1"
+
+#: api/v3/Job/ProcessHelloasso.php:108
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:101
+msgid "Limit"
+msgstr "Limite"
+
+#: helloasso_payment_processor.php:154 helloasso_payment_processor.php:201
+#: helloasso_payment_processor.php:447
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:155
+msgid "Liée le : %1"
+msgstr "Liée le : %1"
+
+#: api/v3/Job/ProcessHelloasso.php:109
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:102
+msgid "Maximum number of contributions to process per payment processor."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:104
+msgid "Mire HelloAsso"
+msgstr "Mire HelloAsso"
+
+#. Corrected from old msgid: Mire HelloAsso : URL d autorisation
+#: settings/helloasso_payment_processor.setting.php:188
+msgid "Mire HelloAsso : URL d'autorisation"
+msgstr "Mire HelloAsso : URL d'autorisation"
+
+#: settings/helloasso_payment_processor.setting.php:199
+msgid "Mire HelloAsso : URL du token"
+msgstr "Mire HelloAsso : URL du token"
+
+#: settings/helloasso_payment_processor.setting.php:150
+msgid "Mire HelloAsso : activer la connexion partagée"
+msgstr "Mire HelloAsso : activer la connexion partagée"
+
+#. Corrected from old msgid: Mire HelloAsso : client ID partage
+#: settings/helloasso_payment_processor.setting.php:166
+msgid "Mire HelloAsso : client ID partagé"
+msgstr "Mire HelloAsso : client ID partagé"
+
+msgid "Mire HelloAsso : client ID production"
+msgstr ""
+
+msgid "Mire HelloAsso : client ID sandbox"
+msgstr ""
+
+#. Corrected from old msgid: Mire HelloAsso : client secret partage
+#: settings/helloasso_payment_processor.setting.php:177
+msgid "Mire HelloAsso : client secret partagé"
+msgstr "Mire HelloAsso : client secret partagé"
+
+msgid "Mire HelloAsso : client secret production"
+msgstr ""
+
+msgid "Mire HelloAsso : client secret sandbox"
+msgstr ""
+
+#: helloasso_payment_processor.php:126 helloasso_payment_processor.php:505
+msgid "Mire HelloAsso production"
+msgstr "Mire HelloAsso production"
+
+#: helloasso_payment_processor.php:123 helloasso_payment_processor.php:498
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:104
+msgid "Mire HelloAsso sandbox"
+msgstr "Mire HelloAsso sandbox"
+
+msgid "Missing authorization columns: %1"
+msgstr ""
+
+#: helloasso_payment_processor.php:630
+msgid "Missing indexes: %1"
+msgstr "Index manquants : %1"
+
+msgid "Missing metadata columns: %1"
+msgstr ""
+
+#: helloasso_payment_processor.php:816
+msgid "Missing site URL"
+msgstr "URL du site manquante"
+
+#: helloasso_payment_processor.php:140
+msgid "Mode de connexion live"
+msgstr "Mode de connexion live"
+
+#: helloasso_payment_processor.php:188
+msgid "Mode de connexion sandbox"
+msgstr "Mode de connexion sandbox"
+
+#: CRM/HelloassoPaymentProcessor/Service.php:55
+#: CRM/HelloassoPaymentProcessor/Service.php:166
+msgid "No active HelloAsso payment processor found for mode %1."
+msgstr "Aucun processeur de paiement HelloAsso actif trouvé pour le mode %1."
+
+#: settings/helloasso_payment_processor.setting.php:103
+msgid "Nombre maximum de contributions HelloAsso traitées par processeur pendant une exécution normale du cron."
+msgstr ""
+
+#: CRM/Core/Payment/HelloAsso.php:702
+msgid "OK"
+msgstr "OK"
+
+#. Corrected from old msgid: Objet HelloAsso introuvable (404). Les reverifications courte et longue ont ete desactivees pour eviter des appels repetes.
+#: CRM/Core/Payment/HelloAsso.php:849 CRM/Core/Payment/HelloAsso.php:1059
+msgid "Objet HelloAsso introuvable (404). Les révérifications courte et longue ont été désactivées pour éviter des appels répétés."
+msgstr ""
+
+msgid "One or more HelloAsso authorization links have expired and must be reconnected: %1"
+msgstr ""
+
+msgid "One or more HelloAsso authorization links will expire soon: %1"
+msgstr ""
+
+msgid "One or more HelloAsso links expect automatic webhook registration, but no webhook is stored yet: %1. Reconnect the authorization screen to push the webhook, or disable automatic webhook registration on that processor if another CiviCRM instance must keep manual control of the HelloAsso webhook URL."
+msgstr ""
+
+msgid "One or more HelloAsso payment processors have no payment method configured: %1. Configure a payment method on the processor; new processors use Credit Card by default."
+msgstr ""
+
+#: helloasso_payment_processor.php:760
+msgid "One or more HelloAsso payment processors still rely on API keys that could not authenticate: %1"
+msgstr ""
+
+msgid "One or more HelloAsso payment processors use Check as their payment method: %1. Review the processor configuration and select Credit Card or your existing HelloAsso online payment method."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:88
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:87
+msgid "Only process contributions received on or after this date/time."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:93
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:91
+msgid "Only process contributions received on or before this date/time."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:98
+msgid "Only process follow-ups due on or before this date/time. Leave empty to disable this filter."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:97
+msgid "Only process long follow-ups due on or before this date/time. Leave empty to use now."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:102
+msgid "Only scheduled follow-ups"
+msgstr "Uniquement les suivis planifiés"
+
+#: helloasso_payment_processor.php:445
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:153
+msgid "Organisation liée : %1"
+msgstr "Organisation liée : %1"
+
+#: helloasso_payment_processor.php:152
+msgid "Organisation production liée : %1"
+msgstr "Organisation production liée : %1"
+
+#: helloasso_payment_processor.php:199
+msgid "Organisation sandbox liée : %1"
+msgstr "Organisation sandbox liée : %1"
+
+#: CRM/Core/Payment/HelloAsso.mgd.php:22
+msgid "Organization Name"
+msgstr "Nom de l'organisation"
+
+#. Corrected from old msgid: Ouvrez d abord les réglages de cette mire pour saisir le client ID et le client secret partagés, puis revenez lancer la connexion.
+#: helloasso_payment_processor.php:473
+msgid "Ouvrez d'abord les réglages de cette mire pour saisir le client ID et le client secret partagés, puis revenez lancer la connexion."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:121
+msgid "Ouvrir les paramètres HelloAsso"
+msgstr "Ouvrir les paramètres HelloAsso"
+
+#: helloasso_payment_processor.php:468
+msgid "Ouvrir les réglages de cette mire"
+msgstr "Ouvrir les réglages de cette mire"
+
+#: helloasso_payment_processor.php:226 helloasso_payment_processor.php:231
+msgid "Ouvrir les réglages de la mire"
+msgstr "Ouvrir les réglages de la mire"
+
+#: helloasso_payment_processor.php:182
+msgid "Ouvrir les réglages de la mire production"
+msgstr "Ouvrir les réglages de la mire production"
+
+#: managed/NavigationHelloAsso.mgd.php:14
+msgid "Parametres HelloAsso"
+msgstr "Paramètres HelloAsso"
+
+#: helloasso_payment_processor.php:493
+msgid "Parcours mire HelloAsso"
+msgstr "Parcours mire HelloAsso"
+
+#: CRM/Core/Payment/HelloAsso.php:671
+msgid "Payload webhook HelloAsso invalide dans la file."
+msgstr "Payload webhook HelloAsso invalide dans la file."
+
+#: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:366
+#: api/v3/Job/ProcessHelloasso.php:72
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:71
+msgid "Payment processor ID"
+msgstr "ID du processeur de paiement"
+
+#: settings/helloasso_payment_processor.setting.php:55
+msgid "Place les webhooks HelloAsso dans la file PaymentprocessorWebhook au lieu de les traiter immédiatement."
+msgstr ""
+
+msgid "Pont d'intégration standard (mjwshared)"
+msgstr "Pont d'intégration standard (mjwshared)"
+
+#: helloasso_payment_processor.php:496
+msgid "Pour une première configuration : activez la mire ici, enregistrez la page, puis ouvrez le rail sandbox ou production pour saisir le client ID et le client secret avant de lancer la connexion."
+msgstr ""
+
+msgid "Process first step"
+msgstr ""
+
+#: managed/ProcessHelloAsso.mgd.php:15
+msgid "Process scheduled HelloAsso payment follow-ups and targeted synchronisations."
+msgstr ""
+
+#: managed/ProcessHelloAsso.mgd.php:35
+msgid "Process scheduled long-window HelloAsso consistency checks."
+msgstr ""
+
+msgid "Process second step"
+msgstr ""
+
+#: helloasso_payment_processor.php:440
+msgid "Processeur ciblé :"
+msgstr "Processeur ciblé :"
+
+#. Corrected from old msgid: Publie une Checkout Option HelloAsso pour Afform / Form Builder en s appuyant sur le mécanisme de checkout du core CiviCRM.
+#: settings/helloasso_payment_processor.setting.php:87
+msgid "Publie une Checkout Option HelloAsso pour Afform / Form Builder en s'appuyant sur le mécanisme de checkout du core CiviCRM."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:87
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:86
+msgid "Receive date from"
+msgstr "Date de réception à partir de"
+
+#: api/v3/Job/ProcessHelloasso.php:92
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:91
+msgid "Receive date to"
+msgstr "Date de réception jusqu'à"
+
+msgid "Refresh linked HelloAsso authorizations once their current refresh tokens reach mid-life."
+msgstr ""
+
+#: settings/helloasso_payment_processor.setting.php:119
+msgid "Refuse les webhooks HelloAsso dont la signature legacy invoiceID/sig est absente ou invalide."
+msgstr ""
+
+#: settings/helloasso_payment_processor.setting.php:135
+msgid "Refuse les webhooks partenaire HelloAsso dont le header x-ha-signature est absent ou invalide quand une clé de signature webhook est enregistrée pour ce processeur."
+msgstr ""
+
+#. Corrected from old msgid: Renseignez d abord le client ID et le client secret partagés sur la page de réglages de la mire, puis revenez lancer la connexion.
+#: helloasso_payment_processor.php:180
+msgid "Renseignez d'abord le client ID et le client secret partagés sur la page de réglages de la mire, puis revenez lancer la connexion."
+msgstr ""
+
+msgid "Restrict maintenance to one linked HelloAsso payment processor."
+msgstr ""
+
+#: api/v3/Job/ProcessHelloasso.php:73
+#: api/v3/Job/ProcessHelloassoLongFollowup.php:72
+msgid "Restrict processing to one HelloAsso payment processor."
+msgstr "Restreindre le traitement à un seul processeur de paiement HelloAsso."
+
+#: helloasso_payment_processor.php:253
+msgid "Sandbox client ID for HelloAsso test payments."
+msgstr "Client ID Sandbox pour les paiements de test HelloAsso."
+
+#: helloasso_payment_processor.php:254
+msgid "Sandbox client secret for HelloAsso test payments."
+msgstr "Client Secret Sandbox pour les paiements de test HelloAsso."
+
+#: helloasso_payment_processor.php:255
+msgid "Sandbox organization slug or name used for test API calls."
+msgstr ""
+
+msgid "Taille maximale des lots de traitement (Cron)"
+msgstr ""
+
+#: helloasso_payment_processor.php:770
+msgid "The HelloAsso API key health check could not be completed: %1"
+msgstr ""
+
+msgid "The HelloAsso authorization check could not be completed: %1"
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:199
+msgid "The HelloAsso partner settings form token is invalid. Please reload the page and try again."
+msgstr ""
+
+#: helloasso_payment_processor.php:648
+msgid "The HelloAsso schema check could not be completed: %1"
+msgstr "La vérification du schéma HelloAsso n'a pas pu aboutir : %1"
+
+#: helloasso_payment_processor.php:636
+msgid "The HelloAsso v2 schema upgrade is incomplete. %1 Run <code>cv updb</code> and then <code>cv flush</code> before relying on webhook queueing, follow-up sync, or legacy repair."
+msgstr ""
+
+#. Converted from French to English in source code
+msgid "The HelloAsso webhook registered for %1 points to a different domain. Inbound payments will not be processed on this CiviCRM instance: %2."
+msgstr "Le webhook enregistré pour %1 pointe vers un domaine différent de cette instance. Les notifications de paiement HelloAsso ne seront pas reçues ni traitées sur ce CiviCRM : %2."
+
+msgid "The last HelloAsso authorization renewal failed for: %1. The maintenance job will retry; reconnect if the failure continues."
+msgstr ""
+
+#. Corrected from old msgid: URL d autorisation
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:131
+msgid "URL d'autorisation"
+msgstr "URL d'autorisation"
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:138
+msgid "URL de callback à déclarer chez HelloAsso :"
+msgstr "URL de callback à déclarer chez HelloAsso :"
+
+#. Corrected from old msgid: URL de l ecran d autorisation HelloAsso. En production, la valeur par defaut est https://auth.helloasso.com/authorize.
+#: settings/helloasso_payment_processor.setting.php:189
+msgid "URL de l'écran d'autorisation HelloAsso. En production, la valeur par défaut est https://auth.helloasso.com/authorize."
+msgstr ""
+
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:133
+msgid "URL du token"
+msgstr "URL du token"
+
+#: helloasso_payment_processor.php:165 helloasso_payment_processor.php:212
+#: helloasso_payment_processor.php:462
+#: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:142
+msgid "URL webhook enregistrée : %1"
+msgstr "URL webhook enregistrée : %1"
+
+#: helloasso_payment_processor.php:808
+msgid "Unknown authentication failure"
+msgstr "Échec d'authentification inconnu"
+
+#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:79
+msgid "Unsupported HelloAsso connection mode."
+msgstr "Mode de connexion HelloAsso non supporté."
+
+#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:197
+msgid "Unsupported HelloAsso webhook ownership mode."
+msgstr "Mode de propriété de webhook HelloAsso non supporté."
+
+msgid "Upgrade Batch (%1 => %2)"
+msgstr ""
+
+#. Corrected from old msgid: Vous avez ouvert directement le processeur de test HelloAsso. CiviCRM enregistre les valeurs live et test ensemble sur cet écran. Pour éviter d écraser la production, vous allez être redirigé vers la fiche principale du processeur live associé.
+#: helloasso_payment_processor.php:892
+msgid "Vous avez ouvert directement le processeur de test HelloAsso. CiviCRM enregistre les valeurs live et test ensemble sur cet écran. Pour éviter d'écraser la production, vous allez être redirigé vers la fiche principale du processeur live associé."
+msgstr ""
+
+#: Civi/HelloassoPaymentProcessor/CheckoutOption/HelloAssoHostedCheckout.php:45
+msgid "Vous serez redirigé vers HelloAsso pour effectuer le paiement."
+msgstr "Vous serez redirigé vers HelloAsso pour effectuer le paiement."
+
+msgid "Vérification stricte de la signature historique"
+msgstr "Vérification stricte de la signature historique"
+
+msgid "Vérification stricte de la signature partenaire"
+msgstr "Vérification stricte de la signature partenaire"
+
+#. Corrected from old msgid: Webhook duplique ignore.
+#: CRM/Core/Payment/HelloAsso.php:663
+msgid "Webhook dupliqué ignoré."
+msgstr "Webhook dupliqué ignoré."
+
+#: api/v3/Job/ProcessHelloasso.php:103
+msgid "When enabled, only contributions with a scheduled HelloAsso follow-up are processed."
+msgstr ""
+
+#: helloasso_payment_processor.php:373
+msgid "géré par cette instance CiviCRM"
+msgstr "géré par cette instance CiviCRM"
+
+#. Converted from French to English in source code
+msgid "instead of"
+msgstr "au lieu de"
+
+#: helloasso_payment_processor.php:372
+msgid "manuel / autre instance maîtresse"
+msgstr "manuel / autre instance maîtresse"
+
+msgid "production"
+msgstr ""
+
+msgid "refresh refused"
+msgstr ""
+
+msgid "sandbox"
+msgstr ""
+
+#. Corrected from old msgid: Évite de renvoyer les utilisateurs vers des URL CiviCRM ou AJAX fragiles lorsqu un paiement est annulé ou échoue.
+#: settings/helloasso_payment_processor.setting.php:39
+msgid "Évite de renvoyer les utilisateurs vers des URL CiviCRM ou AJAX fragiles lorsqu'un paiement est annulé ou échoue."
+msgstr ""
+
