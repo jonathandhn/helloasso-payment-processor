@@ -2,6 +2,27 @@
 
 class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framework\TestCase
 {
+    public function testBuildCheckoutAmountFieldsUsesQuickFormInstallmentSelection(): void
+    {
+        $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
+            ->newInstanceWithoutConstructor();
+        $method = new ReflectionMethod($processor, 'resolveCheckoutInstallmentCount');
+        $method->setAccessible(TRUE);
+
+        $propertyBag = \Civi\Payment\PropertyBag::cast([
+            'amount' => 50.00,
+            'is_recur' => TRUE,
+            'frequency_unit' => 'month',
+            'frequency_interval' => 1,
+        ]);
+
+        $count = $method->invoke($processor, $propertyBag, [
+            'helloasso_installments' => 2,
+        ]);
+
+        $this->assertSame(2, $count);
+    }
+
     public function testScheduledSynchronizationForwardsNormalizedFilters(): void
     {
         $processorArray = ['id' => 14];

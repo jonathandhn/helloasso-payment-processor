@@ -607,10 +607,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         try {
+            $recurInstallments = $this->resolveCheckoutInstallmentCount($propertyBag, $options);
+
             if (!empty($options['schedule_total_amount'])) {
                 return CRM_HelloassoPaymentProcessor_InstallmentSchedule::buildMonthly(
                     (int) round(((float) $options['schedule_total_amount']) * 100),
-                    $propertyBag->has('recurInstallments') ? (int) $propertyBag->getRecurInstallments() : 0,
+                    $recurInstallments,
                     new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())),
                     min((int) date('j'), 27)
                 );
@@ -619,7 +621,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             if (!empty($options['helloasso_installments'])) {
                 return CRM_HelloassoPaymentProcessor_InstallmentSchedule::buildMonthly(
                     $installmentAmount,
-                    $propertyBag->has('recurInstallments') ? (int) $propertyBag->getRecurInstallments() : 0,
+                    $recurInstallments,
                     new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())),
                     min((int) date('j'), 27)
                 );
@@ -627,7 +629,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
             return CRM_HelloassoPaymentProcessor_InstallmentPlan::buildMonthly(
                 $installmentAmount,
-                $propertyBag->has('recurInstallments') ? (int) $propertyBag->getRecurInstallments() : 0,
+                $recurInstallments,
                 $propertyBag->has('recurFrequencyInterval') ? (int) $propertyBag->getRecurFrequencyInterval() : 0,
                 $propertyBag->has('recurFrequencyUnit') ? (string) $propertyBag->getRecurFrequencyUnit() : '',
                 new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get()))
@@ -638,6 +640,21 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 1 => $e->getMessage(),
             ]));
         }
+    }
+
+    private function resolveCheckoutInstallmentCount(\Civi\Payment\PropertyBag $propertyBag, array $options): int
+    {
+        $helloAssoInstallments = filter_var(
+            $options['helloasso_installments'] ?? NULL,
+            FILTER_VALIDATE_INT
+        );
+        if ($helloAssoInstallments !== FALSE && $helloAssoInstallments > 0) {
+            return $helloAssoInstallments;
+        }
+
+        return $propertyBag->has('recurInstallments')
+            ? (int) $propertyBag->getRecurInstallments()
+            : 0;
     }
 
     private function synchronizePreparedInstallmentAmounts(
