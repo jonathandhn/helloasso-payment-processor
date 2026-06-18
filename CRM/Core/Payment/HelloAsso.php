@@ -284,7 +284,14 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
     public function supportsRefund(): bool
     {
-        return (bool) Civi::settings()->get('helloasso_enable_refunds');
+        if (!(bool) Civi::settings()->get('helloasso_enable_refunds')) {
+            return FALSE;
+        }
+
+        $paymentProcessorId = $this->getPaymentProcessorId();
+        return $paymentProcessorId
+            && (new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig())
+                ->shouldUsePluginPublic($paymentProcessorId, $this->getPaymentProcessorConfig());
     }
 
     public function doRefund(&$params): array
@@ -310,11 +317,18 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             throw new PaymentProcessorException(E::ts('HelloAsso accepted the refund request but did not return a refund operation ID.'));
         }
 
-        CRM_Core_Session::setStatus(
-            E::ts('HelloAsso has accepted the refund request. The local CiviCRM refund has been recorded immediately; the final HelloAsso refund state will be confirmed later by webhook or scheduled synchronization.'),
-            E::ts('HelloAsso refund requested'),
-            'success'
-        );
+        Civi::log()->info(sprintf(
+            'HelloAsso refund requested: payment_id=%d refund_operation_id=%s processor_id=%s mode=%s amount=%s',
+            $helloAssoPaymentId,
+            (string) $refundOperation['id'],
+            (string) $this->getPaymentProcessorId(),
+            $this->_is_test ? 'test' : 'live',
+            (string) $refundAmount
+        ));
+        CRM_Core_Session::singleton()->set('last_refund', [
+            'payment_id' => $helloAssoPaymentId,
+            'refund_operation_id' => (string) $refundOperation['id'],
+        ], 'helloasso_payment_processor');
 
         return [
             'refund_trxn_id' => (string) $refundOperation['id'],
@@ -1036,10 +1050,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         ];
 
         if ($filters['only_scheduled'] && empty($filters['due_before'])) {
-            $filters['due_before'] = date('Y-m-d H:i:s');
+            $filters['due_before'] = $this->formatMetadataTimestamp($this->nowForMetadata());
         }
         elseif (!empty($filters['due_before']) && strtolower((string) $filters['due_before']) === 'now') {
-            $filters['due_before'] = date('Y-m-d H:i:s');
+            $filters['due_before'] = $this->formatMetadataTimestamp($this->nowForMetadata());
         }
 
         $limit = !empty($options['limit']) ? (int) $options['limit'] : $this->getFollowUpCronLimit();
@@ -1102,7 +1116,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             $params[$paramIndex++] = [$this->normalizeNullableTimestamp($filters['receive_date_to']), 'Timestamp'];
         }
 
-        $dueBefore = $filters['due_before'] ?? date('Y-m-d H:i:s');
+        $dueBefore = $filters['due_before'] ?? $this->formatMetadataTimestamp($this->nowForMetadata());
         $where[] = "m.long_sync_next_date <= %{$paramIndex}";
         $params[$paramIndex++] = [$this->normalizeNullableTimestamp($dueBefore), 'Timestamp'];
 
@@ -1196,7 +1210,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         ];
 
         if (empty($filters['due_before']) || strtolower((string) $filters['due_before']) === 'now') {
-            $filters['due_before'] = date('Y-m-d H:i:s');
+            $filters['due_before'] = $this->formatMetadataTimestamp($this->nowForMetadata());
         }
 
         $limit = !empty($options['limit']) ? (int) $options['limit'] : $this->getFollowUpCronLimit();
@@ -1397,7 +1411,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     {
         $signature = $this->getPartnerWebhookSignatureHeader();
         $signatureKey = $this->getPartnerWebhookSignatureKey();
-        $strictSignature = $this->isPartnerWebhookSignatureRequired();
+        $strictSignature = $this->isPartnerWebhookSignatureRequired()
+            && $this->isPartnerWebhookSignatureEnforcedForProcessor();
 
         if ($signature === NULL || $signature === '') {
             if ($strictSignature && $signatureKey) {
@@ -1653,12 +1668,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         $metadata = $metadata ?: $this->loadMetadataForContribution($contributionId);
-        $origin = new DateTimeImmutable('now');
+        $origin = $this->nowForMetadata();
         $minutes = $this->getShortFollowUpMinutes();
 
         $metadata->contribution_id = $contributionId;
-        $metadata->sync_origin_date = $origin->format('Y-m-d H:i:s');
-        $metadata->sync_next_date = $origin->modify('+' . $minutes[0] . ' minutes')->format('Y-m-d H:i:s');
+        $metadata->sync_origin_date = $this->formatMetadataTimestamp($origin);
+        $metadata->sync_next_date = $this->formatMetadataTimestamp($origin->modify('+' . $minutes[0] . ' minutes'));
         $metadata->sync_last_date = 'null';
         $metadata->sync_attempt_count = 0;
         if ($this->hasHelloAssoMetadataColumn('sync_error_count')) {
@@ -1680,8 +1695,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         $metadata->contribution_id = $contributionId;
         $metadata->long_sync_scheme = $scheme;
-        $metadata->long_sync_origin_date = $origin->format('Y-m-d H:i:s');
-        $metadata->long_sync_next_date = $origin->modify('+' . $scheduleDays[0] . ' days')->format('Y-m-d H:i:s');
+        $metadata->long_sync_origin_date = $this->formatMetadataTimestamp($origin);
+        $metadata->long_sync_next_date = $this->formatMetadataTimestamp($origin->modify('+' . $scheduleDays[0] . ' days'));
         $metadata->long_sync_last_date = 'null';
         $metadata->long_sync_attempt_count = 0;
         if ($this->hasHelloAssoMetadataColumn('long_sync_error_count')) {
@@ -1715,9 +1730,9 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         if ((string) $metadata->long_sync_scheme !== $scheme) {
             $metadata->long_sync_scheme = $scheme;
             if (empty($metadata->long_sync_last_date) && ((int) ($metadata->long_sync_attempt_count ?? 0) === 0)) {
-                $origin = new DateTimeImmutable((string) $metadata->long_sync_origin_date);
+                $origin = $this->metadataDateTime((string) $metadata->long_sync_origin_date);
                 $scheduleDays = $this->getLongFollowUpDays($scheme);
-                $metadata->long_sync_next_date = $origin->modify('+' . $scheduleDays[0] . ' days')->format('Y-m-d H:i:s');
+                $metadata->long_sync_next_date = $this->formatMetadataTimestamp($origin->modify('+' . $scheduleDays[0] . ' days'));
             }
             $metadata->save();
         }
@@ -1735,7 +1750,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return;
         }
 
-        $metadata->sync_last_date = date('Y-m-d H:i:s');
+        $metadata->sync_last_date = $this->formatMetadataTimestamp($this->nowForMetadata());
         $metadata->sync_attempt_count = (int) ($metadata->sync_attempt_count ?? 0) + 1;
         if ($this->hasHelloAssoMetadataColumn('sync_error_count')) {
             $metadata->sync_error_count = 0;
@@ -1755,8 +1770,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return;
         }
 
-        $origin = !empty($metadata->sync_origin_date) ? new DateTimeImmutable($metadata->sync_origin_date) : new DateTimeImmutable('now');
-        $metadata->sync_next_date = $origin->modify('+' . $minutes[$attemptIndex] . ' minutes')->format('Y-m-d H:i:s');
+        $origin = !empty($metadata->sync_origin_date) ? $this->metadataDateTime($metadata->sync_origin_date) : $this->nowForMetadata();
+        $metadata->sync_next_date = $this->formatMetadataTimestamp($origin->modify('+' . $minutes[$attemptIndex] . ' minutes'));
         $this->logFollowUpMetadataSnapshot('short', $contributionId, $metadata);
         $metadata->save();
     }
@@ -1773,7 +1788,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return;
         }
 
-        $metadata->long_sync_last_date = date('Y-m-d H:i:s');
+        $metadata->long_sync_last_date = $this->formatMetadataTimestamp($this->nowForMetadata());
         $metadata->long_sync_attempt_count = (int) ($metadata->long_sync_attempt_count ?? 0) + 1;
         if ($this->hasHelloAssoMetadataColumn('long_sync_error_count')) {
             $metadata->long_sync_error_count = 0;
@@ -1787,12 +1802,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         $scheme = $this->detectLongFollowUpScheme(NULL, $metadata, $scheme ?: (string) ($metadata->long_sync_scheme ?? 'card'));
         $metadata->long_sync_scheme = $scheme;
-        $origin = !empty($metadata->long_sync_origin_date) ? new DateTimeImmutable((string) $metadata->long_sync_origin_date) : new DateTimeImmutable('now');
+        $origin = !empty($metadata->long_sync_origin_date) ? $this->metadataDateTime((string) $metadata->long_sync_origin_date) : $this->nowForMetadata();
         $nextDate = $this->computeNextLongFollowUpDate(
             $origin,
             $scheme,
             (int) $metadata->long_sync_attempt_count,
-            new DateTimeImmutable('now')
+            $this->nowForMetadata()
         );
         if (!$nextDate) {
             $metadata->save();
@@ -1800,7 +1815,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return;
         }
 
-        $metadata->long_sync_next_date = $nextDate->format('Y-m-d H:i:s');
+        $metadata->long_sync_next_date = $this->formatMetadataTimestamp($nextDate);
         $this->logFollowUpMetadataSnapshot('long', $contributionId, $metadata);
         $metadata->save();
     }
@@ -1921,12 +1936,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $stopLong = $isLong;
 
         if (!$this->hasHelloAssoMetadataColumn($errorColumn)) {
-            $retryDate = (new DateTimeImmutable('+15 minutes'))->format('YmdHis');
+            $retryDate = $this->formatMetadataTimestamp($this->nowForMetadata()->modify('+15 minutes'), 'YmdHis');
             CRM_Core_DAO::executeQuery(
                 "UPDATE civicrm_hello_asso_metadata SET {$dateColumn} = %1, {$lastDateColumn} = %2 WHERE contribution_id = %3",
                 [
                     1 => [$retryDate, 'Timestamp'],
-                    2 => [date('YmdHis'), 'Timestamp'],
+                    2 => [$this->formatMetadataTimestamp($this->nowForMetadata(), 'YmdHis'), 'Timestamp'],
                     3 => [$contributionId, 'Integer'],
                 ]
             );
@@ -1936,7 +1951,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         CRM_Core_DAO::executeQuery(
             "UPDATE civicrm_hello_asso_metadata SET {$errorColumn} = COALESCE({$errorColumn}, 0) + 1, {$lastDateColumn} = %1 WHERE contribution_id = %2",
             [
-                1 => [date('YmdHis'), 'Timestamp'],
+                1 => [$this->formatMetadataTimestamp($this->nowForMetadata(), 'YmdHis'), 'Timestamp'],
                 2 => [$contributionId, 'Integer'],
             ]
         );
@@ -1958,7 +1973,10 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         $backoffIndex = min($errorCount - 1, count(self::TECHNICAL_ERROR_BACKOFF_MINUTES) - 1);
-        $retryDate = (new DateTimeImmutable('+' . self::TECHNICAL_ERROR_BACKOFF_MINUTES[$backoffIndex] . ' minutes'))->format('YmdHis');
+        $retryDate = $this->formatMetadataTimestamp(
+            $this->nowForMetadata()->modify('+' . self::TECHNICAL_ERROR_BACKOFF_MINUTES[$backoffIndex] . ' minutes'),
+            'YmdHis'
+        );
         CRM_Core_DAO::executeQuery(
             "UPDATE civicrm_hello_asso_metadata SET {$dateColumn} = %1 WHERE contribution_id = %2",
             [
@@ -1985,7 +2003,24 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             }
         }
 
-        return new DateTimeImmutable('now');
+        return $this->nowForMetadata();
+    }
+
+    private function nowForMetadata(): DateTimeImmutable
+    {
+        return new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    }
+
+    private function metadataDateTime(string $value): DateTimeImmutable
+    {
+        return new DateTimeImmutable($value, new DateTimeZone('UTC'));
+    }
+
+    private function formatMetadataTimestamp(DateTimeInterface $dateTime, string $format = 'Y-m-d H:i:s'): string
+    {
+        return DateTimeImmutable::createFromInterface($dateTime)
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format($format);
     }
 
     private function getPaymentProcessorConfig(): array
@@ -2160,6 +2195,14 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     private function isPartnerWebhookSignatureRequired(): bool
     {
         return (bool) Civi::settings()->get('helloasso_v2_require_partner_webhook_signature');
+    }
+
+    private function isPartnerWebhookSignatureEnforcedForProcessor(): bool
+    {
+        $paymentProcessorId = $this->getPaymentProcessorId();
+        return $paymentProcessorId
+            && (new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig())
+                ->shouldUsePluginPublic($paymentProcessorId, $this->getPaymentProcessorConfig());
     }
 
     private function normalizeNullableTimestamp($value): ?string
