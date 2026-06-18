@@ -74,12 +74,12 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     }
 
     if ($partnerAuth->isTestProcessor()) {
-      Civi::settings()->set('helloasso_partner_client_id_test', trim((string) ($_POST['helloasso_partner_client_id'] ?? '')));
+      Civi::settings()->set('helloasso_partner_client_id_test', trim((string) ($_POST['helloasso_partner_form_client_id'] ?? '')));
     }
     else {
-      Civi::settings()->set('helloasso_partner_client_id_live', trim((string) ($_POST['helloasso_partner_client_id'] ?? '')));
+      Civi::settings()->set('helloasso_partner_client_id_live', trim((string) ($_POST['helloasso_partner_form_client_id'] ?? '')));
     }
-    $submittedSecret = trim((string) ($_POST['helloasso_partner_client_secret'] ?? ''));
+    $submittedSecret = trim((string) ($_POST['helloasso_partner_form_client_secret'] ?? ''));
     if ($submittedSecret !== '') {
       if ($partnerAuth->isTestProcessor()) {
         Civi::settings()->set('helloasso_partner_client_secret_test', $submittedSecret);
@@ -107,12 +107,10 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     $redirectUri = htmlspecialchars($partnerAuth->getRedirectUri(), ENT_QUOTES, 'UTF-8');
     $enabled = (bool) Civi::settings()->get('helloasso_partner_auth_enabled');
     $isTestProcessor = $partnerAuth->isTestProcessor();
-    if ($isTestProcessor) {
-      $storedClientId = trim((string) Civi::settings()->get('helloasso_partner_client_id_test'));
-    }
-    else {
-      $storedClientId = trim((string) Civi::settings()->get('helloasso_partner_client_id_live'));
-    }
+    $credentialResolver = new CRM_HelloassoPaymentProcessor_PartnerCredentials();
+    $localCredentials = $credentialResolver->getLocalCredentials($isTestProcessor);
+    $resolvedCredentials = $partnerAuth->getResolvedCredentials();
+    $storedClientId = (string) ($localCredentials['clientId'] ?? '');
     $clientId = htmlspecialchars($storedClientId, ENT_QUOTES, 'UTF-8');
     $authorizeUrl = htmlspecialchars($partnerAuth->getEffectiveAuthorizeUrl(), ENT_QUOTES, 'UTF-8');
     $tokenUrl = htmlspecialchars($partnerAuth->getEffectiveTokenUrl(), ENT_QUOTES, 'UTF-8');
@@ -156,16 +154,22 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     $html .= '<input type="hidden" name="helloasso_partner_form_token" value="' . $formToken . '">';
     $html .= '<input type="hidden" name="helloasso_partner_form_action" value="save">';
     $html .= '<table class="form-layout-compressed">';
-    $html .= '<tr><td><label for="helloasso_partner_client_id">' . $sharedClientIdLabel . '</label></td>';
-    $html .= '<td><input class="huge" type="text" id="helloasso_partner_client_id" name="helloasso_partner_client_id" value="' . $clientId . '"></td></tr>';
-    $html .= '<tr><td><label for="helloasso_partner_client_secret">' . $sharedClientSecretLabel . '</label></td>';
-    $html .= '<td><input class="huge" type="password" id="helloasso_partner_client_secret" name="helloasso_partner_client_secret" value="">';
+    $html .= '<tr><td><label for="helloasso_partner_form_client_id">' . $sharedClientIdLabel . '</label></td>';
+    $html .= '<td><input class="huge" type="text" id="helloasso_partner_form_client_id" name="helloasso_partner_form_client_id" value="' . $clientId . '"></td></tr>';
+    $html .= '<tr><td><label for="helloasso_partner_form_client_secret">' . $sharedClientSecretLabel . '</label></td>';
+    $html .= '<td><input class="huge" type="password" id="helloasso_partner_form_client_secret" name="helloasso_partner_form_client_secret" value="">';
     $html .= '<br><span class="description">' . E::ts('Leave blank to keep the current secret.') . '</span></td></tr>';
     $html .= '<tr><td><label for="helloasso_partner_authorize_url">' . E::ts("Authorization URL") . '</label></td>';
     $html .= '<td><input class="huge" type="text" id="helloasso_partner_authorize_url" name="helloasso_partner_authorize_url" value="' . $authorizeUrl . '"></td></tr>';
     $html .= '<tr><td><label for="helloasso_partner_token_url">' . E::ts('Token URL') . '</label></td>';
     $html .= '<td><input class="huge" type="text" id="helloasso_partner_token_url" name="helloasso_partner_token_url" value="' . $tokenUrl . '"></td></tr>';
     $html .= '</table>';
+    if (!empty($resolvedCredentials['is_community'])) {
+      $html .= '<p class="description">' . E::ts('Community HelloAsso authorization-screen credentials are currently used for this rail. Enter a local client ID and client secret here only if you want to override the community credentials.') . '</p>';
+    }
+    elseif (($resolvedCredentials['source'] ?? '') === 'local') {
+      $html .= '<p class="description">' . E::ts('Local HelloAsso authorization-screen credentials are currently used for this rail.') . '</p>';
+    }
     $html .= '<p><button class="button crm-form-submit default" type="submit">' . E::ts('Save authorization-screen settings') . '</button></p>';
     $html .= '</form>';
     $html .= '<p><strong>' . E::ts('Callback URL to declare at HelloAsso:') . '</strong><br><code>' . $redirectUri . '</code></p>';

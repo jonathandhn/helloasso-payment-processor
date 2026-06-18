@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-06-03 10:55+0000\n"
+"PO-Revision-Date: 2026-06-03 13:23+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -27,8 +27,8 @@ msgid "Afform / Form Builder integration"
 msgstr "Intégration Afform / Form Builder"
 
 #. Maintained French translation
-msgid "Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. HelloAsso partial refunds remain unsupported by this integration."
-msgstr "Autorise les utilisateurs CiviCRM disposant des droits de remboursement à demander des remboursements complets HelloAsso depuis l'écran de remboursement. Les remboursements partiels HelloAsso restent non pris en charge par cette intégration."
+msgid "Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. Refunds require the HelloAsso authorization-screen mode. HelloAsso partial refunds remain unsupported by this integration."
+msgstr "Autorise les utilisateurs CiviCRM disposant des droits de remboursement à demander des remboursements complets HelloAsso depuis l'écran de remboursement. Les remboursements nécessitent le mode mire HelloAsso. Les remboursements partiels HelloAsso restent non pris en charge par cette intégration."
 
 #. Maintained French translation
 msgid "Authorization URL"
@@ -74,10 +74,6 @@ msgstr "Client ID dédié à la mire HelloAsso production."
 msgid "Client ID dedicated to the HelloAsso sandbox authorization screen."
 msgstr "Client ID dédié à la mire HelloAsso sandbox."
 
-#. Maintained French translation
-msgid "Client ID provided by HelloAsso for the shared authorization screen. Do not commit this value to a public repository."
-msgstr "Client ID fourni par HelloAsso pour la mire partagée. Ne pas versionner cette valeur dans un dépôt public."
-
 #: CRM/Core/Payment/HelloAsso.mgd.php:20
 msgid "Client Id"
 msgstr "Client ID"
@@ -102,10 +98,6 @@ msgstr "Client secret dédié à la mire HelloAsso production."
 msgid "Client secret dedicated to the HelloAsso sandbox authorization screen."
 msgstr "Client secret dédié à la mire HelloAsso sandbox."
 
-#. Maintained French translation
-msgid "Client secret provided by HelloAsso for the shared authorization screen. Keep this value locally on the CiviCRM instance."
-msgstr "Client secret fourni par HelloAsso pour la mire partagée. À conserver localement sur l'instance CiviCRM."
-
 #: api/v3/Job/ProcessHelloassoLongFollowup.php:82
 msgid "Comma-separated contribution status names to include, for example \"Completed,Pending\"."
 msgstr ""
@@ -113,6 +105,10 @@ msgstr ""
 #: api/v3/Job/ProcessHelloasso.php:83
 msgid "Comma-separated contribution status names to include, for example \"Pending,Failed\"."
 msgstr ""
+
+#. Maintained French translation
+msgid "Community HelloAsso authorization-screen credentials are currently used for this rail. Enter a local client ID and client secret here only if you want to override the community credentials."
+msgstr "Les identifiants communautaires de mire HelloAsso sont actuellement utilisés pour ce rail. Renseignez ici un client ID et un client secret locaux seulement si vous voulez remplacer les identifiants communautaires."
 
 #. Maintained French translation
 msgid "Connect production to HelloAsso"
@@ -281,14 +277,6 @@ msgid "HelloAsso authorization screen: sandbox client secret"
 msgstr "Mire HelloAsso : client secret sandbox"
 
 #. Maintained French translation
-msgid "HelloAsso authorization screen: shared client ID"
-msgstr "Mire HelloAsso : client ID partagé"
-
-#. Maintained French translation
-msgid "HelloAsso authorization screen: shared client secret"
-msgstr "Mire HelloAsso : client secret partagé"
-
-#. Maintained French translation
 msgid "HelloAsso authorization screen: token URL"
 msgstr "Mire HelloAsso : URL du token"
 
@@ -364,14 +352,6 @@ msgstr "Autorisation partenaire HelloAsso"
 msgid "HelloAsso partner authorization cannot be refreshed."
 msgstr "L'autorisation partenaire HelloAsso ne peut pas être rafraîchie."
 
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:265
-msgid "HelloAsso partner authorization could not be refreshed locally."
-msgstr ""
-
-#: CRM/HelloassoPaymentProcessor/PartnerAuth.php:112
-msgid "HelloAsso partner authorization could not be stored locally."
-msgstr "L'autorisation partenaire HelloAsso n'a pas pu être stockée localement."
-
 #: CRM/HelloassoPaymentProcessor/PartnerAuth.php:89
 msgid "HelloAsso partner authorization did not return an organization slug."
 msgstr ""
@@ -402,6 +382,10 @@ msgstr ""
 msgid "HelloAsso partner authorization requires SSL verification to be enabled."
 msgstr ""
 
+#. Maintained French translation
+msgid "HelloAsso partner authorization requires a payment processor."
+msgstr "L'autorisation partenaire HelloAsso nécessite un processeur de paiement."
+
 #: CRM/HelloassoPaymentProcessor/PartnerAuth.php:301
 msgid "HelloAsso partner authorization response is missing OAuth tokens."
 msgstr ""
@@ -417,10 +401,6 @@ msgstr ""
 #. Maintained French translation
 msgid "HelloAsso partner information could not be retrieved: %1"
 msgstr "Les informations partenaire HelloAsso n'ont pas pu être récupérées : %1"
-
-#: settings/helloasso_payment_processor.setting.php:210
-msgid "HelloAsso partner linked organization token"
-msgstr "Jeton d'organisation liée partenaire HelloAsso"
 
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:81
 msgid "HelloAsso partner settings have been saved on this page."
@@ -450,18 +430,12 @@ msgstr "Le paiement HelloAsso est temporairement indisponible : l'organisation l
 msgid "HelloAsso payment processor not found: %1"
 msgstr "Processeur de paiement HelloAsso introuvable : %1"
 
-#: settings/helloasso_payment_processor.setting.php:221
-msgid "HelloAsso per-processor authorization state"
-msgstr "État d'autorisation par processeur HelloAsso"
-
 #: CRM/HelloassoPaymentProcessor/HelloAssoClient.php:241
 msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
 msgstr ""
 
-#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:40
-#: CRM/HelloassoPaymentProcessor/ProcessorAuthConfig.php:58
-msgid "HelloAsso processor authorization state could not be encoded."
-msgstr "L'état d'autorisation du processeur HelloAsso n'a pas pu être encodé."
+msgid "HelloAsso processor authorization table is missing."
+msgstr ""
 
 #. Maintained French translation
 msgid "HelloAsso production authorization screen"
@@ -582,14 +556,6 @@ msgstr "HelloAsso: trop de cas (%1) pour la réparation GUI. Utiliser le mode te
 msgid "HelloAsso: unable to obtain the payment processor OAuth token."
 msgstr "HelloAsso : impossible de recuperer le jeton OAuth du processeur de paiement."
 
-#: settings/helloasso_payment_processor.setting.php:222
-msgid "Internal storage for sandbox authorization-screen state per HelloAsso payment processor. Do not edit manually."
-msgstr ""
-
-#: settings/helloasso_payment_processor.setting.php:211
-msgid "Internal storage for the linked organization OAuth token. Do not edit manually."
-msgstr ""
-
 #. Maintained French translation
 msgid "Invalid HelloAsso processor configuration for %1 (%2):"
 msgstr "Configuration du processeur HelloAsso %1 (%2) invalide :"
@@ -618,6 +584,10 @@ msgstr "Mode de connexion live"
 #. Maintained French translation
 msgid "Live payment processor ID"
 msgstr "ID du processeur live"
+
+#. Maintained French translation
+msgid "Local HelloAsso authorization-screen credentials are currently used for this rail."
+msgstr "Les identifiants locaux de mire HelloAsso sont actuellement utilisés pour ce rail."
 
 #. Maintained French translation
 msgid "Maximum number of HelloAsso contributions processed per payment processor during a normal cron execution."
@@ -657,6 +627,10 @@ msgstr "Aucune organisation HelloAsso production n'est encore liée à ce proces
 #. Maintained French translation
 msgid "No HelloAsso sandbox organization is linked to this processor yet."
 msgstr "Aucune organisation HelloAsso sandbox n'est encore liée à ce processeur."
+
+#. Maintained French translation
+msgid "No active HelloAsso authorization-screen processor is linked for mode %1."
+msgstr "Aucun processeur HelloAsso actif connecté par mire n'est lié pour le mode %1."
 
 #. Maintained French translation
 msgid "No active HelloAsso connection is available for this Checkout Option."

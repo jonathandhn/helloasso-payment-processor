@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"POT-Creation-Date: 2026-06-03 10:55+0000\n"
-"PO-Revision-Date: 2026-06-03 10:55+0000\n"
+"POT-Creation-Date: 2026-06-03 13:23+0000\n"
+"PO-Revision-Date: 2026-06-03 13:23+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Afform / Form Builder integration"
 msgstr ""
 
-msgid "Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. HelloAsso partial refunds remain unsupported by this integration."
+msgid "Allow CiviCRM users with refund permissions to request full HelloAsso refunds from the payment refund screen. Refunds require the HelloAsso authorization-screen mode. HelloAsso partial refunds remain unsupported by this integration."
 msgstr ""
 
 msgid "Authorization URL"
@@ -60,9 +60,6 @@ msgstr ""
 msgid "Client ID dedicated to the HelloAsso sandbox authorization screen."
 msgstr ""
 
-msgid "Client ID provided by HelloAsso for the shared authorization screen. Do not commit this value to a public repository."
-msgstr ""
-
 msgid "Client Id"
 msgstr ""
 
@@ -81,13 +78,13 @@ msgstr ""
 msgid "Client secret dedicated to the HelloAsso sandbox authorization screen."
 msgstr ""
 
-msgid "Client secret provided by HelloAsso for the shared authorization screen. Keep this value locally on the CiviCRM instance."
-msgstr ""
-
 msgid "Comma-separated contribution status names to include, for example \"Completed,Pending\"."
 msgstr ""
 
 msgid "Comma-separated contribution status names to include, for example \"Pending,Failed\"."
+msgstr ""
+
+msgid "Community HelloAsso authorization-screen credentials are currently used for this rail. Enter a local client ID and client secret here only if you want to override the community credentials."
 msgstr ""
 
 msgid "Connect production to HelloAsso"
@@ -207,12 +204,6 @@ msgstr ""
 msgid "HelloAsso authorization screen: sandbox client secret"
 msgstr ""
 
-msgid "HelloAsso authorization screen: shared client ID"
-msgstr ""
-
-msgid "HelloAsso authorization screen: shared client secret"
-msgstr ""
-
 msgid "HelloAsso authorization screen: token URL"
 msgstr ""
 
@@ -270,12 +261,6 @@ msgstr ""
 msgid "HelloAsso partner authorization cannot be refreshed."
 msgstr ""
 
-msgid "HelloAsso partner authorization could not be refreshed locally."
-msgstr ""
-
-msgid "HelloAsso partner authorization could not be stored locally."
-msgstr ""
-
 msgid "HelloAsso partner authorization did not return an organization slug."
 msgstr ""
 
@@ -300,6 +285,9 @@ msgstr ""
 msgid "HelloAsso partner authorization requires SSL verification to be enabled."
 msgstr ""
 
+msgid "HelloAsso partner authorization requires a payment processor."
+msgstr ""
+
 msgid "HelloAsso partner authorization response is missing OAuth tokens."
 msgstr ""
 
@@ -310,9 +298,6 @@ msgid "HelloAsso partner client ID and secret must be configured before connecti
 msgstr ""
 
 msgid "HelloAsso partner information could not be retrieved: %1"
-msgstr ""
-
-msgid "HelloAsso partner linked organization token"
 msgstr ""
 
 msgid "HelloAsso partner settings have been saved on this page."
@@ -336,13 +321,10 @@ msgstr ""
 msgid "HelloAsso payment processor not found: %1"
 msgstr ""
 
-msgid "HelloAsso per-processor authorization state"
-msgstr ""
-
 msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
 msgstr ""
 
-msgid "HelloAsso processor authorization state could not be encoded."
+msgid "HelloAsso processor authorization table is missing."
 msgstr ""
 
 msgid "HelloAsso production authorization screen"
@@ -441,12 +423,6 @@ msgstr ""
 msgid "HelloAsso: unable to obtain the payment processor OAuth token."
 msgstr ""
 
-msgid "Internal storage for sandbox authorization-screen state per HelloAsso payment processor. Do not edit manually."
-msgstr ""
-
-msgid "Internal storage for the linked organization OAuth token. Do not edit manually."
-msgstr ""
-
 msgid "Invalid HelloAsso processor configuration for %1 (%2):"
 msgstr ""
 
@@ -466,6 +442,9 @@ msgid "Live connection mode"
 msgstr ""
 
 msgid "Live payment processor ID"
+msgstr ""
+
+msgid "Local HelloAsso authorization-screen credentials are currently used for this rail."
 msgstr ""
 
 msgid "Maximum number of HelloAsso contributions processed per payment processor during a normal cron execution."
@@ -496,6 +475,9 @@ msgid "No HelloAsso production organization is linked to this processor yet."
 msgstr ""
 
 msgid "No HelloAsso sandbox organization is linked to this processor yet."
+msgstr ""
+
+msgid "No active HelloAsso authorization-screen processor is linked for mode %1."
 msgstr ""
 
 msgid "No active HelloAsso connection is available for this Checkout Option."

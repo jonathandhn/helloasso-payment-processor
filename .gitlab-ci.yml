@@ -1,0 +1,60 @@
+stages:
+  - build
+  - release
+
+build_release:
+  stage: build
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git zip bash
+  script:
+    # 1. Replace placeholders with secret values from GitLab CI/CD Variables
+    - |
+      sed -i "s|%%HELLOASSO_LIVE_CLIENT_ID%%|${HELLOASSO_LIVE_CLIENT_ID}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+      sed -i "s|%%HELLOASSO_LIVE_CLIENT_SECRET%%|${HELLOASSO_LIVE_CLIENT_SECRET}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+      sed -i "s|%%HELLOASSO_SANDBOX_CLIENT_ID%%|${HELLOASSO_SANDBOX_CLIENT_ID}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+      sed -i "s|%%HELLOASSO_SANDBOX_CLIENT_SECRET%%|${HELLOASSO_SANDBOX_CLIENT_SECRET}|g" CRM/HelloassoPaymentProcessor/PartnerCredentials.php
+
+    # 2. Extract version from tag
+    - VERSION=${CI_COMMIT_TAG}
+    - echo "Building version ${VERSION}"
+
+    # 3. Create extension directory structure for clean installation
+    - mkdir -p build/helloasso-payment-processor
+    - cp -R * build/helloasso-payment-processor/ || true
+    - rm -rf build/helloasso-payment-processor/build
+    - rm -rf build/helloasso-payment-processor/.git
+    - rm -rf build/helloasso-payment-processor/.github
+    - rm -rf build/helloasso-payment-processor/.gitlab-ci.yml
+    - rm -rf build/helloasso-payment-processor/.gitignore
+
+    # 4. Pack the extension zip file
+    - cd build
+    - zip -r ../helloasso-payment-processor-${VERSION}.zip helloasso-payment-processor
+    - cd ..
+  artifacts:
+    name: "helloasso-payment-processor-${CI_COMMIT_TAG}"
+    paths:
+      - helloasso-payment-processor-*.zip
+    expire_in: 4 weeks
+  rules:
+    - if: $CI_COMMIT_TAG
+
+create_release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: build_release
+      artifacts: true
+  script:
+    - echo "Creating release on GitLab for ${CI_COMMIT_TAG}"
+  release:
+    name: 'Release ${CI_COMMIT_TAG}'
+    description: 'Release automatique construite et packagée par le pipeline GitLab CI.'
+    tag_name: '${CI_COMMIT_TAG}'
+    assets:
+      links:
+        - name: 'helloasso-payment-processor-${CI_COMMIT_TAG}.zip'
+          url: '${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_TAG}/raw/helloasso-payment-processor-${CI_COMMIT_TAG}.zip?job=build_release'
+  rules:
+    - if: $CI_COMMIT_TAG
