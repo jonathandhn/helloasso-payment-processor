@@ -5,10 +5,6 @@
   <description>HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation.</description>
   <license>AGPL-3.0</license>
   <maintainer>
-    <author>Antoine BREHERET</author>
-    <email>breheret@makoa.fr</email>
-  </maintainer>
-  <maintainer>
     <author>Jonathan Dahan</author>
     <email>jonathan@dhn.one</email>
   </maintainer>

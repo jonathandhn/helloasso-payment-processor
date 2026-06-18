@@ -296,15 +296,25 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             $errorUrl = $safeAbortUrl;
         }
 
-        $response = $this->createCheckoutIntentAndStore(
-            $propertyBag,
-            [
-                'item_name' => $this->getPaymentDescription($params, 250),
-                'back_url' => $backUrl,
-                'error_url' => $errorUrl,
-                'return_url' => $returnUrl,
-            ]
-        );
+        try {
+            $response = $this->createCheckoutIntentAndStore(
+                $propertyBag,
+                [
+                    'item_name' => $this->getPaymentDescription($params, 250),
+                    'back_url' => $backUrl,
+                    'error_url' => $errorUrl,
+                    'return_url' => $returnUrl,
+                ]
+            );
+        }
+        catch (\Throwable $e) {
+            \Civi::log()->warning(sprintf(
+                'HelloAsso API connection failed during checkout initialization for contribution %d: %s',
+                $propertyBag->getContributionID(),
+                $e->getMessage()
+            ));
+            throw new PaymentProcessorException(E::ts("The HelloAsso payment processor is currently unavailable. Please try again later."));
+        }
 
         // Check if it's a Drupal AJAX request (Webform)
         if ($this->isDrupalAjaxRequest()) {
@@ -336,16 +346,26 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         $errorUrl = (string) ($urls['error_url'] ?? $backUrl);
         $returnUrl = (string) ($urls['return_url'] ?? ($landingUrl !== '' ? $landingUrl : $backUrl));
 
-        $response = $this->createCheckoutIntentAndStore(
-            $propertyBag,
-            [
-                'contribution_id' => $contributionId,
-                'item_name' => $this->buildContributionCheckoutLabel($contributionId),
-                'back_url' => $backUrl,
-                'error_url' => $errorUrl,
-                'return_url' => $returnUrl,
-            ]
-        );
+        try {
+            $response = $this->createCheckoutIntentAndStore(
+                $propertyBag,
+                [
+                    'contribution_id' => $contributionId,
+                    'item_name' => $this->buildContributionCheckoutLabel($contributionId),
+                    'back_url' => $backUrl,
+                    'error_url' => $errorUrl,
+                    'return_url' => $returnUrl,
+                ]
+            );
+        }
+        catch (\Throwable $e) {
+            \Civi::log()->warning(sprintf(
+                'HelloAsso API connection failed during hosted checkout initialization for contribution %d: %s',
+                $contributionId,
+                $e->getMessage()
+            ));
+            throw new PaymentProcessorException(E::ts("The HelloAsso payment processor is currently unavailable. Please try again later."));
+        }
 
         return (string) $response['redirectUrl'];
     }
@@ -1210,7 +1230,16 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                     $results['updated']++;
                 }
             }
-            catch (Exception $e) {
+            catch (\Throwable $e) {
+                if ($e instanceof \GuzzleHttp\Exception\TransferException) {
+                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . $e->getMessage();
+                    CRM_HelloassoPaymentProcessor_Logger::error(
+                        'HelloAsso short cron sync aborted due to API timeout or connection failure.',
+                        ['contribution_id' => (int) $dao->contribution_id, 'error' => $e->getMessage()]
+                    );
+                    break;
+                }
+
                 if ($this->isHelloAssoNotFoundException($e)) {
                     $this->stopContributionFollowUps((int) $dao->contribution_id);
                     $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("HelloAsso object not found (404). Short and long follow-up checks have been disabled to avoid repeated calls.");
@@ -1280,7 +1309,16 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                     $results['updated']++;
                 }
             }
-            catch (Exception $e) {
+            catch (\Throwable $e) {
+                if ($e instanceof \GuzzleHttp\Exception\TransferException) {
+                    $results['errors'][] = 'Contribution ' . $contribution->id . ': ' . $e->getMessage();
+                    CRM_HelloassoPaymentProcessor_Logger::error(
+                        'HelloAsso organization payment sync aborted due to API timeout or connection failure.',
+                        ['contribution_id' => (int) $contribution->id, 'error' => $e->getMessage()]
+                    );
+                    break;
+                }
+
                 $results['errors'][] = 'Contribution ' . $contribution->id . ': ' . $e->getMessage();
                 CRM_HelloassoPaymentProcessor_Logger::debug(
                     'HelloAsso organization payment sync attempt failed.',
@@ -1440,7 +1478,16 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                     $results['updated']++;
                 }
             }
-            catch (Exception $e) {
+            catch (\Throwable $e) {
+                if ($e instanceof \GuzzleHttp\Exception\TransferException) {
+                    $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . $e->getMessage();
+                    CRM_HelloassoPaymentProcessor_Logger::error(
+                        'HelloAsso long cron sync aborted due to API timeout or connection failure.',
+                        ['contribution_id' => (int) $dao->contribution_id, 'error' => $e->getMessage()]
+                    );
+                    break;
+                }
+
                 if ($this->isHelloAssoNotFoundException($e)) {
                     $this->stopContributionFollowUps((int) $dao->contribution_id);
                     $results['errors'][] = 'Contribution ' . $dao->contribution_id . ': ' . E::ts("HelloAsso object not found (404). Short and long follow-up checks have been disabled to avoid repeated calls.");

@@ -388,18 +388,18 @@ Les tests d'intégration manipulent la base de données réelle (transactions is
 
 ## Crédits
 
+L'extension est actuellement maintenue par Jonathan Dahan
+([jonathan.dhn.one](https://jonathan.dhn.one), `jonathan@dhn.one`), qui a développé et validé la branche V2, ses intégrations multi-CMS et ses mécanismes de fiabilisation.
+
 L'extension originale a été initiée par civiuser (Sidney) et Pierre Morvan :
 [dépôt historique](https://github.com/ryarnyah/helloasso-payment-processor).
 
-La version publiée par Makoa a été développée par Antoine Breheret et Dewy
+La version 1 publiée par Makoa a été développée par Antoine Breheret et Dewy
 Mercerais.
 
-La branche V2, ses intégrations multi-CMS et ses mécanismes de fiabilisation
-ont été développés et validés par Jonathan Dahan
-([jonathan.dhn.one](https://jonathan.dhn.one), `jonathan@dhn.one`).
+Tests actifs et suivi : Guillaume Sorel ([@GuillaumeSorel](https://lab.civicrm.org/GuillaumeSorel)) / Gestad.
 
-Contributions historiques : Guillaume Sorel / All In Appli et
-[Symbiotic](https://symbiotic.coop).
+Contributions historiques : [Symbiotic](https://symbiotic.coop).
 
 ## Licence
 

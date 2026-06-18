@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.1.0-alpha1\n"
-"POT-Creation-Date: 2026-06-08 10:43+0000\n"
-"PO-Revision-Date: 2026-06-08 10:43+0000\n"
+"POT-Creation-Date: 2026-06-10 18:11+0000\n"
+"PO-Revision-Date: 2026-06-10 18:11+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: Translations\n"
 "Language: \n"
@@ -27,6 +27,9 @@ msgstr ""
 msgid "A recurring HelloAsso payment is missing its order or installment identity."
 msgstr ""
 
+msgid "Access Token"
+msgstr ""
+
 msgid "Access token valid until: %1"
 msgstr ""
 
@@ -37,6 +40,9 @@ msgid "Allow CiviCRM users with refund permissions to request full HelloAsso ref
 msgstr ""
 
 msgid "Allow finite monthly installment checkout payloads for HelloAsso payment processors."
+msgstr ""
+
+msgid "Amount"
 msgstr ""
 
 msgid "Authorization URL"
@@ -61,6 +67,9 @@ msgid "Base HelloAsso API URL for sandbox payments. Keep the sandbox default unl
 msgstr ""
 
 msgid "Callback URL to declare at HelloAsso:"
+msgstr ""
+
+msgid "Checkout Intent ID"
 msgstr ""
 
 msgid "Checkout intent ID"
@@ -117,6 +126,9 @@ msgstr ""
 msgid "Connect to HelloAsso"
 msgstr ""
 
+msgid "Connection Mode"
+msgstr ""
+
 msgid "Contribution"
 msgstr ""
 
@@ -126,6 +138,9 @@ msgstr ""
 msgid "Contribution ID"
 msgstr ""
 
+msgid "Contribution Recur ID"
+msgstr ""
+
 msgid "Contribution is not a future HelloAsso installment"
 msgstr ""
 
@@ -133,6 +148,9 @@ msgid "Contribution is not a future scheduled HelloAsso installment."
 msgstr ""
 
 msgid "Contribution statuses"
+msgstr ""
+
+msgid "Created At"
 msgstr ""
 
 msgid "Disconnect the linked organization"
@@ -186,6 +204,9 @@ msgstr ""
 msgid "Enter the shared client ID and client secret on the authorization-screen settings page first, then return to start the connection."
 msgstr ""
 
+msgid "Expires At"
+msgstr ""
+
 msgid "FK to Contribution"
 msgstr ""
 
@@ -216,10 +237,22 @@ msgstr ""
 msgid "Future HelloAsso installments were cancelled successfully. Payments already collected were not refunded."
 msgstr ""
 
+msgid "Hello Asso Installment"
+msgstr ""
+
+msgid "Hello Asso Installments"
+msgstr ""
+
 msgid "Hello Asso Metadata"
 msgstr ""
 
 msgid "Hello Asso Metadatas"
+msgstr ""
+
+msgid "Hello Asso Processor Auth"
+msgstr ""
+
+msgid "Hello Asso Processor Auths"
 msgstr ""
 
 msgid "HelloAsso"
@@ -237,7 +270,7 @@ msgstr ""
 msgid "HelloAsso Payments Processor"
 msgstr ""
 
-msgid "HelloAsso Reference command ID "
+msgid "HelloAsso Reference command ID"
 msgstr ""
 
 msgid "HelloAsso accepted the refund request but did not return a refund operation ID."
@@ -307,6 +340,9 @@ msgid "HelloAsso installments must be collected every month."
 msgstr ""
 
 msgid "HelloAsso installments must be monthly."
+msgstr ""
+
+msgid "HelloAsso is currently unavailable. Please try again later."
 msgstr ""
 
 msgid "HelloAsso linked organization has been disconnected."
@@ -403,6 +439,12 @@ msgid "HelloAsso payment is temporarily unavailable: the linked organization is 
 msgstr ""
 
 msgid "HelloAsso payment processor not found: %1"
+msgstr ""
+
+msgid "HelloAsso payment reconciliation metadata"
+msgstr ""
+
+msgid "HelloAsso per-processor OAuth and webhook state"
 msgstr ""
 
 msgid "HelloAsso plugin-public mode requires a saved payment processor ID."
@@ -519,7 +561,16 @@ msgstr ""
 msgid "HelloAsso: unable to authenticate with the payment processor API keys."
 msgstr ""
 
+msgid "Helloasso Payment ID"
+msgstr ""
+
 msgid "ID"
+msgstr ""
+
+msgid "Idempotent mapping of HelloAsso installments to CiviCRM contributions"
+msgstr ""
+
+msgid "Installment Number"
 msgstr ""
 
 msgid "Invalid HelloAsso installment schedule: %1"
@@ -532,6 +583,15 @@ msgid "Invalid HelloAsso webhook payload in the queue."
 msgstr ""
 
 msgid "Key used to sign contribution"
+msgstr ""
+
+msgid "Last Refresh Error"
+msgstr ""
+
+msgid "Last Refresh Error Date"
+msgstr ""
+
+msgid "Last Refresh Http Status"
 msgstr ""
 
 msgid "Last event type"
@@ -550,6 +610,9 @@ msgid "Leave blank to keep the current secret."
 msgstr ""
 
 msgid "Limit"
+msgstr ""
+
+msgid "Linked At"
 msgstr ""
 
 msgid "Linked on: %1"
@@ -720,7 +783,13 @@ msgstr ""
 msgid "Open this authorization-screen settings page first to enter the shared client ID and client secret, then return to start the connection."
 msgstr ""
 
+msgid "Order ID"
+msgstr ""
+
 msgid "Organization Name"
+msgstr ""
+
+msgid "Organization Slug"
 msgstr ""
 
 msgid "Organization linked: %1"
@@ -736,6 +805,12 @@ msgid "Partner notification URLs returned by HelloAsso: %1"
 msgstr ""
 
 msgid "Pay in full"
+msgstr ""
+
+msgid "Payment Date"
+msgstr ""
+
+msgid "Payment Processor ID"
 msgstr ""
 
 msgid "Payment details will be shown here depending on the selected Checkout Option. For payment to be taken you must either set a Checkout Option value on the Contribution or add a user input to select one."
@@ -784,6 +859,21 @@ msgid "Receive date from"
 msgstr ""
 
 msgid "Receive date to"
+msgstr ""
+
+msgid "Redirect Uri"
+msgstr ""
+
+msgid "Refresh Expires At"
+msgstr ""
+
+msgid "Refresh Issued At"
+msgstr ""
+
+msgid "Refresh Status"
+msgstr ""
+
+msgid "Refresh Token"
 msgstr ""
 
 msgid "Refresh linked HelloAsso authorizations once their current refresh tokens reach mid-life."
@@ -852,6 +942,9 @@ msgstr ""
 msgid "Standard frontend bridge (mjwshared)"
 msgstr ""
 
+msgid "State"
+msgstr ""
+
 msgid "Strict legacy signature verification"
 msgstr ""
 
@@ -907,6 +1000,9 @@ msgid "The HelloAsso order ID stored on this recurring contribution is invalid."
 msgstr ""
 
 msgid "The HelloAsso partner settings form token is invalid. Please reload the page and try again."
+msgstr ""
+
+msgid "The HelloAsso payment processor is currently unavailable. Please try again later."
 msgstr ""
 
 msgid "The HelloAsso plan was cancelled, but its local CiviCRM records could not be synchronized: %1"
@@ -996,7 +1092,22 @@ msgstr ""
 msgid "Untrusted webhook ignored; no locally expected HelloAsso object identifier."
 msgstr ""
 
+msgid "Updated At"
+msgstr ""
+
 msgid "Upgrade Batch (%1 => %2)"
+msgstr ""
+
+msgid "Webhook Ownership"
+msgstr ""
+
+msgid "Webhook Signature Key"
+msgstr ""
+
+msgid "Webhook Updated At"
+msgstr ""
+
+msgid "Webhook Url"
 msgstr ""
 
 msgid "Webhook management: %1"

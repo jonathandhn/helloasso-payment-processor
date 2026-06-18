@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.1.0-alpha1\n"
-"PO-Revision-Date: 2026-06-08 10:43+0000\n"
+"PO-Revision-Date: 2026-06-10 18:11+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: es_ES\n"
 "Language: es_ES\n"
@@ -86,6 +86,10 @@ msgstr "Las cuotas HelloAsso deben cobrarse cada mes."
 #. Public-facing string in checkout or validation flow
 msgid "HelloAsso installments must be monthly."
 msgstr "Las cuotas HelloAsso deben ser mensuales."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso is currently unavailable. Please try again later."
+msgstr "HelloAsso no está disponible temporalmente. Por favor, inténtelo de nuevo más tarde."
 
 #. Public-facing string in checkout or validation flow
 msgid "HelloAsso refused the cancellation. Reconnect the organization through the authorization screen and grant the OrganizationAdmin or FormAdmin role; the client must also include the RefundManagement privilege."
@@ -178,6 +182,10 @@ msgstr "Falta el identificador del pedido HelloAsso en esta contribución recurr
 #. Public-facing string in checkout or validation flow
 msgid "The HelloAsso order ID stored on this recurring contribution is invalid."
 msgstr "El identificador del pedido HelloAsso guardado en esta contribución recurrente no es válido."
+
+#. Public-facing string in checkout or validation flow
+msgid "The HelloAsso payment processor is currently unavailable. Please try again later."
+msgstr "El procesador de pago HelloAsso no está disponible temporalmente. Por favor, inténtelo de nuevo más tarde."
 
 #. Public-facing string in checkout or validation flow
 msgid "The contribution mapped to this HelloAsso installment no longer exists."
