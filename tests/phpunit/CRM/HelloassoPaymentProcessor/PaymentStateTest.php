@@ -1,10 +1,12 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_PaymentStateTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider outcomeProvider
      */
+    #[DataProvider("outcomeProvider")]
     public function testMapsPublishedHelloAssoStates(string $state, string $expected): void
     {
         $this->assertSame(

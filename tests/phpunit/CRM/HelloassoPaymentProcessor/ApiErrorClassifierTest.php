@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_ApiErrorClassifierTest extends \PHPUnit\Framework\TestCase
 {
     public function testDetectsAssociationWithoutPaymentEligibility(): void
@@ -14,8 +16,8 @@ class CRM_HelloassoPaymentProcessor_ApiErrorClassifierTest extends \PHPUnit\Fram
     }
 
     /**
-     * @dataProvider unrelatedApiResponses
      */
+    #[DataProvider("unrelatedApiResponses")]
     public function testDoesNotMisclassifyOtherApiErrors(
         string $method,
         string $path,

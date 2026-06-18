@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_InstallmentFollowUpTest extends \PHPUnit\Framework\TestCase
 {
     public function testRecognizesFuturePendingInstallment(): void
@@ -17,8 +19,8 @@ class CRM_HelloassoPaymentProcessor_InstallmentFollowUpTest extends \PHPUnit\Fra
     }
 
     /**
-     * @dataProvider notFuturePendingProvider
      */
+    #[DataProvider("notFuturePendingProvider")]
     public function testRejectsPaymentsThatAreNotFuturePendingInstallments(array $payment): void
     {
         $this->assertFalse(

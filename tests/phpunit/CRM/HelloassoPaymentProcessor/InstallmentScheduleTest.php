@@ -1,5 +1,7 @@
 <?php
 
+
+use PHPUnit\Framework\Attributes\DataProvider;
 class CRM_HelloassoPaymentProcessor_InstallmentScheduleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildsMonthlyCheckoutTermsWithoutLosingCents(): void
@@ -38,8 +40,8 @@ class CRM_HelloassoPaymentProcessor_InstallmentScheduleTest extends \PHPUnit\Fra
     }
 
     /**
-     * @dataProvider invalidScheduleProvider
      */
+    #[DataProvider("invalidScheduleProvider")]
     public function testRejectsSchedulesOutsideHelloAssoRules(
         int $totalAmount,
         int $installmentCount,
