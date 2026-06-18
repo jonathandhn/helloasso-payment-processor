@@ -172,6 +172,10 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     ]);
   }
 
+  public function getPartnerInformation(): array {
+    return $this->request('GET', '/v5/partners/me');
+  }
+
   public function requestApi(string $method, string $path, array $options = []): array {
     return $this->request($method, $path, $options);
   }
@@ -201,7 +205,12 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
   }
 
   public function getRedirectUri(): string {
-    return CRM_Utils_System::url('civicrm/helloasso/partner/callback', 'reset=1', TRUE, NULL, FALSE, TRUE);
+    $query = 'reset=1';
+    if ($this->paymentProcessorId) {
+      $query .= '&processor_id=' . $this->paymentProcessorId;
+    }
+
+    return CRM_Utils_System::url('civicrm/helloasso/partner/callback', $query, TRUE, NULL, FALSE, TRUE);
   }
 
   public function isTestProcessor(): bool {
@@ -241,7 +250,17 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     }
 
     if ($statusCode < 200 || $statusCode >= 300) {
-      throw new PaymentProcessorException($this->buildApiErrorMessage($decoded, $statusCode));
+      $errorMessage = $this->buildApiErrorMessage($decoded, $statusCode);
+      if ($this->isCheckoutInitializationRequest($method, $path) && $statusCode === 409) {
+        $this->recordOrganizationPaymentBlock($errorMessage, $statusCode);
+        throw new PaymentProcessorException($this->getOrganizationPaymentBlockedMessage());
+      }
+
+      throw new PaymentProcessorException($errorMessage);
+    }
+
+    if ($this->isCheckoutInitializationRequest($method, $path)) {
+      $this->clearOrganizationPaymentBlock();
     }
 
     return is_array($decoded) ? $decoded : [];
@@ -410,20 +429,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     $link['last_refresh_error_date'] = date('Y-m-d H:i:s');
     $link['last_refresh_http_status'] = $statusCode;
 
-    try {
-      if ($this->paymentProcessorId) {
-        $this->getProcessorAuthConfig()->storeLink($this->paymentProcessorId, $link);
-      }
-      else {
-        $encodedLink = json_encode($link);
-        if (is_string($encodedLink)) {
-          Civi::settings()->set('helloasso_partner_link_json', $encodedLink);
-        }
-      }
-    }
-    catch (Exception $e) {
-      Civi::log()->error('HelloAsso partner refresh failure could not be persisted: ' . $e->getMessage());
-    }
+    $this->storeLinkSafely($link, 'HelloAsso partner refresh failure could not be persisted');
 
     Civi::log()->error(sprintf(
       'HelloAsso partner token refresh failed for payment processor %s (HTTP %d): %s',
@@ -433,12 +439,71 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     ));
   }
 
+  private function storeLinkSafely(array $link, string $failureMessage): void {
+    try {
+      if ($this->paymentProcessorId) {
+        $this->getProcessorAuthConfig()->storeLink($this->paymentProcessorId, $link);
+        return;
+      }
+
+      $encodedLink = json_encode($link);
+      if (is_string($encodedLink)) {
+        Civi::settings()->set('helloasso_partner_link_json', $encodedLink);
+      }
+    }
+    catch (Exception $e) {
+      Civi::log()->error($failureMessage . ': ' . $e->getMessage());
+    }
+  }
+
   private function isReconnectRequiredHttpStatus(int $statusCode): bool {
     return in_array($statusCode, [400, 401, 403, 404], TRUE);
   }
 
   private function getReconnectRequiredPaymentMessage(): string {
     return E::ts('HelloAsso payment is temporarily unavailable: HelloAsso connection must be restored by an administrator.');
+  }
+
+  private function getOrganizationPaymentBlockedMessage(): string {
+    return E::ts('HelloAsso payment is temporarily unavailable: the linked organization is not currently allowed by HelloAsso to receive online payments.');
+  }
+
+  private function isCheckoutInitializationRequest(string $method, string $path): bool {
+    return strtoupper($method) === 'POST'
+      && (bool) preg_match('#^/v5/organizations/[^/]+/checkout-intents$#', $path);
+  }
+
+  private function recordOrganizationPaymentBlock(string $message, int $statusCode): void {
+    $link = $this->getStoredLink();
+    if (!$link) {
+      return;
+    }
+
+    $link['refresh_status'] = 'organization_blocked';
+    $link['last_refresh_error'] = $message;
+    $link['last_refresh_error_date'] = date('Y-m-d H:i:s');
+    $link['last_refresh_http_status'] = $statusCode;
+    $this->storeLinkSafely($link, 'HelloAsso organization payment block could not be persisted');
+
+    Civi::log()->error(sprintf(
+      'HelloAsso organization cannot receive payments for payment processor %s (HTTP %d): %s',
+      $this->paymentProcessorId ?: 'legacy',
+      $statusCode,
+      $message
+    ));
+  }
+
+  private function clearOrganizationPaymentBlock(): void {
+    $link = $this->getStoredLink();
+    if (!$link || ($link['refresh_status'] ?? '') !== 'organization_blocked') {
+      return;
+    }
+
+    $link['refresh_status'] = 'active';
+    $link['last_refresh_error'] = NULL;
+    $link['last_refresh_error_date'] = NULL;
+    $link['last_refresh_http_status'] = NULL;
+    $this->storeLinkSafely($link, 'HelloAsso organization payment block could not be cleared');
   }
 
   private function assertConfigured(): void {

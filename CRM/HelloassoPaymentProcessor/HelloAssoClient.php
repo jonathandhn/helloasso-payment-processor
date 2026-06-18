@@ -245,10 +245,32 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         }
 
         if ($statusCode < 200 || $statusCode >= 300) {
-            throw new PaymentProcessorException($this->buildApiErrorMessage($decoded, $statusCode));
+            $errorMessage = $this->buildApiErrorMessage($decoded, $statusCode);
+            if ($this->isCheckoutInitializationRequest($method, $path) && $statusCode === 409) {
+                Civi::log()->error(sprintf(
+                    'HelloAsso organization cannot receive payments for payment processor %s (HTTP %d): %s',
+                    $paymentProcessor['id'] ?? 'unknown',
+                    $statusCode,
+                    $errorMessage
+                ));
+                throw new PaymentProcessorException($this->getOrganizationPaymentBlockedMessage());
+            }
+
+            throw new PaymentProcessorException($errorMessage);
         }
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function isCheckoutInitializationRequest(string $method, string $path): bool
+    {
+        return strtoupper($method) === 'POST'
+            && (bool) preg_match('#^/v5/organizations/[^/]+/checkout-intents$#', $path);
+    }
+
+    private function getOrganizationPaymentBlockedMessage(): string
+    {
+        return E::ts('HelloAsso payment is temporarily unavailable: the linked organization is not currently allowed by HelloAsso to receive online payments.');
     }
 
     private function requestHelloAssoViaPluginPublic(array $paymentProcessor, string $method, string $path, array $options = []): array

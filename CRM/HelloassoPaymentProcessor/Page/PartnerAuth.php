@@ -37,7 +37,11 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
   private function handleCallback(CRM_HelloassoPaymentProcessor_PartnerAuth $partnerAuth): void {
     $error = CRM_Utils_Request::retrieve('error', 'String', $this, FALSE);
     if ($error) {
-      throw new PaymentProcessorException(E::ts('HelloAsso partner authorization failed: %1', [1 => $error]));
+      $errorDescription = CRM_Utils_Request::retrieve('error_description', 'String', $this, FALSE);
+      $message = $errorDescription
+        ? E::ts('HelloAsso partner authorization failed: %1 (%2)', [1 => $error, 2 => $errorDescription])
+        : E::ts('HelloAsso partner authorization failed: %1', [1 => $error]);
+      throw new PaymentProcessorException($message);
     }
 
     $code = CRM_Utils_Request::retrieve('code', 'String', $this, TRUE);
@@ -127,6 +131,16 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
     $refreshExpiresAtLabel = helloasso_payment_processor_format_datetime($link['refresh_expires_at'] ?? NULL);
     $lastRefreshErrorDateLabel = helloasso_payment_processor_format_datetime($link['last_refresh_error_date'] ?? NULL);
     $settingsUrl = htmlspecialchars(helloasso_payment_processor_get_helloasso_settings_url(), ENT_QUOTES, 'UTF-8');
+    $partnerInformation = NULL;
+    $partnerInformationError = NULL;
+    if ($link && $enabled) {
+      try {
+        $partnerInformation = $partnerAuth->getPartnerInformation();
+      }
+      catch (Exception $e) {
+        $partnerInformationError = $e->getMessage();
+      }
+    }
 
     $html = '<div class="crm-block crm-form-block">';
     $html .= '<h3>' . $screenLabel . '</h3>';
@@ -173,6 +187,11 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
         $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
         $html .= '<p class="status warning">' . E::ts("The HelloAsso link can no longer be renewed%1%2. Reconnect the organization before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
       }
+      elseif (($link['refresh_status'] ?? '') === 'organization_blocked') {
+        $httpStatus = !empty($link['last_refresh_http_status']) ? ' HTTP ' . (int) $link['last_refresh_http_status'] : '';
+        $failureDate = $lastRefreshErrorDateLabel !== '' ? ' (' . htmlspecialchars($lastRefreshErrorDateLabel, ENT_QUOTES, 'UTF-8') . ')' : '';
+        $html .= '<p class="status warning">' . E::ts("The linked HelloAsso organization is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen.", [1 => $httpStatus, 2 => $failureDate]) . '</p>';
+      }
       elseif (($link['refresh_status'] ?? '') === 'refresh_failed') {
         $html .= '<p class="status warning">' . E::ts("The latest HelloAsso link renewal failed. Check the next maintenance job or reconnect the organization if the problem persists.") . '</p>';
       }
@@ -184,6 +203,12 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
       }
       if ($refreshExpiresAtLabel !== '') {
         $html .= '<p>' . E::ts("Authorization link valid until: %1", [1 => htmlspecialchars($refreshExpiresAtLabel, ENT_QUOTES, 'UTF-8')]) . '</p>';
+      }
+      if (is_array($partnerInformation)) {
+        $html .= $this->renderPartnerInformation($partnerInformation);
+      }
+      elseif ($partnerInformationError !== NULL) {
+        $html .= '<p class="status warning">' . E::ts('HelloAsso partner information could not be retrieved: %1', [1 => htmlspecialchars($partnerInformationError, ENT_QUOTES, 'UTF-8')]) . '</p>';
       }
       $html .= '<p>' . $connectButtonHtml . '</p>';
       $html .= '<form method="post" action="' . $formActionUrlEscaped . '">';
@@ -237,6 +262,52 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
 
   private function getPostCallbackReturnUrl(int $paymentProcessorId): string {
     return $this->getPartnerPageUrl('reset=1&processor_id=' . $paymentProcessorId);
+  }
+
+  private function renderPartnerInformation(array $partnerInformation): string {
+    $name = trim((string) ($partnerInformation['displayName'] ?? $partnerInformation['name'] ?? ''));
+    $apiClient = is_array($partnerInformation['apiClient'] ?? NULL) ? $partnerInformation['apiClient'] : [];
+    $domain = trim((string) ($apiClient['domain'] ?? ''));
+    $privileges = is_array($apiClient['privileges'] ?? NULL) ? $apiClient['privileges'] : [];
+    $notifications = is_array($partnerInformation['urlNotificationList'] ?? NULL) ? $partnerInformation['urlNotificationList'] : [];
+
+    $html = '<div class="helloasso-partner-information">';
+    $html .= '<p class="status success">' . E::ts('HelloAsso partner API status: reachable.') . '</p>';
+    if ($name !== '') {
+      $html .= '<p class="description">' . E::ts('Partner account: %1', [1 => htmlspecialchars($name, ENT_QUOTES, 'UTF-8')]) . '</p>';
+    }
+    if ($domain !== '') {
+      $html .= '<p class="description">' . E::ts('Authorized partner domain: %1', [1 => htmlspecialchars($domain, ENT_QUOTES, 'UTF-8')]) . '</p>';
+    }
+    if ($privileges) {
+      $html .= '<p class="description">' . E::ts('Partner API privileges: %1', [1 => htmlspecialchars(implode(', ', array_map('strval', $privileges)), ENT_QUOTES, 'UTF-8')]) . '</p>';
+    }
+    if ($notifications) {
+      $html .= '<p class="description">' . E::ts('Partner notification URLs returned by HelloAsso: %1', [1 => $this->formatPartnerNotifications($notifications)]) . '</p>';
+    }
+    else {
+      $html .= '<p class="description">' . E::ts('HelloAsso did not return any partner notification URL on this client.') . '</p>';
+    }
+    $html .= '</div>';
+
+    return $html;
+  }
+
+  private function formatPartnerNotifications(array $notifications): string {
+    $labels = [];
+    foreach ($notifications as $notification) {
+      if (!is_array($notification)) {
+        continue;
+      }
+      $type = trim((string) ($notification['apiNotificationType'] ?? ''));
+      $url = trim((string) ($notification['url'] ?? ''));
+      if ($url === '') {
+        continue;
+      }
+      $labels[] = htmlspecialchars(($type !== '' ? $type . ': ' : '') . $url, ENT_QUOTES, 'UTF-8');
+    }
+
+    return $labels ? implode('; ', $labels) : E::ts('none');
   }
 
 }

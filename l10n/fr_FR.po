@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: helloasso-payment-processor 2.0.0\n"
-"PO-Revision-Date: 2026-05-27 17:39+0000\n"
+"PO-Revision-Date: 2026-05-28 15:11+0000\n"
 "Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
 "Language-Team: fr_FR\n"
 "Language: fr_FR\n"
@@ -33,6 +33,10 @@ msgstr "URL d'autorisation"
 #. Maintained French translation
 msgid "Authorization link valid until: %1"
 msgstr "Liaison d'autorisation valable jusqu'au : %1"
+
+#. Maintained French translation
+msgid "Authorized partner domain: %1"
+msgstr "Domaine partenaire autorisé : %1"
 
 #. Maintained French translation
 msgid "Automatically enable the webhook"
@@ -281,6 +285,10 @@ msgid "HelloAsso authorization-screen flow"
 msgstr "Parcours mire HelloAsso"
 
 #. Maintained French translation
+msgid "HelloAsso did not return any partner notification URL on this client."
+msgstr "HelloAsso n'a retourné aucune URL de notification partenaire pour ce client."
+
+#. Maintained French translation
 msgid "HelloAsso endpoint used to exchange the authorization code and refresh OAuth tokens."
 msgstr "Endpoint HelloAsso utilisé pour échanger le code d'autorisation et rafraîchir les jetons OAuth."
 
@@ -324,6 +332,10 @@ msgstr "Paiements en ligne HelloAsso, connexions par mire, webhooks sécurisés 
 msgid "HelloAsso organization %1 is now linked."
 msgstr "L'organisation HelloAsso %1 est désormais liée."
 
+#. Maintained French translation
+msgid "HelloAsso partner API status: reachable."
+msgstr "État de l'API partenaire HelloAsso : joignable."
+
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:30
 msgid "HelloAsso partner authorization"
 msgstr "Autorisation partenaire HelloAsso"
@@ -347,6 +359,10 @@ msgstr ""
 #: CRM/HelloassoPaymentProcessor/Page/PartnerAuth.php:40
 msgid "HelloAsso partner authorization failed: %1"
 msgstr "L'autorisation partenaire HelloAsso a échoué : %1"
+
+#. Maintained French translation
+msgid "HelloAsso partner authorization failed: %1 (%2)"
+msgstr "L'autorisation partenaire HelloAsso a échoué : %1 (%2)"
 
 msgid "HelloAsso partner authorization is currently being refreshed. Please retry the payment."
 msgstr ""
@@ -378,6 +394,10 @@ msgstr "L'état d'autorisation partenaire HelloAsso est invalide ou expiré."
 msgid "HelloAsso partner client ID and secret must be configured before connecting an organization."
 msgstr ""
 
+#. Maintained French translation
+msgid "HelloAsso partner information could not be retrieved: %1"
+msgstr "Les informations partenaire HelloAsso n'ont pas pu être récupérées : %1"
+
 #: settings/helloasso_payment_processor.setting.php:210
 msgid "HelloAsso partner linked organization token"
 msgstr "Jeton d'organisation liée partenaire HelloAsso"
@@ -401,6 +421,10 @@ msgstr "Incohérence de la signature du webhook partenaire HelloAsso."
 #. Converted from French to English in source code
 msgid "HelloAsso payment is temporarily unavailable: HelloAsso connection must be restored by an administrator."
 msgstr "Le paiement HelloAsso est temporairement indisponible : la connexion HelloAsso doit être rétablie par un administrateur."
+
+#. Maintained French translation
+msgid "HelloAsso payment is temporarily unavailable: the linked organization is not currently allowed by HelloAsso to receive online payments."
+msgstr "Le paiement HelloAsso est temporairement indisponible : l'organisation liée n'est actuellement pas autorisée par HelloAsso à recevoir des paiements en ligne."
 
 #: CRM/HelloassoPaymentProcessor/Service.php:187
 msgid "HelloAsso payment processor not found: %1"
@@ -474,6 +498,10 @@ msgstr "HelloAsso : Décalage de domaine (Instance de Test/Staging)"
 #: helloasso_payment_processor.php:639
 msgid "HelloAsso: Incomplete V2 Upgrade"
 msgstr "HelloAsso : Mise à niveau V2 incomplète"
+
+#. Maintained French translation
+msgid "HelloAsso: Organization Cannot Receive Payments"
+msgstr "HelloAsso : organisation non autorisée à recevoir des paiements"
 
 msgid "HelloAsso: Payment Method Missing"
 msgstr ""
@@ -639,6 +667,10 @@ msgstr ""
 msgid "One or more HelloAsso authorization links will expire soon: %1"
 msgstr ""
 
+#. Maintained French translation
+msgid "One or more HelloAsso linked organizations are not currently allowed by HelloAsso to receive online payments. Check their administrative status before accepting new payments through the authorization screen: %1"
+msgstr "Une ou plusieurs organisations HelloAsso liées ne sont actuellement pas autorisées par HelloAsso à recevoir des paiements en ligne. Vérifiez leur état administratif avant d'accepter de nouveaux paiements via la mire : %1"
+
 msgid "One or more HelloAsso links expect automatic webhook registration, but no webhook is stored yet: %1. Reconnect the authorization screen to push the webhook, or disable automatic webhook registration on that processor if another CiviCRM instance must keep manual control of the HelloAsso webhook URL."
 msgstr ""
 
@@ -709,6 +741,18 @@ msgstr "Nom de l'organisation"
 #. Maintained French translation
 msgid "Organization linked: %1"
 msgstr "Organisation liée : %1"
+
+#. Maintained French translation
+msgid "Partner API privileges: %1"
+msgstr "Privilèges API partenaire : %1"
+
+#. Maintained French translation
+msgid "Partner account: %1"
+msgstr "Compte partenaire : %1"
+
+#. Maintained French translation
+msgid "Partner notification URLs returned by HelloAsso: %1"
+msgstr "URL de notification partenaire retournées par HelloAsso : %1"
 
 #: CRM/HelloassoPaymentProcessor/DAO/HelloAssoMetadata.php:366
 #: api/v3/Job/ProcessHelloasso.php:72
@@ -918,6 +962,10 @@ msgid "The latest HelloAsso link renewal failed. Check the next maintenance job 
 msgstr "Le dernier renouvellement de la liaison HelloAsso a échoué. Vérifiez le prochain job de maintenance ou reconnectez l'organisation si le problème persiste."
 
 #. Maintained French translation
+msgid "The linked HelloAsso organization is not currently allowed to receive online payments%1%2. Check its administrative status in HelloAsso before accepting new payments through the authorization screen."
+msgstr "L'organisation HelloAsso liée n'est actuellement pas autorisée à recevoir des paiements en ligne%1%2. Vérifiez son état administratif dans HelloAsso avant d'accepter de nouveaux paiements via la mire."
+
+#. Maintained French translation
 msgid "The official button above opens the HelloAsso connection. If you need to adjust client credentials or check the link status, use the settings link first."
 msgstr "Le bouton officiel ci-dessus ouvre la connexion HelloAsso. Si vous avez besoin d'ajuster les identifiants client ou de vérifier l'état de liaison, utilisez d'abord le lien d'ouverture des réglages."
 
@@ -1019,6 +1067,14 @@ msgstr "géré par cette instance CiviCRM"
 #. Maintained French translation
 msgid "manual / another instance in control"
 msgstr "manuel / autre instance maîtresse"
+
+#. Maintained French translation
+msgid "none"
+msgstr "aucune"
+
+#. Maintained French translation
+msgid "payment refused"
+msgstr "paiement refusé"
 
 msgid "production"
 msgstr ""
