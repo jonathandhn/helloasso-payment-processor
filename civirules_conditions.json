@@ -1,0 +1,7 @@
+[
+  {
+    "name": "helloasso_not_future_installment",
+    "label": "Contribution is not a future HelloAsso installment",
+    "class_name": "CRM_HelloassoPaymentProcessor_Civirules_Condition_NotFutureInstallment"
+  }
+]

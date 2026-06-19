@@ -1,0 +1,224 @@
+# Translation file
+
+msgid ""
+msgstr ""
+"Project-Id-Version: helloasso-payment-processor 2.1.0-alpha1\n"
+"PO-Revision-Date: 2026-06-10 18:11+0000\n"
+"Last-Translator: Jonathan Dahan <jonathan@dhn.one>\n"
+"Language-Team: es_ES\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Public-facing string in checkout or validation flow
+msgid "%1 monthly installments"
+msgstr "%1 mensualidades"
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso authorization-screen setup"
+msgstr "Configuración de la pantalla de autorización de HelloAsso"
+
+#. Public-facing string in checkout or validation flow
+msgid "This HelloAsso processor can be saved a first time without API credentials when the authorization screen is enabled."
+msgstr "Este procesador HelloAsso puede guardarse una primera vez sin credenciales API cuando la pantalla de autorización está activada."
+
+#. Public-facing string in checkout or validation flow
+msgid "Enter the processor name, save once, then return to this processor to configure the live and sandbox authorization-screen connections."
+msgstr "Introduzca el nombre del procesador, guarde una primera vez y vuelva después a este procesador para configurar las conexiones de la pantalla de autorización en producción y sandbox."
+
+#. Public-facing string in checkout or validation flow
+msgid "Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments handled by HelloAsso."
+msgstr "Pague de una vez o divida este pago en un calendario fijo de 2 a 12 mensualidades gestionado por HelloAsso."
+
+#. Public-facing string in checkout or validation flow
+msgid "A recurring HelloAsso payment is missing its order or installment identity."
+msgstr "Falta el identificador del pedido o de la cuota en un pago recurrente de HelloAsso."
+
+#. Public-facing string in checkout or validation flow
+msgid "Choose a one-time payment or a fixed schedule of 2 to 12 monthly payments."
+msgstr "Elija un pago único o un calendario fijo de 2 a 12 mensualidades."
+
+#. Public-facing string in checkout or validation flow
+msgid "CiviCRM could not create the contribution for HelloAsso installment %1."
+msgstr "CiviCRM no pudo crear la contribución correspondiente a la cuota HelloAsso %1."
+
+#. Public-facing string in checkout or validation flow
+msgid "Contribution is not a future HelloAsso installment"
+msgstr "La contribución no es una cuota futura de HelloAsso"
+
+#. Public-facing string in checkout or validation flow
+msgid "Enable HelloAsso SEPA direct debit"
+msgstr "Activar el débito directo SEPA de HelloAsso"
+
+#. Public-facing string in checkout or validation flow
+msgid "Enable HelloAsso installment payments"
+msgstr "Activar los pagos HelloAsso en cuotas"
+
+#. Public-facing string in checkout or validation flow
+msgid "First name and last name must not be identical (HelloAsso rule)."
+msgstr "El nombre y el apellido no deben ser idénticos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "First/last name contains unauthorized special characters (HelloAsso rule)."
+msgstr "El nombre/apellido contiene caracteres especiales no permitidos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "First/last name must contain at least 3 characters (HelloAsso rule)."
+msgstr "El nombre/apellido debe contener al menos 3 caracteres (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "First/last name must contain at least one vowel (HelloAsso rule)."
+msgstr "El nombre/apellido debe contener al menos una vocal (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "First/last name must not contain 3 repeated characters (HelloAsso rule)."
+msgstr "El nombre/apellido no debe contener 3 caracteres repetitivos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "First/last name must not contain numbers (HelloAsso rule)."
+msgstr "El nombre/apellido no debe contener números (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "Future HelloAsso installments were cancelled successfully. Payments already collected were not refunded."
+msgstr "Las futuras cuotas de HelloAsso se cancelaron correctamente. Los pagos ya cobrados no se reembolsaron."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso installment cancellation is available only for processors connected through the authorization screen."
+msgstr "La cancelación de cuotas HelloAsso solo está disponible para procesadores conectados mediante la pantalla de autorización."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso installment cancellation requires an authorization-screen connection."
+msgstr "La cancelación de cuotas HelloAsso requiere una conexión mediante la pantalla de autorización."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso installment payments are disabled."
+msgstr "Los pagos de HelloAsso en cuotas están desactivados."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso installments must be collected every month."
+msgstr "Las cuotas HelloAsso deben cobrarse cada mes."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso installments must be monthly."
+msgstr "Las cuotas HelloAsso deben ser mensuales."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso is currently unavailable. Please try again later."
+msgstr "HelloAsso no está disponible temporalmente. Por favor, inténtelo de nuevo más tarde."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso refused the cancellation. Reconnect the organization through the authorization screen and grant the OrganizationAdmin or FormAdmin role; the client must also include the RefundManagement privilege."
+msgstr "HelloAsso rechazó la cancelación. Vuelva a conectar la asociación mediante la pantalla de autorización y conceda el rol OrganizationAdmin o FormAdmin; el cliente también debe incluir el privilegio RefundManagement."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso requires between %1 and %2 installments for this form."
+msgstr "HelloAsso requiere entre %1 y %2 cuotas para este formulario."
+
+#. Public-facing string in checkout or validation flow
+msgid "HelloAsso requires between 2 and 12 installments."
+msgstr "HelloAsso requiere entre 2 y 12 cuotas."
+
+#. Public-facing string in checkout or validation flow
+msgid "Invalid HelloAsso installment schedule: %1"
+msgstr "Calendario de cuotas HelloAsso no válido: %1"
+
+#. Public-facing string in checkout or validation flow
+msgid "Installment schedule"
+msgstr "Calendario de pagos"
+
+#. Public-facing string in checkout or validation flow
+msgid "Maximum installments"
+msgstr "Número máximo de cuotas"
+
+#. Public-facing string in checkout or validation flow
+msgid "Minimum installments"
+msgstr "Número mínimo de cuotas"
+
+#. Public-facing string in checkout or validation flow
+msgid "Number of installments"
+msgstr "Número de plazos"
+
+#. Public-facing string in checkout or validation flow
+msgid "Offer HelloAsso installment payments"
+msgstr "Ofrecer el pago HelloAsso en cuotas"
+
+#. Public-facing string in checkout or validation flow
+msgid "Offer SEPA direct debit on HelloAsso Checkout, including installment checkouts. HelloAsso only displays it for eligible organizations and may keep card payment available."
+msgstr "Ofrece el débito directo SEPA en HelloAsso Checkout, incluidos los pagos en cuotas. HelloAsso solo lo muestra para las asociaciones elegibles y puede mantener disponible el pago con tarjeta."
+
+#. Public-facing string in checkout or validation flow
+msgid "One-time payment"
+msgstr "Pago único"
+
+#. Public-facing string in checkout or validation flow
+msgid "Online contribution"
+msgstr "Contribución en línea"
+
+#. Public-facing string in checkout or validation flow
+msgid "Online contribution: %1"
+msgstr "Contribución en línea: %1"
+
+#. Public-facing string in checkout or validation flow
+msgid "Pay in full"
+msgstr "Pagar en un solo pago"
+
+#. Public-facing string in checkout or validation flow
+msgid "Payment schedule"
+msgstr "Calendario de pagos"
+
+#. Public-facing string in checkout or validation flow
+msgid "The %1 contains unauthorized characters (HelloAsso rule)."
+msgstr "El %1 contiene caracteres no permitidos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "The %1 must contain at least 3 characters (HelloAsso rule)."
+msgstr "El %1 debe contener al menos 3 caracteres (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "The %1 must contain at least one vowel (HelloAsso rule)."
+msgstr "El %1 debe contener al menos una vocal (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "The %1 must not contain 3 repeated characters (HelloAsso rule)."
+msgstr "El %1 no debe contener 3 caracteres repetitivos (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "The %1 must not contain numbers (HelloAsso rule)."
+msgstr "El %1 no debe contener números (regla HelloAsso)."
+
+#. Public-facing string in checkout or validation flow
+msgid "The HelloAsso authorization does not include the RefundManagement privilege required to cancel future installments."
+msgstr "La autorización de HelloAsso no incluye el privilegio RefundManagement necesario para cancelar futuras cuotas."
+
+#. Public-facing string in checkout or validation flow
+msgid "The HelloAsso installment mapping table is missing. Apply the extension database upgrades before processing installments."
+msgstr "Falta la tabla de correspondencia de cuotas HelloAsso. Aplique las actualizaciones de la base de datos de la extensión antes de procesar las cuotas."
+
+#. Public-facing string in checkout or validation flow
+msgid "The HelloAsso order ID is missing from this recurring contribution."
+msgstr "Falta el identificador del pedido HelloAsso en esta contribución recurrente."
+
+#. Public-facing string in checkout or validation flow
+msgid "The HelloAsso order ID stored on this recurring contribution is invalid."
+msgstr "El identificador del pedido HelloAsso guardado en esta contribución recurrente no es válido."
+
+#. Public-facing string in checkout or validation flow
+msgid "The HelloAsso payment processor is currently unavailable. Please try again later."
+msgstr "El procesador de pago HelloAsso no está disponible temporalmente. Por favor, inténtelo de nuevo más tarde."
+
+#. Public-facing string in checkout or validation flow
+msgid "The contribution mapped to this HelloAsso installment no longer exists."
+msgstr "La contribución asociada a esta cuota HelloAsso ya no existe."
+
+#. Public-facing string in checkout or validation flow
+msgid "The value of %1 is not allowed by HelloAsso."
+msgstr "El valor de %1 no está permitido por HelloAsso."
+
+#. Public-facing string in checkout or validation flow
+msgid "This value is not allowed by HelloAsso."
+msgstr "Este valor no está permitido por HelloAsso."
+
+#. Public-facing string in checkout or validation flow
+msgid "You will be redirected to HelloAsso to complete your payment."
+msgstr "Será redirigido a HelloAsso para realizar el pago."
