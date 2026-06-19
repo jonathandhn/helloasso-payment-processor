@@ -1,18 +1,28 @@
 <?xml version="1.0"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="true" processIsolation="false" stopOnFailure="false" cacheResult="false" bootstrap="tests/phpunit/bootstrap.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         failOnRisky="true"
+         failOnWarning="true"
+         cacheResult="false"
+         bootstrap="tests/phpunit/bootstrap.php"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
+  <source>
+    <include>
+      <directory suffix=".php">./CRM</directory>
+      <directory suffix=".php">./Civi</directory>
+    </include>
+  </source>
   <testsuites>
-    <testsuite name="My Test Suite">
+    <testsuite name="HelloAsso unit tests">
       <directory>./tests/phpunit</directory>
+      <exclude>./tests/phpunit/CRM/HelloassoPaymentProcessor/Base</exclude>
+      <exclude>./tests/phpunit/CRM/HelloassoPaymentProcessor/InstallmentStoreIntegrationTest.php</exclude>
+      <exclude>./tests/phpunit/CRM/HelloassoPaymentProcessor/ServiceIntegrationTest.php</exclude>
+      <exclude>./tests/phpunit/CRM/HelloassoPaymentProcessor/UpgraderIntegrationTest.php</exclude>
+      <exclude>./tests/phpunit/CRM/HelloassoPaymentProcessor/HelloAssoClientContractTest.php</exclude>
     </testsuite>
   </testsuites>
-  <filter>
-    <whitelist>
-      <directory suffix=".php">./</directory>
-    </whitelist>
-  </filter>
-  <listeners>
-    <listener class="Civi\Test\CiviTestListener">
-      <arguments/>
-    </listener>
-  </listeners>
+
 </phpunit>

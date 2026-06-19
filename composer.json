@@ -1,0 +1,36 @@
+{
+  "name": "jonathandhn/helloasso-payment-processor",
+  "description": "HelloAsso payment processor for CiviCRM: online payments, authorization-screen connections, secure webhooks and reconciliation.",
+  "type": "civicrm-ext",
+  "license": "AGPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Antoine BREHERET",
+      "email": "breheret@makoa.fr"
+    },
+    {
+      "name": "Jonathan Dahan",
+      "email": "jonathan@dhn.one"
+    }
+  ],
+  "require": {
+    "php": ">=8.0 <8.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
+  },
+  "scripts": {
+    "test": "phpunit -c phpunit.xml.dist"
+  },
+  "suggest": {
+    "civicrm/civicrm-core": "CiviCRM 6.14 or later is required.",
+    "civicrm/mjwshared": "Payment Shared is required by this extension."
+  },
+  "extra": {
+    "installer-name": "helloasso-payment-processor"
+  },
+  "support": {
+    "source": "https://github.com/jonathandhn/helloasso-payment-processor",
+    "issues": "https://github.com/jonathandhn/helloasso-payment-processor/issues"
+  }
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         cacheResult="false"
+         bootstrap="tests/phpunit/bootstrap-integration.php"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
+  <!--
+    Suite d'integration CiviCRM/DB - PHPUnit 11.
+
+    Lance avec :
+      php vendor/bin/phpunit -c phpunit-integration.xml -no-coverage
+
+    Necessite un CiviCRM fonctionnel (base de donnees + cv).
+    HELLOASSO_UNIT_ONLY doit etre absent ou vide : le bootstrap-integration.php
+    boot CiviCRM via cv php:boot level=full + CIVICRM_UF=UnitTests.
+
+    Les tests portent @group headless et gerent leur rollback via
+    CRM_Core_Transaction dans CiviHeadlessTestCase::setUp/tearDown.
+  -->
+  <source>
+    <include>
+      <directory suffix=".php">./CRM</directory>
+      <directory suffix=".php">./Civi</directory>
+    </include>
+  </source>
+  <testsuites>
+    <testsuite name="HelloAsso integration tests">
+      <directory>./tests/phpunit</directory>
+      <exclude>./tests/phpunit/CRM/HelloassoPaymentProcessor/Base</exclude>
+    </testsuite>
+  </testsuites>
+  <groups>
+    <include>
+      <group>headless</group>
+    </include>
+  </groups>
+  <php>
+    <env name="HELLOASSO_UNIT_ONLY" value="0"/>
+  </php>
+</phpunit>
