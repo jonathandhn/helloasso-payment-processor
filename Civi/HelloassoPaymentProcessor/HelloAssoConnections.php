@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class HelloAssoConnections extends AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.checkout.options' => 'getCheckoutOptions',
       // Run after civi_contribute registers CheckoutBlock so our admin wrapper sticks.
