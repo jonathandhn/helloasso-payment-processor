@@ -134,6 +134,19 @@ class CRM_HelloassoPaymentProcessor_InstallmentStore
         );
     }
 
+    public function findInstallmentNumberByContributionId(int $contributionId): ?int
+    {
+        $installmentNumber = CRM_Core_DAO::singleValueQuery(
+            'SELECT installment_number
+             FROM ' . self::TABLE_NAME . '
+             WHERE contribution_id = %1
+             LIMIT 1',
+            [1 => [$contributionId, 'Integer']]
+        );
+
+        return $installmentNumber ? (int) $installmentNumber : NULL;
+    }
+
     public function updateState(int $paymentProcessorId, array $identity): void
     {
         $params = [

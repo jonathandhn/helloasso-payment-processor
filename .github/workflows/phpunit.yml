@@ -1,0 +1,139 @@
+name: PHPUnit
+
+on:
+  workflow_dispatch:
+    inputs:
+      civicrm-version:
+        description: CiviCRM version constraint
+        required: false
+        default: ^6.14
+        type: string
+  pull_request:
+    paths:
+      - '**.php'
+      - composer.json
+      - phpunit.xml.dist
+      - phpunit-integration.xml
+      - .github/workflows/phpunit.yml
+  push:
+    branches:
+      - main
+    paths:
+      - '**.php'
+      - composer.json
+      - phpunit.xml.dist
+      - phpunit-integration.xml
+      - .github/workflows/phpunit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CIVICRM_VERSION: ${{ inputs.civicrm-version || '^6.14' }}
+      DATABASE_URL: mysql://user:password@127.0.0.1:3306/civicrm?new_link=true
+
+    steps:
+      - name: Checkout extension
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: bcmath, curl, fileinfo, gd, intl, mbstring, mysqli, xml, zip
+          coverage: none
+        env:
+          fail-fast: true
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php84-composer-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-php84-composer-
+
+      - name: Install test runner
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Set up MySQL
+        run: |
+          sudo systemctl start mysql.service
+          until sudo mysqladmin ping --silent; do sleep 1; done
+          sudo mysql -e 'CREATE DATABASE civicrm;' --user=root --password=root
+          sudo mysql -e 'CREATE USER "user"@"localhost" IDENTIFIED BY "password";' --user=root --password=root
+          sudo mysql -e 'GRANT ALL ON *.* TO "user"@"localhost";' --user=root --password=root
+          sudo mysql -e 'GRANT SUPER ON *.* TO "user"@"localhost";' --user=root --password=root
+          sudo mysql -e 'FLUSH PRIVILEGES;' --user=root --password=root
+
+      - name: Install CiviCRM standalone
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          EXT_DIR="$GITHUB_WORKSPACE"
+          EXT_PACKAGE=$(composer show --self --name-only)
+
+          cd ..
+          git clone --depth=1 https://github.com/civicrm/civicrm-standalone.git
+          cd civicrm-standalone
+
+          composer config --no-plugins allow-plugins.composer/installers true
+          composer config --no-plugins allow-plugins.cweagans/composer-patches true
+          composer config --json 'extra.installer-paths.ext/{$name}' '["type:civicrm-ext"]'
+          composer config repositories.helloasso path "$EXT_DIR"
+          composer remove --no-update civicrm/civicrm-core civicrm/civicrm-packages
+          composer require --no-update \
+            "civicrm/civicrm-core:$CIVICRM_VERSION" \
+            "civicrm/civicrm-packages:$CIVICRM_VERSION"
+          composer require --with-all-dependencies --no-interaction --no-progress \
+            composer/installers \
+            civicrm/cli-tools \
+            "$EXT_PACKAGE"
+
+          git clone --depth=1 \
+            https://lab.civicrm.org/extensions/mjwshared.git \
+            ext/mjwshared
+
+      - name: Configure CiviCRM
+        run: |
+          cd ../civicrm-standalone
+          export PATH="$(realpath vendor/bin):$PATH"
+          cv core:install \
+            --db="$DATABASE_URL" \
+            --comp="CiviContribute,CiviEvent,CiviMember"
+          export CV_CONFIG="$HOME/.cv.json"
+          cv vars:fill --quiet
+          sed -i "s#\"TEST_DB_DSN\": \".*\"#\"TEST_DB_DSN\": \"$DATABASE_URL\"#g" "$CV_CONFIG"
+          cv en mjwshared -y
+          cv en helloasso-payment-processor -y
+          cv updb -y
+
+      - name: Run unit tests
+        env:
+          HELLOASSO_UNIT_ONLY: '0'
+          HELLOASSO_BOOT_LEVEL: full
+        run: |
+          export PATH="$(realpath ../civicrm-standalone/vendor/bin):$PATH"
+          export CV_CONFIG="$HOME/.cv.json"
+          composer phpunit
+
+      - name: Run CiviCRM integration tests
+        env:
+          HELLOASSO_TEST_API_CLIENT_ID: ${{ secrets.HELLOASSO_TEST_API_CLIENT_ID }}
+          HELLOASSO_TEST_API_CLIENT_SECRET: ${{ secrets.HELLOASSO_TEST_API_CLIENT_SECRET }}
+          HELLOASSO_TEST_ORGANIZATION_SLUG: ${{ vars.HELLOASSO_TEST_ORGANIZATION_SLUG }}
+        run: |
+          export PATH="$(realpath ../civicrm-standalone/vendor/bin):$PATH"
+          export CV_CONFIG="$HOME/.cv.json"
+          composer phpunit:integration

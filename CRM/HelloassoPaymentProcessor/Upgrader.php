@@ -14,6 +14,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
 
   public function postInstall(): void {
     $this->ensureHelloAssoPaymentInstrumentDefaults();
+    $this->ensureInstallmentLineItemTable();
   }
 
   public function upgrade_4200(): bool {
@@ -585,6 +586,48 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     $this->ensureHelloAssoPaymentInstrumentDefaults();
 
     return TRUE;
+  }
+
+  public function upgrade_4224(): bool {
+    $this->ctx->log->info('Applying update 4224: persist line-item allocations for HelloAsso installments.');
+    $this->ensureInstallmentLineItemTable();
+
+    return TRUE;
+  }
+
+  private function ensureInstallmentLineItemTable(): void {
+    CRM_Core_DAO::executeQuery("
+      CREATE TABLE IF NOT EXISTS civicrm_hello_asso_installment_line_item (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        contribution_recur_id int unsigned NOT NULL,
+        installment_number int unsigned NOT NULL,
+        line_item_ordinal int unsigned NOT NULL,
+        source_line_item_id int unsigned NULL DEFAULT NULL,
+        entity_table varchar(64) NOT NULL,
+        entity_id int unsigned NOT NULL,
+        price_field_value_id int unsigned NULL DEFAULT NULL,
+        financial_type_id int unsigned NOT NULL,
+        label varchar(255) NOT NULL,
+        original_amount int unsigned NOT NULL,
+        allocated_amount int unsigned NOT NULL,
+        created_at datetime NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uniq_recur_installment_ordinal (
+          contribution_recur_id,
+          installment_number,
+          line_item_ordinal
+        ),
+        KEY index_source_line_item_id (source_line_item_id),
+        CONSTRAINT FK_hello_asso_installment_line_item_recur
+          FOREIGN KEY (contribution_recur_id) REFERENCES civicrm_contribution_recur(id) ON DELETE CASCADE,
+        CONSTRAINT FK_hello_asso_installment_line_item_source
+          FOREIGN KEY (source_line_item_id) REFERENCES civicrm_line_item(id) ON DELETE SET NULL,
+        CONSTRAINT FK_hello_asso_installment_line_item_price
+          FOREIGN KEY (price_field_value_id) REFERENCES civicrm_price_field_value(id) ON DELETE SET NULL,
+        CONSTRAINT FK_hello_asso_installment_line_item_financial_type
+          FOREIGN KEY (financial_type_id) REFERENCES civicrm_financial_type(id) ON DELETE RESTRICT
+      ) ENGINE=InnoDB
+    ");
   }
 
   private function addColumnIfMissing(string $columnName, string $sql): void {

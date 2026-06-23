@@ -17,10 +17,12 @@
     "php": ">=8.0 <8.5"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.6"
+    "phpunit/phpunit": "^11.5"
   },
   "scripts": {
-    "test": "phpunit -c phpunit.xml.dist"
+    "phpunit": "phpunit -c phpunit.xml.dist --no-coverage",
+    "phpunit:integration": "phpunit -c phpunit-integration.xml --no-coverage",
+    "test": "@phpunit"
   },
   "suggest": {
     "civicrm/civicrm-core": "CiviCRM 6.14 or later is required.",

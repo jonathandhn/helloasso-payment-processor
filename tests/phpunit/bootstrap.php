@@ -3,8 +3,9 @@
 ini_set('memory_limit', '2G');
 
 if (getenv('HELLOASSO_UNIT_ONLY') !== '1') {
+  $bootLevel = getenv('HELLOASSO_BOOT_LEVEL') ?: 'classloader';
   // phpcs:disable
-  eval(cv('php:boot --level=classloader', 'phpcode'));
+  eval(cv('php:boot --level=' . $bootLevel, 'phpcode'));
   // phpcs:enable
 }
 // Allow autoloading of PHPUnit helper classes in this extension.

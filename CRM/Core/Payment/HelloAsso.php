@@ -565,13 +565,19 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             'payer' => $payer,
             'metadata' => $metadata,
         ];
-
         $response = CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
             ->createCheckoutIntent($this->getPaymentProcessorConfig(), $this->_is_test, $request);
 
         if (empty($response['redirectUrl']) || empty($response['id'])) {
             throw new PaymentProcessorException(E::ts("Unknown error while preparing the HelloAsso redirect."));
         }
+
+        $this->captureInstallmentLineItemPlan(
+            $propertyBag,
+            $contributionId,
+            $request,
+            $options
+        );
 
         $contribution = $this->loadContributionById($contributionId);
         if (!$contribution) {
@@ -693,8 +699,54 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
         $this->synchronizeInitialInstallmentContributionAmountShape(
             $contributionId,
-            (int) $request['initialAmount']
+            (int) $request['initialAmount'],
+            1
         );
+    }
+
+    private function captureInstallmentLineItemPlan(
+        \Civi\Payment\PropertyBag $propertyBag,
+        int $contributionId,
+        array $request,
+        array $options
+    ): void {
+        if (
+            !$propertyBag->getIsRecur()
+            || !$propertyBag->has('contributionRecurID')
+            || !isset($request['initialAmount'])
+            || (
+                empty($options['helloasso_installments'])
+                && empty($options['schedule_total_amount'])
+            )
+        ) {
+            return;
+        }
+
+        $installmentAmounts = [(int) $request['initialAmount']];
+        foreach (($request['terms'] ?? []) as $term) {
+            if (!isset($term['amount'])) {
+                return;
+            }
+            $installmentAmounts[] = (int) $term['amount'];
+        }
+
+        try {
+            (new CRM_HelloassoPaymentProcessor_InstallmentLineItemAllocation())
+                ->capturePlan(
+                    (int) $propertyBag->getContributionRecurID(),
+                    $contributionId,
+                    $installmentAmounts
+                );
+        }
+        catch (RuntimeException $e) {
+            Civi::log()->error(
+                'Unable to prepare the HelloAsso installment line-item allocation: '
+                . $e->getMessage()
+            );
+            throw new PaymentProcessorException(E::ts(
+                'The HelloAsso payment processor is currently unavailable. Please try again later.'
+            ));
+        }
     }
 
     private function buildPayerFromPropertyBag(\Civi\Payment\PropertyBag $propertyBag): array
@@ -1871,9 +1923,15 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         $paymentAmount = $this->resolveContributionPaymentAmount($contribution, $paymentData);
+        $installmentNumber = 1;
+        if (!empty($contribution->contribution_recur_id)) {
+            $installmentNumber = (new CRM_HelloassoPaymentProcessor_InstallmentStore())
+                ->findInstallmentNumberByContributionId((int) $contribution->id) ?? 1;
+        }
         $this->synchronizeInitialInstallmentContributionAmountShape(
             (int) $contribution->id,
-            (int) round($paymentAmount * 100)
+            (int) round($paymentAmount * 100),
+            $installmentNumber
         );
         if (abs((float) $contribution->total_amount - $paymentAmount) > 0.0001) {
             $contribution->total_amount = $paymentAmount;
@@ -1937,7 +1995,8 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
     private function synchronizeInitialInstallmentContributionAmountShape(
         int $contributionId,
-        int $targetAmountCents
+        int $targetAmountCents,
+        int $installmentNumber = 1
     ): void {
         if ($contributionId < 1 || $targetAmountCents < 0) {
             return;
@@ -1952,6 +2011,25 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             ]
         );
         if ($contributionRecurId < 1) {
+            return;
+        }
+
+        $lineItemAllocation = new CRM_HelloassoPaymentProcessor_InstallmentLineItemAllocation();
+        if ($lineItemAllocation->hasInstallment($contributionRecurId, $installmentNumber)) {
+            if (!$lineItemAllocation->applyInstallment(
+                $contributionRecurId,
+                $installmentNumber,
+                $contributionId,
+                $targetAmountCents
+            )) {
+                Civi::log()->error(sprintf(
+                    'Unable to apply the saved HelloAsso installment allocation to contribution %d.',
+                    $contributionId
+                ));
+                throw new PaymentProcessorException(E::ts(
+                    'The HelloAsso payment processor is currently unavailable. Please try again later.'
+                ));
+            }
             return;
         }
 
