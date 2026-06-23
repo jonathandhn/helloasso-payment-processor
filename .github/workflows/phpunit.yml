@@ -115,8 +115,8 @@ jobs:
           export CV_CONFIG="$HOME/.cv.json"
           cv vars:fill --quiet
           sed -i "s#\"TEST_DB_DSN\": \".*\"#\"TEST_DB_DSN\": \"$DATABASE_URL\"#g" "$CV_CONFIG"
-          cv en mjwshared -y
-          cv en helloasso-payment-processor -y
+          cv en mjwshared
+          cv en helloasso-payment-processor
           cv updb -y
 
       - name: Run unit tests
