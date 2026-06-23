@@ -13,10 +13,15 @@ class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
     {
         $processorId = $this->createTestProcessor();
         $contactId = $this->createTestContact();
+        $recurId = $this->createTestRecur($processorId, ['contact_id' => $contactId]);
         $contributionId = $this->createTestContribution($contactId, $processorId, [
             'total_amount' => 10.00,
             'contribution_status_id' => 'Pending',
+            'contribution_recur_id' => $recurId,
         ]);
+        \Civi\Api4\LineItem::delete(FALSE)
+            ->addWhere('contribution_id', '=', $contributionId)
+            ->execute();
 
         \Civi\Api4\LineItem::create(FALSE)
             ->setValues([
@@ -60,5 +65,71 @@ class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
                 $lineItemRows
             )), 2)
         );
+    }
+
+    public function testNonRecurrentMixedContributionKeepsDonationAndMembershipShape(): void
+    {
+        $processorId = $this->createTestProcessor();
+        $contactId = $this->createTestContact();
+        $contributionId = $this->createTestContribution($contactId, $processorId, [
+            'total_amount' => 150.00,
+            'contribution_status_id' => 'Pending',
+        ]);
+        \Civi\Api4\LineItem::delete(FALSE)
+            ->addWhere('contribution_id', '=', $contributionId)
+            ->execute();
+
+        \Civi\Api4\LineItem::create(FALSE)
+            ->setValues([
+                'entity_table' => 'civicrm_contribution',
+                'entity_id' => $contributionId,
+                'contribution_id' => $contributionId,
+                'label' => 'Don',
+                'qty' => 1,
+                'unit_price' => 110.00,
+                'line_total' => 110.00,
+                'financial_type_id' => 1,
+            ])
+            ->execute();
+        \Civi\Api4\LineItem::create(FALSE)
+            ->setValues([
+                'entity_table' => 'civicrm_membership',
+                'entity_id' => $contributionId,
+                'contribution_id' => $contributionId,
+                'label' => 'Cotisation',
+                'qty' => 1,
+                'unit_price' => 40.00,
+                'line_total' => 40.00,
+                'financial_type_id' => 1,
+            ])
+            ->execute();
+
+        $processorArray = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $processorId]);
+        $processor = new CRM_Core_Payment_HelloAsso('test', $processorArray);
+        $method = new ReflectionMethod($processor, 'synchronizeInitialInstallmentContributionAmountShape');
+        $method->setAccessible(TRUE);
+
+        $method->invoke(
+            $processor,
+            $contributionId,
+            15000
+        );
+
+        $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $contributionId]);
+        $lineItems = \Civi\Api4\LineItem::get(FALSE)
+            ->addSelect('entity_table', 'unit_price', 'line_total')
+            ->addWhere('contribution_id', '=', $contributionId)
+            ->addOrderBy('id', 'ASC')
+            ->execute();
+        $lineItemRows = iterator_to_array($lineItems);
+
+        $this->assertSame(150.00, (float) $contribution['total_amount']);
+        $this->assertCount(2, $lineItemRows);
+        $this->assertSame('civicrm_contribution', $lineItemRows[0]['entity_table']);
+        $this->assertSame(110.00, (float) $lineItemRows[0]['unit_price']);
+        $this->assertSame(110.00, (float) $lineItemRows[0]['line_total']);
+        $this->assertSame('civicrm_membership', $lineItemRows[1]['entity_table']);
+        $this->assertSame(40.00, (float) $lineItemRows[1]['unit_price']);
+        $this->assertSame(40.00, (float) $lineItemRows[1]['line_total']);
     }
 }

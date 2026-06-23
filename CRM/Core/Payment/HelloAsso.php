@@ -1943,6 +1943,18 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return;
         }
 
+        $contributionRecurId = (int) CRM_Core_DAO::singleValueQuery(
+            'SELECT contribution_recur_id
+             FROM civicrm_contribution
+             WHERE id = %1',
+            [
+                1 => [$contributionId, 'Integer'],
+            ]
+        );
+        if ($contributionRecurId < 1) {
+            return;
+        }
+
         $targetAmount = round($targetAmountCents / 100, 2);
         CRM_Core_DAO::executeQuery(
             'UPDATE civicrm_contribution
