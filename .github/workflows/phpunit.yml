@@ -140,6 +140,7 @@ jobs:
         run: |
           export PATH="$(realpath ../civicrm-standalone/vendor/bin):$PATH"
           export CV_CONFIG="$HOME/.cv.json"
+          export CIVICRM_SETTINGS="$(realpath ../civicrm-standalone/private/civicrm.settings.php)"
           composer phpunit
 
       - name: Run CiviCRM integration tests
@@ -151,4 +152,5 @@ jobs:
         run: |
           export PATH="$(realpath ../civicrm-standalone/vendor/bin):$PATH"
           export CV_CONFIG="$HOME/.cv.json"
+          export CIVICRM_SETTINGS="$(realpath ../civicrm-standalone/private/civicrm.settings.php)"
           composer phpunit:integration
