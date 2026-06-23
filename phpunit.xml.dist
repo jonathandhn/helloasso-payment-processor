@@ -7,7 +7,7 @@
          failOnWarning="true"
          cacheResult="false"
          bootstrap="tests/phpunit/bootstrap.php"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
   <source>
     <include>
       <directory suffix=".php">./CRM</directory>

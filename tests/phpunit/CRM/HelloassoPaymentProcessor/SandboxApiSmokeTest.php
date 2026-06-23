@@ -11,6 +11,10 @@ class CRM_HelloassoPaymentProcessor_SandboxApiSmokeTest
 {
     public function testSandboxCredentialsAuthenticateAndReadPayments(): void
     {
+        if (getenv('HELLOASSO_RUN_SANDBOX_SMOKE') !== '1') {
+            $this->markTestSkipped('HelloAsso sandbox smoke test is disabled for this job.');
+        }
+
         $clientId = trim((string) getenv('HELLOASSO_TEST_API_CLIENT_ID'));
         $clientSecret = trim((string) getenv('HELLOASSO_TEST_API_CLIENT_SECRET'));
         $organizationSlug = trim((string) getenv('HELLOASSO_TEST_ORGANIZATION_SLUG'));

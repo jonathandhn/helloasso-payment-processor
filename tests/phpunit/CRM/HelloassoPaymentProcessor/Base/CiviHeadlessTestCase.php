@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base class for HelloAsso CiviCRM integration tests (PHPUnit 11).
+ * Base class for HelloAsso CiviCRM integration tests (PHPUnit 10/11).
  *
  * CiviCRM est booté au niveau full par bootstrap-integration.php.
  * Chaque test s'exécute dans une transaction MySQL rollbackée automatiquement

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Bootstrap pour les tests d'intégration CiviCRM (PHPUnit 11+).
+ * Bootstrap pour les tests d'intégration CiviCRM (PHPUnit 10/11).
  *
  * PHPUnit 11 a supprimé les TestListeners — CiviTestListener n'est plus appelé.
  * On boot CiviCRM directement ici avec --level=full + CIVICRM_UF=UnitTests.

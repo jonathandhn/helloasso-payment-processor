@@ -5,9 +5,9 @@
          stopOnFailure="false"
          cacheResult="false"
          bootstrap="tests/phpunit/bootstrap-integration.php"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
   <!--
-    Suite d'integration CiviCRM/DB - PHPUnit 11.
+    Suite d'integration CiviCRM/DB - PHPUnit 10/11.
 
     Lance avec :
       php vendor/bin/phpunit -c phpunit-integration.xml -no-coverage
