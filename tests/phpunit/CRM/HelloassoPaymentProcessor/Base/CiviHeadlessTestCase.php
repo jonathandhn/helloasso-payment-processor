@@ -10,8 +10,8 @@
  * Lancement :
  *   php vendor/bin/phpunit -c phpunit-integration.xml --no-coverage
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 abstract class CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
     extends \PHPUnit\Framework\TestCase
 {

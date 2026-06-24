@@ -3,9 +3,9 @@
 /**
  * Read-only smoke tests against the HelloAsso sandbox.
  *
- * @group headless
- * @group sandbox
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
+#[\PHPUnit\Framework\Attributes\Group('sandbox')]
 class CRM_HelloassoPaymentProcessor_SandboxApiSmokeTest
     extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {

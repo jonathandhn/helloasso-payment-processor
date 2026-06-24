@@ -10,8 +10,8 @@ use Civi\Payment\Exception\PaymentProcessorException;
 /**
  * Tests d'intégration pour le client HelloAsso (GuzzleHttp + cache CiviCRM).
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {
     private CRM_HelloassoPaymentProcessor_HelloAssoClient $client;

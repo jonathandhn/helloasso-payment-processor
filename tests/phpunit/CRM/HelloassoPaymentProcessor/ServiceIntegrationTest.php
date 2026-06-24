@@ -10,8 +10,8 @@ use Civi\Payment\Exception\PaymentProcessorException;
  * - sanitizeProcessor() ne laisse jamais filtrer les credentials sensibles
  * - Les exceptions sont levées aux bons moments
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_ServiceIntegrationTest
     extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {

@@ -20,8 +20,8 @@
     "phpunit/phpunit": "^10.5 || ^11.5"
   },
   "scripts": {
-    "phpunit": "phpunit -c phpunit.xml.dist --no-coverage",
-    "phpunit:integration": "phpunit -c phpunit-integration.xml --no-coverage",
+    "phpunit": "phpunit -c phpunit.xml.dist --no-coverage --display-phpunit-deprecations",
+    "phpunit:integration": "phpunit -c phpunit-integration.xml --no-coverage --display-phpunit-deprecations",
     "test": "@phpunit"
   },
   "suggest": {

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_HostedCheckoutBrowserReturnIntegrationTest
     extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {

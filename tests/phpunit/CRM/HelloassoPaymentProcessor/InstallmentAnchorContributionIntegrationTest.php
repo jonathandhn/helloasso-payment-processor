@@ -4,8 +4,8 @@
  * Verifie que la contribution d'ancrage d'un echeancier est ramenee
  * au premier terme reellement attendu.
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
     extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {

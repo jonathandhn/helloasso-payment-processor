@@ -9,8 +9,8 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 /**
  * Tests end-to-end de synchronisation (Cron et webhooks).
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_SynchronizationE2ETest extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {
     private MockHandler $mockHandler;

@@ -11,8 +11,8 @@
  * test — les tables civicrm_hello_asso_installment et civicrm_contribution_recur
  * sont restaurées sans intervention manuelle.
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_InstallmentStoreIntegrationTest
     extends CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
 {

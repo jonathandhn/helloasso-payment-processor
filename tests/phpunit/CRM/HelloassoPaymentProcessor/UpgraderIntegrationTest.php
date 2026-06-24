@@ -12,8 +12,8 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
  *
  * Comme le bootstrap a déjà booté CiviCRM, nous avons accès à la DB.
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_UpgraderIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     private CRM_HelloassoPaymentProcessor_Upgrader $upgrader;

@@ -5,8 +5,8 @@ use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 /**
  * Test class for private data normalizer methods in the Upgrader.
  *
- * @group headless
  */
+#[\PHPUnit\Framework\Attributes\Group('headless')]
 class CRM_HelloassoPaymentProcessor_UpgraderSqlFixtureTest extends \PHPUnit\Framework\TestCase
 {
     private CRM_HelloassoPaymentProcessor_Upgrader $upgrader;
