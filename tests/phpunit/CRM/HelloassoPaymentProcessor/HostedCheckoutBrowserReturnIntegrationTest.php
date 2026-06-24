@@ -21,7 +21,8 @@ class CRM_HelloassoPaymentProcessor_HostedCheckoutBrowserReturnIntegrationTest
         $metadata->payment_processor_id = $processorId;
         $metadata->save();
 
-        $processor = new class('test', ['id' => $processorId]) extends CRM_Core_Payment_HelloAsso {
+        $processorConfig = ['id' => $processorId];
+        $processor = new class('test', $processorConfig) extends CRM_Core_Payment_HelloAsso {
             public array $capturedOptions = [];
 
             public function processScheduledSynchronization(array $options = []): array

@@ -8,6 +8,10 @@ class CRM_HelloassoPaymentProcessor_UpgraderRecurringSupportTest extends CRM_Hel
             'is_recur' => 0,
             'name' => 'HelloAsso_sync_' . uniqid(),
         ]);
+        CRM_Core_DAO::executeQuery(
+            'UPDATE civicrm_payment_processor SET is_recur = 0 WHERE id = %1',
+            [1 => [$processorId, 'Integer']]
+        );
 
         $mapper = CRM_Extension_System::singleton()->getMapper();
         $upgrader = new CRM_HelloassoPaymentProcessor_Upgrader(

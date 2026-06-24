@@ -10,7 +10,6 @@ class CRM_HelloassoPaymentProcessor_ContributionPageAmountConfigTest extends CRM
             'name' => 'HelloAsso_live_' . uniqid(),
         ]);
 
-        CRM_Utils_Cache::singleton()->deleteGroup('CRM_Financial_BAO_Payment_Processor');
         CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live', TRUE);
 
         $form = $this->getMockBuilder(CRM_Core_Form::class)

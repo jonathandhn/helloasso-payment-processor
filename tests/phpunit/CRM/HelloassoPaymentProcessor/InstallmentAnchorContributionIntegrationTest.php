@@ -223,18 +223,19 @@ class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
             ['civicrm_membership', $businessEntityId, 'Cotisation', 40.00],
             ['civicrm_participant', $businessEntityId, 'Billet', 50.00],
         ] as [$entityTable, $entityId, $label, $amount]) {
-            \Civi\Api4\LineItem::create(FALSE)
-                ->setValues([
-                    'entity_table' => $entityTable,
-                    'entity_id' => $entityId,
-                    'contribution_id' => $contributionId,
-                    'label' => $label,
-                    'qty' => 1,
-                    'unit_price' => $amount,
-                    'line_total' => $amount,
-                    'financial_type_id' => 1,
-                ])
-                ->execute();
+            CRM_Core_DAO::executeQuery(
+                'INSERT INTO civicrm_line_item
+                    (entity_table, entity_id, contribution_id, label, qty,
+                     unit_price, line_total, financial_type_id)
+                 VALUES (%1, %2, %3, %4, 1, %5, %5, 1)',
+                [
+                    1 => [$entityTable, 'String'],
+                    2 => [$entityId, 'Integer'],
+                    3 => [$contributionId, 'Integer'],
+                    4 => [$label, 'String'],
+                    5 => [$amount, 'Money'],
+                ]
+            );
         }
     }
 }
