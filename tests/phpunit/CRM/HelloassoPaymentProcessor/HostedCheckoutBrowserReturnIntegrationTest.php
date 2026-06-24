@@ -54,7 +54,7 @@ class CRM_HelloassoPaymentProcessor_HostedCheckoutBrowserReturnIntegrationTest
 
         $reloaded = new CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata();
         $reloaded->contribution_id = $contributionId;
-        $this->assertTrue($reloaded->find(TRUE));
+        $this->assertSame(1, (int) $reloaded->find(TRUE));
         $this->assertNotEmpty($reloaded->sync_origin_date);
         $this->assertNotEmpty($reloaded->sync_next_date);
         $this->assertSame('0', (string) $reloaded->sync_attempt_count);
