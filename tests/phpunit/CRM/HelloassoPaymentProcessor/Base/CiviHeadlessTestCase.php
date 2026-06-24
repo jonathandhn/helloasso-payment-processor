@@ -44,11 +44,14 @@ abstract class CRM_HelloassoPaymentProcessor_Base_CiviHeadlessTestCase
      */
     protected function createTestProcessor(array $overrides = []): int
     {
+        $processorType = civicrm_api3('PaymentProcessorType', 'getsingle', [
+            'name' => 'HelloAsso',
+        ]);
         $result = civicrm_api3('PaymentProcessor', 'create', array_merge([
             'name'                      => 'HelloAsso_test_' . uniqid(),
             'title'                     => 'HelloAsso Test',
             'class_name'                => 'Payment_HelloAsso',
-            'payment_processor_type_id' => 15, // HelloAsso
+            'payment_processor_type_id' => (int) $processorType['id'],
             'financial_account_id'      => 12, // Compte Passerelle
             'is_active'                 => 1,
             'is_default'                => 0,
