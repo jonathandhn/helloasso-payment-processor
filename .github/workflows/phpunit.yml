@@ -115,7 +115,7 @@ jobs:
             ext/mjwshared
 
           # mjwshared 1.5.8 predates Symfony's typed subscriber contract.
-          sed -i 's/public static function getSubscribedEvents() {/public static function getSubscribedEvents(): array {/' \
+          sed -i 's/public static function getSubscribedEvents(): array {/public static function getSubscribedEvents(): array {/' \
             ext/mjwshared/Civi/PaymentprocessorWebhook/Tasks.php \
             ext/mjwshared/Civi/MJW/Payment/Membership.php
 
