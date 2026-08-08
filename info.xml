@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="helloasso-payment-processor" type="module">
   <file>helloasso_payment_processor</file>
-  <name>helloasso-payment-processor</name>
+  <name>HelloAsso Payment Processor</name>
   <description>HelloAsso online payments, authorization-screen connections, secure webhooks and payment reconciliation.</description>
   <license>AGPL-3.0</license>
   <maintainer>
@@ -14,8 +14,8 @@
     <url desc="Support">https://lab.civicrm.org/extensions/helloasso-payment-processor/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2026-07-01</releaseDate>
-  <version>2.1.1</version>
+  <releaseDate>2026-07-13</releaseDate>
+  <version>2.1.2</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>6.14</ver>

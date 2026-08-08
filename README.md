@@ -204,10 +204,15 @@ L'extension connaît deux mécanismes de signature, car les sites peuvent
 recevoir à la fois des notifications historiques configurées manuellement et
 des notifications créées par la mire.
 
-| Réglage | Défaut | Mécanisme | Effet |
-| --- | ---: | --- | --- |
-| `helloasso_v2_require_partner_webhook_signature` | Activé | Mire / `x-ha-signature` | En mode mire, exige que le header `x-ha-signature` corresponde à la clé de signature stockée lors de l'enregistrement du webhook. Peut être désactivé pour un relais webhook ou une architecture multi-instances qui ne transmet pas cette signature telle quelle. |
-| `helloasso_v2_require_webhook_signature` | Désactivé | Legacy / `metadata.invoiceID` + `metadata.sig` | Exige l'ancien HMAC local basé sur l'`invoiceID`. À activer seulement si les webhooks historiques envoyés à cette instance portent bien cette signature. |
+- `helloasso_v2_require_partner_webhook_signature` est **activé** par défaut.
+  En mode mire, il exige que le header `x-ha-signature` corresponde à la clé
+  stockée lors de l'enregistrement du webhook. Il peut être désactivé pour un
+  relais webhook ou une architecture multi-instances qui ne transmet pas cette
+  signature telle quelle.
+- `helloasso_v2_require_webhook_signature` est **désactivé** par défaut.
+  Il exige l'ancien HMAC local basé sur `metadata.invoiceID` et `metadata.sig`.
+  Ne l'activer que si les webhooks historiques envoyés à cette instance portent
+  bien cette signature.
 
 Une signature présente et vérifiable doit toujours être correcte. Une
 signature absente peut être tolérée selon les réglages ci-dessus, mais le
@@ -229,12 +234,16 @@ HelloAsso sur des identifiants inconnus.
 
 Vérifier que les jobs suivants sont actifs dans CiviCRM :
 
-| Job | Rôle |
-| --- | --- |
-| `Job.process_paymentprocessor_webhooks` | Traite les notifications placées en file d'attente. |
-| `Job.process_helloasso` | Exécute le rattrapage court `T+5` / `T+15` / `T+45`; le dernier passage annule un plan multi-échéance resté sans paiement ou marque un panier classique abandonné en conservant sa contribution `Pending` pour les relances. |
-| `Job.process_helloasso_long_followup` | Contrôle les changements tardifs, dont les remboursements. |
-| `Job.refresh_helloasso_partner_links` | Renouvelle les liaisons mire avant leur expiration. |
+- `Job.process_paymentprocessor_webhooks` : traite les notifications placées
+  en file d'attente.
+- `Job.process_helloasso` : exécute le rattrapage court `T+5` / `T+15` /
+  `T+45`. Le dernier passage annule un plan multi-échéance resté sans paiement
+  ou marque un panier classique abandonné en conservant sa contribution
+  `Pending` pour les relances.
+- `Job.process_helloasso_long_followup` : contrôle les changements tardifs,
+  dont les remboursements.
+- `Job.refresh_helloasso_partner_links` : renouvelle les liaisons mire avant
+  leur expiration.
 
 ## Commandes Utiles
 
@@ -276,27 +285,59 @@ les instances, `cv` peut ne pas reconstruire immédiatement toute l'interface ;
 si une entrée de menu ou un écran de configuration manque encore, utiliser aussi
 **Administrer > Paramètres système > Vider les caches**.
 
-| Setting | Défaut | Exposé dans l'UI | Rôle |
-| --- | ---: | --- | --- |
-| `helloasso_v2_standard_frontend_bridge` | Activé | Non | Active le pont frontend `CRM.payment` / `mjwshared` utilisé par les formulaires classiques et Webform. |
-| `helloasso_v2_safe_abort_urls` | Activé | Non | Remplace les URL d'annulation ou d'erreur fragiles par une URL sûre lorsque le contexte est AJAX ou CiviCRM interne. |
-| `helloasso_v2_queue_webhooks` | Activé | Oui, page globale | Place les webhooks dans la file `PaymentprocessorWebhook` au lieu de les traiter immédiatement. |
-| `helloasso_v2_followup_enabled` | Activé | Oui, page globale | Programme les contrôles courts `T+5` / `T+15` / `T+45` après création d'un checkout. À `T+45`, un checkout classique sans paiement reste `Pending` pour permettre les relances de panier. |
-| `helloasso_v2_afform_checkout` | Activé | Oui, page globale | Expose la Checkout Option HelloAsso pour Afform / Form Builder. |
-| `helloasso_enable_refunds` | Désactivé | Oui, page globale | Autorise les remboursements complets HelloAsso depuis l'écran de remboursement CiviCRM. Nécessite le mode mire HelloAsso. |
-| `helloasso_enable_installments` | Désactivé | Oui, page globale | Autorise les échéanciers mensuels finis de 2 à 12 paiements dans Afform, Webform et les formulaires de contribution classiques. Dans QuickForm, laisser le champ vide conserve un paiement unique. |
-| `helloasso_quickform_redirect_message` | « Vous serez redirigé… » | Oui, page globale | Message affiché sur les formulaires classiques de contribution et d'inscription à un événement, uniquement lorsque HelloAsso est sélectionné. Ce réglage apparaît dans l'interface en français comme `Message de redirection HelloAsso sur les formulaires standards`. |
-| `helloasso_enable_sepa` | Activé | Oui, page globale | Demande à HelloAsso de proposer le prélèvement SEPA sur les checkouts simples et avec échéances. L'affichage dépend de l'éligibilité et du réglage de l'association chez HelloAsso. |
-| `helloasso_v2_cron_limit` | `15` | Oui, page globale | Limite le nombre de contributions traitées par processeur lors des jobs de maintenance. |
-| `helloasso_v2_require_webhook_signature` | Désactivé | Oui, page globale | Rejette les webhooks legacy dont la signature `invoiceID` / `sig` est absente ou invalide. |
-| `helloasso_v2_require_partner_webhook_signature` | Activé | Oui, page globale | Rejette les webhooks mire dont `x-ha-signature` est absent ou invalide lorsqu'une clé de signature est stockée. Peut être désactivé pour les architectures multi-instances ou avec relais webhook. |
-| `helloasso_partner_auth_enabled` | Activé | Oui, page globale | Affiche et autorise les pages de connexion par mire HelloAsso. |
-| `helloasso_partner_client_id_test` | Vide | Oui, page mire sandbox | Client ID partenaire pour la mire sandbox. |
-| `helloasso_partner_client_secret_test` | Vide | Oui, page mire sandbox | Client secret partenaire pour la mire sandbox. |
-| `helloasso_partner_client_id_live` | Vide | Oui, page mire production | Client ID partenaire pour la mire production. |
-| `helloasso_partner_client_secret_live` | Vide | Oui, page mire production | Client secret partenaire pour la mire production. |
-| `helloasso_partner_authorize_url` | `https://auth.helloasso.com/authorize` | Oui, pages mire | URL d'autorisation OAuth HelloAsso. |
-| `helloasso_partner_token_url` | `https://api.helloasso.com/oauth2/token` | Oui, pages mire | URL d'échange et de renouvellement des tokens OAuth. |
+### Réglages Techniques
+
+- `helloasso_v2_standard_frontend_bridge` (**activé**, non exposé) : active le
+  pont frontend `CRM.payment` / `mjwshared` utilisé par les formulaires
+  classiques et Webform.
+- `helloasso_v2_safe_abort_urls` (**activé**, non exposé) : remplace les URL
+  d'annulation ou d'erreur fragiles par une URL sûre dans un contexte AJAX ou
+  CiviCRM interne.
+- `helloasso_v2_queue_webhooks` (**activé**, page globale) : place les
+  webhooks dans la file `PaymentprocessorWebhook` au lieu de les traiter
+  immédiatement.
+- `helloasso_v2_followup_enabled` (**activé**, page globale) : programme les
+  contrôles courts `T+5` / `T+15` / `T+45`. À `T+45`, un checkout classique
+  sans paiement reste `Pending` pour permettre les relances de panier.
+- `helloasso_v2_afform_checkout` (**activé**, page globale) : expose la
+  Checkout Option HelloAsso pour Afform / Form Builder.
+- `helloasso_v2_cron_limit` (`15`, page globale) : limite le nombre de
+  contributions traitées par processeur lors des jobs de maintenance.
+
+### Fonctions De Paiement
+
+- `helloasso_enable_refunds` (**désactivé**, page globale) : autorise les
+  remboursements complets depuis l'écran CiviCRM. Nécessite le mode mire.
+- `helloasso_enable_installments` (**désactivé**, page globale) : autorise les
+  échéanciers mensuels finis de 2 à 12 paiements dans Afform, Webform et les
+  formulaires classiques. Dans QuickForm, laisser le champ vide conserve un
+  paiement unique.
+- `helloasso_enable_sepa` (**activé**, page globale) : demande à HelloAsso de
+  proposer le prélèvement SEPA. Son affichage dépend de l'éligibilité et du
+  réglage de l'association chez HelloAsso.
+- `helloasso_quickform_redirect_message` (page globale) : message de
+  redirection affiché uniquement lorsque HelloAsso est sélectionné sur les
+  formulaires classiques de contribution ou d'inscription. Son libellé dans
+  l'interface française est `Message de redirection HelloAsso sur les
+  formulaires standards`.
+
+### Mire HelloAsso
+
+- `helloasso_v2_require_webhook_signature` (**désactivé**, page globale) :
+  rejette les webhooks legacy dont `invoiceID` / `sig` est absent ou invalide.
+- `helloasso_v2_require_partner_webhook_signature` (**activé**, page globale) :
+  rejette les webhooks mire dont `x-ha-signature` est absent ou invalide quand
+  une clé de signature est stockée. Il peut être désactivé pour les
+  architectures multi-instances ou avec relais webhook.
+- `helloasso_partner_auth_enabled` (**activé**, page globale) : affiche et
+  autorise les pages de connexion par mire HelloAsso.
+- `helloasso_partner_client_id_test` et `helloasso_partner_client_secret_test`
+  (page mire sandbox) : identifiants partenaires sandbox.
+- `helloasso_partner_client_id_live` et `helloasso_partner_client_secret_live`
+  (page mire production) : identifiants partenaires production.
+- `helloasso_partner_authorize_url` (pages mire) : URL d'autorisation OAuth.
+- `helloasso_partner_token_url` (pages mire) : URL d'échange et de
+  renouvellement des tokens OAuth.
 
 Les données opérationnelles par processeur de la mire sont stockées dans la
 table dédiée de l'extension lorsque le schéma est à jour.
@@ -308,15 +349,18 @@ HelloAsso d'attente restent en instance; les états validés terminent la
 contribution, les refus et incohérences passent en échec, et `Contested` devient
 un `Chargeback` CiviCRM.
 
-| États HelloAsso | Traitement CiviCRM |
-| --- | --- |
-| `Authorized`, `Registered`, `AuthorizedPreprod`, `Corrected` | Contribution terminée |
-| `Pending`, `Unknown`, `Waiting`, `WaitingBankValidation`, `WaitingBankWithdraw`, `WaitingAuthentication`, `Init` | Contribution en instance et suivi maintenu |
-| `Refused` sur une échéance future | Contribution en échec, plan `Overdue`, suivi de régularisation pendant 30 jours |
-| `Refused` hors régularisation, `Error`, `Canceled`, `Abandoned`, `Deleted`, `Inconsistent`, `NoDonation` | Contribution en échec, suivis arrêtés |
-| `Refunding` | Statut courant conservé jusqu'à la confirmation |
-| `Refunded` | Contribution remboursée, suivis arrêtés |
-| `Contested` | Contribution en rejet bancaire (`Chargeback`), suivis arrêtés |
+- `Authorized`, `Registered`, `AuthorizedPreprod`, `Corrected` : contribution
+  terminée.
+- `Pending`, `Unknown`, `Waiting`, `WaitingBankValidation`,
+  `WaitingBankWithdraw`, `WaitingAuthentication`, `Init` : contribution en
+  instance et suivi maintenu.
+- `Refused` sur une échéance future : contribution en échec, plan `Overdue`,
+  suivi de régularisation pendant 30 jours.
+- `Refused` hors régularisation, `Error`, `Canceled`, `Abandoned`, `Deleted`,
+  `Inconsistent`, `NoDonation` : contribution en échec, suivis arrêtés.
+- `Refunding` : statut courant conservé jusqu'à la confirmation.
+- `Refunded` : contribution remboursée, suivis arrêtés.
+- `Contested` : contribution en rejet bancaire (`Chargeback`), suivis arrêtés.
 
 Un état HelloAsso inconnu est conservé en instance par prudence. Les paiements
 terminés restent surveillés par le cron long pendant sa fenêtre afin de
@@ -435,6 +479,11 @@ Les propositions de fonctions helper ou de points d'extension facilitant ce
 type d'intégration sont bienvenues, notamment pour Webform, Services ou
 d'autres parcours métier. Elles doivent rester isolées et documentées, afin
 de ne pas imposer un comportement spécifique aux parcours CiviCRM standards.
+
+## Traductions
+
+Les traductions de l'extension sont gérées via **Transifex**. Les fichiers de
+traduction générés ne sont pas versionnés dans ce dépôt.
 
 ## Développement et Tests
 
