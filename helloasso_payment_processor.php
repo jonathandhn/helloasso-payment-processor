@@ -345,7 +345,7 @@ function helloasso_payment_processor_add_quickform_checkout_controls(
       'options' => ['limit' => 0],
     ]);
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return;
   }
 
@@ -636,7 +636,7 @@ function helloasso_payment_processor_get_primary_processor(bool $isTest): ?array
       ],
     ]);
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return NULL;
   }
 
@@ -656,7 +656,7 @@ function helloasso_payment_processor_get_payment_processor(int $paymentProcessor
   try {
     return civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $paymentProcessorId]);
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return NULL;
   }
 }
@@ -675,11 +675,11 @@ function helloasso_payment_processor_lock_mjwshared_refund_amount(CRM_Core_Form 
   try {
     $form->freeze(['refund_amount']);
   }
-  catch (Throwable $e) {
+  catch (Throwable) {
     try {
       $form->getElement('refund_amount')->freeze();
     }
-    catch (Throwable $ignored) {
+    catch (Throwable) {
     }
   }
 
@@ -1248,7 +1248,7 @@ function helloasso_payment_processor_describe_payment_processor(int $paymentProc
       return sprintf('%s (#%d, %s)', $title, $paymentProcessorId, $mode);
     }
   }
-  catch (Exception $e) {
+  catch (Exception) {
     // Fall back to the organization slug if the processor has gone missing.
   }
 
@@ -1301,12 +1301,12 @@ function helloasso_payment_processor_get_admin_edit_payment_processor_id(int $pa
           return (int) $liveProcessor['id'];
         }
       }
-      catch (Exception $e) {
+      catch (Exception) {
         // Try the next safe lookup before falling back to the original id.
       }
     }
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return $paymentProcessorId;
   }
   return $paymentProcessorId;
@@ -1375,7 +1375,7 @@ function helloasso_payment_processor_format_datetime(mixed $value): string {
     }
     return $formattedStr;
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return (string) $value;
   }
 }
@@ -1403,7 +1403,7 @@ function helloasso_payment_processor_protect_test_processor_edit(CRM_Core_Form $
       'is_test' => 0,
     ]);
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return;
   }
 
@@ -1441,7 +1441,7 @@ function helloasso_payment_processor_get_editable_sandbox_processor(CRM_Core_For
           $testProcessorId = (int) ($sandboxProcessor['id'] ?? 0);
         }
       }
-      catch (Exception $e) {
+      catch (Exception) {
         return NULL;
       }
     }
@@ -1454,7 +1454,7 @@ function helloasso_payment_processor_get_editable_sandbox_processor(CRM_Core_For
   try {
     return civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $testProcessorId]);
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return NULL;
   }
 }
@@ -1592,7 +1592,7 @@ function helloasso_payment_processor_civicrm_validateForm(string $formName, mixe
           } else {
             return;
           }
-        } catch (Exception $e) {
+        } catch (Exception) {
           return; // Processor not found or error
         }
       } else {
@@ -1612,7 +1612,7 @@ function helloasso_payment_processor_civicrm_validateForm(string $formName, mixe
     try {
       $fields = CRM_HelloassoPaymentProcessor_QuickFormInstallments::apply($fields);
     }
-    catch (InvalidArgumentException $e) {
+    catch (InvalidArgumentException) {
       $errors['helloasso_installments'] = E::ts('HelloAsso requires between 2 and 12 installments.');
     }
   }
@@ -1702,7 +1702,7 @@ function helloasso_payment_processor_get_missing_auth_columns(array $expectedCol
       $existingColumns[] = $dao->Field;
     }
   }
-  catch (Exception $e) {
+  catch (Exception) {
     return $expectedColumns;
   }
 

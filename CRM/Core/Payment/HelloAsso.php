@@ -217,7 +217,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 return $pairedProcessorId && $pairedProcessorId !== $paymentProcessorId ? $pairedProcessorId : NULL;
             }
         }
-        catch (Exception $e) {
+        catch (Exception) {
             // Ignoré silencieusement
         }
         return NULL;
@@ -238,7 +238,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         }
 
         $currentPath = (string) CRM_Utils_System::currentPath();
-        return strpos($currentPath, 'civicrm/admin/paymentProcessor') === 0;
+        return str_starts_with($currentPath, 'civicrm/admin/paymentProcessor');
     }
 
     /**
@@ -882,7 +882,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 'return' => ['street_address', 'city', 'postal_code', 'country_id'],
             ]);
         }
-        catch (Exception $e) {
+        catch (Exception) {
         }
 
         $invoiceId = (string) ($contribution['invoice_id'] ?? '');
@@ -2707,9 +2707,9 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
     private function detectLongFollowUpScheme(?array $paymentData = NULL, ?CRM_HelloassoPaymentProcessor_BAO_HelloAssoMetadata $metadata = NULL, string $default = 'card'): string
     {
         $isInstallment = (int) ($paymentData['installmentNumber'] ?? 0) > 1
-            || strpos($default, 'installment-') === 0;
+            || str_starts_with($default, 'installment-');
         $paymentMeans = strtolower((string) ($paymentData['paymentMeans'] ?? ''));
-        if (strpos($paymentMeans, 'sepa') !== FALSE) {
+        if (str_contains($paymentMeans, 'sepa')) {
             return $isInstallment ? 'installment-sepa' : 'sepa';
         }
 
@@ -2861,7 +2861,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             && (int) ($metadata->long_sync_attempt_count ?? 0) === 0
         ) {
             $defaultScheme = (string) ($metadata->long_sync_scheme ?? 'installment-card');
-            if (strpos($defaultScheme, 'installment-') !== 0) {
+            if (!str_starts_with($defaultScheme, 'installment-')) {
                 $defaultScheme = $defaultScheme === 'sepa' ? 'installment-sepa' : 'installment-card';
             }
             $scheme = $this->detectLongFollowUpScheme(
@@ -3096,7 +3096,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             return FALSE;
         }
 
-        return strpos((string) $eventType, 'LongCronSync') !== 0;
+        return !str_starts_with((string) $eventType, 'LongCronSync');
     }
 
     private function armInstallmentRecovery(
@@ -3183,7 +3183,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
     private function isHelloAssoNotFoundException(Exception $e): bool
     {
-        return strpos($e->getMessage(), 'Erreur API HelloAsso (404)') !== FALSE;
+        return str_contains($e->getMessage(), 'Erreur API HelloAsso (404)');
     }
 
     private function stopContributionFollowUps(int $contributionId, bool $stopShort = TRUE, bool $stopLong = TRUE): void
@@ -3491,7 +3491,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         try {
             return (new DateTimeImmutable((string) $value))->format('YmdHis');
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return (string) $value;
         }
     }
@@ -3511,7 +3511,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 ->setTimezone(new DateTimeZone(date_default_timezone_get()))
                 ->format('YmdHis');
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return (string) $value;
         }
     }

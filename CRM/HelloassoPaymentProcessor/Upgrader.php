@@ -534,25 +534,25 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     $liveTokenUrl = trim((string) Civi::settings()->get('helloasso_partner_token_url_live'));
     $testTokenUrl = trim((string) Civi::settings()->get('helloasso_partner_token_url_test'));
 
-    if ($liveAuthorizeUrl === '' && $legacyAuthorizeUrl !== '' && strpos($legacyAuthorizeUrl, 'helloasso-sandbox') === FALSE) {
+    if ($liveAuthorizeUrl === '' && $legacyAuthorizeUrl !== '' && !str_contains($legacyAuthorizeUrl, 'helloasso-sandbox')) {
       Civi::settings()->set('helloasso_partner_authorize_url_live', $legacyAuthorizeUrl);
     }
     if ($testAuthorizeUrl === '' && $legacyAuthorizeUrl !== '') {
       Civi::settings()->set(
         'helloasso_partner_authorize_url_test',
-        strpos($legacyAuthorizeUrl, 'helloasso-sandbox') !== FALSE
+        str_contains($legacyAuthorizeUrl, 'helloasso-sandbox')
           ? $legacyAuthorizeUrl
           : 'https://auth.helloasso-sandbox.com/authorize'
       );
     }
 
-    if ($liveTokenUrl === '' && $legacyTokenUrl !== '' && strpos($legacyTokenUrl, 'helloasso-sandbox') === FALSE) {
+    if ($liveTokenUrl === '' && $legacyTokenUrl !== '' && !str_contains($legacyTokenUrl, 'helloasso-sandbox')) {
       Civi::settings()->set('helloasso_partner_token_url_live', $legacyTokenUrl);
     }
     if ($testTokenUrl === '' && $legacyTokenUrl !== '') {
       Civi::settings()->set(
         'helloasso_partner_token_url_test',
-        strpos($legacyTokenUrl, 'helloasso-sandbox') !== FALSE
+        str_contains($legacyTokenUrl, 'helloasso-sandbox')
           ? $legacyTokenUrl
           : 'https://api.helloasso-sandbox.com/oauth2/token'
       );
@@ -769,7 +769,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
     try {
       return (new DateTimeImmutable((string) $value))->format('YmdHis');
     }
-    catch (Exception $e) {
+    catch (Exception) {
       return (string) $value;
     }
   }
@@ -824,7 +824,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
         $resolved = $this->resolveLegacyRepairContext($candidate, $client);
       }
       catch (PaymentProcessorException $e) {
-        if (strpos($e->getMessage(), '(429)') !== FALSE || strpos($e->getMessage(), '429') !== FALSE) {
+        if (str_contains($e->getMessage(), '(429)') || str_contains($e->getMessage(), '429')) {
           throw new CRM_Core_Exception(sprintf(
             'HelloAsso legacy trxn_id repair paused because the API returned 429 Too Many Requests while processing contribution %d. Retry later or skip this task.',
             $contributionId
@@ -1056,7 +1056,7 @@ class CRM_HelloassoPaymentProcessor_Upgrader extends CRM_Extension_Upgrader_Base
         ));
       }
       catch (PaymentProcessorException $e) {
-        if (strpos($e->getMessage(), '(429)') !== FALSE || strpos($e->getMessage(), '429') !== FALSE) {
+        if (str_contains($e->getMessage(), '(429)') || str_contains($e->getMessage(), '429')) {
           throw $e;
         }
         continue;

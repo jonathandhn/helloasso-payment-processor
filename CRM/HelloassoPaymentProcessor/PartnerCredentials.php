@@ -109,7 +109,7 @@ class CRM_HelloassoPaymentProcessor_PartnerCredentials {
     $community = $this->getCommunityCredentials($mode);
 
     // Only compute fingerprint of community credentials if placeholders have been replaced
-    if ($this->hasCompletePair($community) && strpos($community['clientId'], '%%') === FALSE) {
+    if ($this->hasCompletePair($community) && !str_contains($community['clientId'], '%%')) {
       $fingerprints[] = $this->fingerprint($community);
     }
 

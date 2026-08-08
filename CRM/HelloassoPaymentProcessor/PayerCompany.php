@@ -29,7 +29,7 @@ class CRM_HelloassoPaymentProcessor_PayerCompany
 
             return self::organizationName($contribution, $organization ?: []);
         }
-        catch (\Throwable $e) {
+        catch (\Throwable) {
             return '';
         }
     }

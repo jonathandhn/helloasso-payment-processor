@@ -307,7 +307,7 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
 
     private function isPartnerInformationForbidden(PaymentProcessorException $e): bool
     {
-        return strpos($e->getMessage(), '(403)') !== FALSE
+        return str_contains($e->getMessage(), '(403)')
             || stripos($e->getMessage(), 'HTTP 403') !== FALSE
             || stripos($e->getMessage(), 'forbidden') !== FALSE;
     }

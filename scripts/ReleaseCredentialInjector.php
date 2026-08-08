@@ -32,7 +32,7 @@ class CRM_HelloassoPaymentProcessor_ReleaseCredentialInjector
             $content = str_replace($placeholder, self::escapePhpSingleQuotedString($value), $content);
         }
 
-        if (strpos($content, '%%HELLOASSO_') !== FALSE) {
+        if (str_contains($content, '%%HELLOASSO_')) {
             throw new RuntimeException('Unresolved HelloAsso credential placeholder remains.');
         }
 
@@ -61,7 +61,7 @@ class CRM_HelloassoPaymentProcessor_ReleaseCredentialInjector
         string $clientSecret
     ): void {
         $fingerprint = hash('sha256', $clientId . "\n" . $clientSecret);
-        if (strpos($content, "'{$fingerprint}'") === FALSE) {
+        if (!str_contains($content, "'{$fingerprint}'")) {
             throw new RuntimeException(
                 "The injected {$mode} credential pair does not match a recognized release fingerprint."
             );

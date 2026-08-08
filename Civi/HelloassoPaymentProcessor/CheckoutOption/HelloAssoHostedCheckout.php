@@ -92,7 +92,7 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
       }
       throw new \CRM_Core_Exception($e->getMessage());
     }
-    catch (\Throwable $e) {
+    catch (\Throwable) {
       if ($prepared['created_recur_id']) {
         $this->rollbackPreparedContributionRecur(
           $session->getContributionId(),
@@ -407,7 +407,7 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
   }
 
   private function addResultMarker(string $url, string $result): string {
-    $separator = strpos($url, '?') === FALSE ? '?' : '&';
+    $separator = !str_contains($url, '?') ? '?' : '&';
     return $url . $separator . 'helloasso_result=' . rawurlencode($result);
   }
 

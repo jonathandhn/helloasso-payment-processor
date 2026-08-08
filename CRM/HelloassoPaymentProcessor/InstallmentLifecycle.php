@@ -164,7 +164,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentLifecycle
         try {
             return (new DateTimeImmutable((string) $value))->format('YmdHis');
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return NULL;
         }
     }

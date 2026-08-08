@@ -14,7 +14,7 @@ $args = $_SERVER['argv'] ?? [];
 $options = [];
 
 foreach ($args as $arg) {
-  if (strpos((string) $arg, '--') !== 0) {
+  if (!str_starts_with((string) $arg, '--')) {
     continue;
   }
 

@@ -584,7 +584,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
 
   private function getApiBaseUrl(): string {
     $tokenUrl = $this->getTokenUrl();
-    if (strpos($tokenUrl, 'helloasso-sandbox') !== FALSE) {
+    if (str_contains($tokenUrl, 'helloasso-sandbox')) {
       return 'https://api.helloasso-sandbox.com';
     }
     return 'https://api.helloasso.com';
@@ -638,7 +638,7 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     try {
       $this->paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $this->paymentProcessorId]);
     }
-    catch (Exception $e) {
+    catch (Exception) {
       $this->paymentProcessor = [];
     }
 

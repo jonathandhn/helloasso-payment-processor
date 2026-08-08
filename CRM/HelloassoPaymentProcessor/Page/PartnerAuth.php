@@ -246,7 +246,7 @@ class CRM_HelloassoPaymentProcessor_Page_PartnerAuth extends CRM_Core_Page {
    * are not allowed to read /v5/partners/me. Keep this diagnostic optional.
    */
   private function isPartnerInformationForbidden(Exception $e): bool {
-    return strpos($e->getMessage(), '(403)') !== FALSE
+    return str_contains($e->getMessage(), '(403)')
       || stripos($e->getMessage(), 'HTTP 403') !== FALSE
       || stripos($e->getMessage(), 'forbidden') !== FALSE;
   }

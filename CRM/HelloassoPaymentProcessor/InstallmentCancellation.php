@@ -82,7 +82,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentCancellation
         try {
             return new DateTimeImmutable($paymentDate) > $now;
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return FALSE;
         }
     }

@@ -34,7 +34,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentFollowUp
             try {
                 return new DateTimeImmutable((string) $candidate);
             }
-            catch (Exception $e) {
+            catch (Exception) {
             }
         }
 
@@ -50,7 +50,7 @@ class CRM_HelloassoPaymentProcessor_InstallmentFollowUp
         try {
             return new DateTimeImmutable((string) $paymentData['date']);
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return NULL;
         }
     }

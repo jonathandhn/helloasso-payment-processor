@@ -398,7 +398,7 @@ class CRM_HelloassoPaymentProcessor_ProcessorAuthConfig {
     try {
       return (new DateTimeImmutable((string) $value))->format('YmdHis');
     }
-    catch (Exception $e) {
+    catch (Exception) {
       return (string) $value;
     }
   }

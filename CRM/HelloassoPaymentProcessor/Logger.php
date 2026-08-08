@@ -7,7 +7,7 @@ class CRM_HelloassoPaymentProcessor_Logger
         try {
             return (bool) Civi::settings()->get('debug_enabled');
         }
-        catch (Throwable $e) {
+        catch (Throwable) {
             return FALSE;
         }
     }

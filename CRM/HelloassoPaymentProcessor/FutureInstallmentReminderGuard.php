@@ -62,7 +62,7 @@ class CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuard
                 new DateTimeZone('UTC')
             );
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return FALSE;
         }
 
@@ -80,7 +80,7 @@ class CRM_HelloassoPaymentProcessor_FutureInstallmentReminderGuard
             );
             return (bool) $table->fetch();
         }
-        catch (Throwable $e) {
+        catch (Throwable) {
             return FALSE;
         }
     }

@@ -19,7 +19,7 @@ class CRM_HelloassoPaymentProcessor_CheckoutAbandonment
         try {
             $origin = new DateTimeImmutable($originDate);
         }
-        catch (Exception $e) {
+        catch (Exception) {
             return FALSE;
         }
 
