@@ -27,7 +27,7 @@ L'extension est publiée sous licence [AGPL-3.0](LICENSE.txt).
 ## Prérequis
 
 - CiviCRM `6.14` ou version ultérieure.
-- Extension CiviCRM `mjwshared`.
+- Extension CiviCRM `mjwshared` `1.5.11` ou version ultérieure.
 - Un compte HelloAsso et, pour les essais, un compte
   [HelloAsso sandbox](https://www.helloasso-sandbox.com/).
 - Pour la configuration par clé API : un `client_id`, un `client_secret` et le
