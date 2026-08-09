@@ -25,7 +25,6 @@ class CRM_HelloassoPaymentProcessor_UpgraderSqlFixtureTest extends \PHPUnit\Fram
     {
         $reflection = new \ReflectionClass(CRM_HelloassoPaymentProcessor_Upgrader::class);
         $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
         return $method->invokeArgs($this->upgrader, $parameters);
     }
 

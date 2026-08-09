@@ -7,7 +7,6 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
             ->newInstanceWithoutConstructor();
         $method = new ReflectionMethod($processor, 'resolveCheckoutInstallmentCount');
-        $method->setAccessible(TRUE);
 
         $propertyBag = \Civi\Payment\PropertyBag::cast([
             'amount' => 50.00,
@@ -73,7 +72,6 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
             ->newInstanceWithoutConstructor();
         $method = new ReflectionMethod($processor, 'allocateAmountCentsByWeight');
-        $method->setAccessible(TRUE);
 
         $allocated = $method->invoke($processor, 500, [700, 300]);
 
@@ -86,7 +84,6 @@ class CRM_HelloassoPaymentProcessor_HelloAssoPaymentTest extends \PHPUnit\Framew
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
             ->newInstanceWithoutConstructor();
         $method = new ReflectionMethod($processor, 'allocateAmountCentsByWeight');
-        $method->setAccessible(TRUE);
 
         $allocated = $method->invoke($processor, 500, [0, 0, 0]);
 

@@ -32,7 +32,6 @@ class CRM_HelloassoPaymentProcessor_SepaDataIntegrityTest extends \PHPUnit\Frame
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
             ->newInstanceWithoutConstructor();
         $method = new ReflectionMethod($processor, 'detectLongFollowUpScheme');
-        $method->setAccessible(TRUE);
         
         // Pour installmentNumber = 1, le type est 'sepa' normal (pas un échéancier)
         $this->assertSame('sepa', $method->invoke($processor, $sepaPayload));

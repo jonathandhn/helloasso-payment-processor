@@ -39,7 +39,6 @@ class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
         $processorArray = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $processorId]);
         $processor = new CRM_Core_Payment_HelloAsso('test', $processorArray);
         $method = new ReflectionMethod($processor, 'synchronizeInitialInstallmentContributionAmountShape');
-        $method->setAccessible(TRUE);
 
         $method->invoke(
             $processor,
@@ -107,7 +106,6 @@ class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
         $processorArray = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $processorId]);
         $processor = new CRM_Core_Payment_HelloAsso('test', $processorArray);
         $method = new ReflectionMethod($processor, 'synchronizeInitialInstallmentContributionAmountShape');
-        $method->setAccessible(TRUE);
 
         $method->invoke(
             $processor,
@@ -163,7 +161,6 @@ class CRM_HelloassoPaymentProcessor_InstallmentAnchorContributionIntegrationTest
         $processorArray = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $processorId]);
         $processor = new CRM_Core_Payment_HelloAsso('test', $processorArray);
         $method = new ReflectionMethod($processor, 'synchronizeInitialInstallmentContributionAmountShape');
-        $method->setAccessible(TRUE);
 
         $installmentContributionIds = [$anchorContributionId];
         for ($installmentNumber = 2; $installmentNumber <= 3; $installmentNumber++) {

@@ -167,7 +167,6 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_Hell
     public function testGetOrganizationSlugThrowsClearExceptionWhenSubjectIsMissing(): void
     {
         $method = new ReflectionMethod($this->client, 'getOrganizationSlug');
-        $method->setAccessible(TRUE);
 
         $this->expectException(PaymentProcessorException::class);
         $this->expectExceptionMessage('organization slug is missing');

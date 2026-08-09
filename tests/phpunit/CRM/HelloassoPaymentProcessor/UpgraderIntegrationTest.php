@@ -31,14 +31,12 @@ class CRM_HelloassoPaymentProcessor_UpgraderIntegrationTest extends \PHPUnit\Fra
 
         // L'upgrader a besoin d'un contexte avec un logger (propriété protected)
         $reflection = new \ReflectionProperty(CRM_HelloassoPaymentProcessor_Upgrader::class, 'ctx');
-        $reflection->setAccessible(true);
         $reflection->setValue($this->upgrader, (object) [
             'log' => \Civi::log(),
         ]);
 
         // Injecter une file d'attente en mémoire pour ne pas crasher sur addTask()
         $queueReflection = new \ReflectionProperty(CRM_HelloassoPaymentProcessor_Upgrader::class, 'queue');
-        $queueReflection->setAccessible(true);
         $queueReflection->setValue($this->upgrader, new \CRM_Queue_Queue_Memory(['name' => 'test-upgrade']));
     }
 

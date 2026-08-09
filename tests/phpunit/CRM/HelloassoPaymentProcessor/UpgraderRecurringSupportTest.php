@@ -20,7 +20,6 @@ class CRM_HelloassoPaymentProcessor_UpgraderRecurringSupportTest extends CRM_Hel
         );
 
         $reflection = new ReflectionProperty(CRM_HelloassoPaymentProcessor_Upgrader::class, 'ctx');
-        $reflection->setAccessible(true);
         $reflection->setValue($upgrader, (object) ['log' => Civi::log()]);
 
         $this->assertSame('0', civicrm_api3('PaymentProcessor', 'getvalue', [

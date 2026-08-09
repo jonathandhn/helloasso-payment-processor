@@ -12,7 +12,6 @@ class CRM_HelloassoPaymentProcessor_FollowUpScheduleTest extends \PHPUnit\Framew
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
             ->newInstanceWithoutConstructor();
         $method = new ReflectionMethod($processor, 'getLongFollowUpDays');
-        $method->setAccessible(TRUE);
 
         $this->assertSame($expected, $method->invoke($processor, $scheme));
     }
@@ -33,7 +32,6 @@ class CRM_HelloassoPaymentProcessor_FollowUpScheduleTest extends \PHPUnit\Framew
         $processor = (new ReflectionClass(CRM_Core_Payment_HelloAsso::class))
             ->newInstanceWithoutConstructor();
         $method = new ReflectionMethod($processor, 'detectLongFollowUpScheme');
-        $method->setAccessible(TRUE);
 
         $this->assertSame(
             'installment-sepa',
