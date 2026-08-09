@@ -482,8 +482,9 @@ de ne pas imposer un comportement spécifique aux parcours CiviCRM standards.
 
 ## Traductions
 
-Les traductions de l'extension sont gérées via **Transifex**. Les fichiers de
-traduction générés ne sont pas versionnés dans ce dépôt.
+Les traductions de l'extension sont gérées via **Transifex**. Les catalogues
+Gettext générés sont inclus dans `l10n/` afin que les traductions soient
+immédiatement disponibles après l'installation de l'extension.
 
 ## Développement et Tests
 
