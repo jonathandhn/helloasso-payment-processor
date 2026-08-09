@@ -108,6 +108,10 @@ jobs:
           composer config --no-plugins allow-plugins.composer/installers true
           composer config --no-plugins allow-plugins.cweagans/composer-patches true
           composer config --json 'extra.installer-paths.ext/{$name}' '["type:civicrm-ext"]'
+          # Historical CiviCRM releases may depend on packages with known advisories.
+          # This applies only to this disposable compatibility-test checkout.
+          composer config --no-plugins policy.advisories.block false
+          composer config --no-plugins policy.advisories.audit report
           composer config repositories.helloasso path "$EXT_DIR"
           composer remove --no-update civicrm/civicrm-core civicrm/civicrm-packages
           composer require --no-update \
@@ -123,6 +127,11 @@ jobs:
           git clone --depth=1 --branch "$MJWSHARED_TAG" \
             https://lab.civicrm.org/extensions/mjwshared.git \
             ext/mjwshared
+
+      - name: Report CiviCRM dependency advisories
+        run: |
+          cd ../civicrm-standalone
+          composer audit --no-interaction
 
       - name: Configure CiviCRM
         run: |

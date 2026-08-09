@@ -496,10 +496,16 @@ CiviCRM satisfaisant `^6.14`.
 Pour tester ponctuellement une cible CiviCRM, ouvrir **Actions > PHPUnit > Run
 workflow** et renseigner :
 
-- `civicrm-version` : `6.14.0` pour le minimum pris en charge, une version
+- `civicrm-version` : `6.14.2` pour le minimum pris en charge, une version
   alpha ou beta précise, ou `dev-master`.
 - `php-version` : `matrix` pour toutes les versions, ou une version unique
-  adaptée à la cible CiviCRM.
+  adaptée à la cible CiviCRM. Pour `6.14.2`, choisir PHP `8.4`.
+
+Les essais de versions historiques peuvent installer des dépendances avec des
+advisories connus. Ce contournement est limité au clone CiviCRM temporaire de
+la CI : le projet de l'extension conserve sa politique Composer. La CI affiche
+ensuite le rapport `composer audit`; un tel run valide la compatibilité, pas la
+sécurité de cette version CiviCRM.
 
 **Exécuter les tests unitaires :**
 ```bash
