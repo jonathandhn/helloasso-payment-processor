@@ -118,7 +118,7 @@ jobs:
             civicrm/cli-tools \
             "$EXT_PACKAGE"
 
-          vendor/bin/cv dl mjwshared --out ext
+          vendor/bin/cv dl mjwshared --to ext
 
       - name: Configure CiviCRM
         run: |
