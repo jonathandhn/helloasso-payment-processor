@@ -2,7 +2,6 @@
   'use strict';
 
   var config = CRM.vars.helloassoQuickForm || {};
-  var ts = CRM.ts('helloasso-payment-processor');
   var processorIds = (config.processorIds || []).map(String);
 
   function selectedProcessorId() {
@@ -27,7 +26,7 @@
 
     if (config.supportsInstallments) {
       var $row = $('<div>', {class: 'crm-section helloasso-installments-section'});
-      $('<div>', {class: 'label', text: ts('Number of installments')}).appendTo($row);
+      $('<div>', {class: 'label', text: config.installmentsLabel}).appendTo($row);
       var $content = $('<div>', {class: 'content'}).appendTo($row);
       var $select = $('<select>', {
         id: 'helloasso_installments',
@@ -36,7 +35,7 @@
       });
       $('<option>', {
         value: '',
-        text: ts('One-time payment')
+        text: config.oneTimeLabel
       }).appendTo($select);
       for (var installment = 2; installment <= 12; installment++) {
         $('<option>', {
@@ -49,7 +48,7 @@
         .appendTo($content);
       $('<div>', {
         class: 'description',
-        text: ts('Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments handled by HelloAsso.')
+        text: config.installmentsDescription
       }).appendTo($content);
       $('<div>', {class: 'clear'}).appendTo($row);
       $row.appendTo($block);
