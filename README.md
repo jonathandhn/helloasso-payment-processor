@@ -489,9 +489,9 @@ traduction générés ne sont pas versionnés dans ce dépôt.
 
 L'extension inclut des tests unitaires rapides et des tests d'intégration complets nécessitant une base de données CiviCRM amorcée (boot complet).
 
-La CI télécharge la dernière version publique de `mjwshared` avec `cv dl`,
-plutôt que de cloner une branche Git. Elle teste par défaut la matrice PHP
-8.1 à 8.5 avec la dernière version CiviCRM satisfaisant `^6.14`.
+La CI clone le dernier tag stable public de `mjwshared`, déterminé à chaque
+run. Elle teste par défaut la matrice PHP 8.1 à 8.5 avec la dernière version
+CiviCRM satisfaisant `^6.14`.
 
 Pour tester ponctuellement une cible CiviCRM, ouvrir **Actions > PHPUnit > Run
 workflow** et renseigner :
