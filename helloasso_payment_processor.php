@@ -391,9 +391,6 @@ function helloasso_payment_processor_add_quickform_checkout_controls(
     'supportsInstallments' => $supportsInstallments,
     'message' => $message,
     'installmentsValue' => $submittedInstallments ?: '',
-    'installmentsLabel' => E::ts('Number of installments'),
-    'oneTimeLabel' => E::ts('One-time payment'),
-    'installmentsDescription' => E::ts('Pay in full or split this payment into a fixed schedule of 2 to 12 monthly installments handled by HelloAsso.'),
   ]);
   Civi::resources()->addScriptFile(E::LONG_NAME, 'js/quickform-checkout.js');
 }
