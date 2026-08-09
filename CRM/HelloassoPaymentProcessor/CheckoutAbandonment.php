@@ -17,7 +17,7 @@ class CRM_HelloassoPaymentProcessor_CheckoutAbandonment
         }
 
         try {
-            $origin = new DateTimeImmutable($originDate);
+            $origin = new DateTimeImmutable($originDate, new DateTimeZone('UTC'));
         }
         catch (Exception) {
             return FALSE;

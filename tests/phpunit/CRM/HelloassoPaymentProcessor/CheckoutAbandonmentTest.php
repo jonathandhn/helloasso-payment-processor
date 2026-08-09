@@ -24,6 +24,25 @@ class CRM_HelloassoPaymentProcessor_CheckoutAbandonmentTest extends \PHPUnit\Fra
         );
     }
 
+    public function testUsesUtcForStoredMetadataTimestamps(): void
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Paris');
+
+        try {
+            $this->assertFalse(
+                CRM_HelloassoPaymentProcessor_CheckoutAbandonment::isExpired(
+                    '2026-08-09 16:10:42',
+                    new DateTimeImmutable('2026-08-09 16:15:04', new DateTimeZone('UTC')),
+                    FALSE
+                )
+            );
+        }
+        finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
     public function testNeverExpiresCheckoutWithPayments(): void
     {
         $this->assertFalse(
