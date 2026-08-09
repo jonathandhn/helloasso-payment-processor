@@ -1,8 +1,7 @@
-(function($, CRM) {
+(function($, ts) {
   'use strict';
 
   var config = CRM.vars.helloassoQuickForm || {};
-  var ts = CRM.ts('helloasso-payment-processor');
   var processorIds = (config.processorIds || []).map(String);
 
   function selectedProcessorId() {
@@ -125,4 +124,4 @@
       synchronizeNativeFields(false);
     });
   });
-})(CRM.$, CRM);
+})(CRM.$, CRM.ts('helloasso-payment-processor'));
