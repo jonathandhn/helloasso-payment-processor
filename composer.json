@@ -5,10 +5,6 @@
   "license": "AGPL-3.0-or-later",
   "authors": [
     {
-      "name": "Antoine BREHERET",
-      "email": "breheret@makoa.fr"
-    },
-    {
       "name": "Jonathan Dahan",
       "email": "jonathan@dhn.one"
     }
@@ -32,7 +28,7 @@
     "installer-name": "helloasso-payment-processor"
   },
   "support": {
-    "source": "https://github.com/jonathandhn/helloasso-payment-processor",
-    "issues": "https://github.com/jonathandhn/helloasso-payment-processor/issues"
+    "source": "https://lab.civicrm.org/extensions/helloasso-payment-processor/",
+    "issues": "https://lab.civicrm.org/extensions/helloasso-payment-processor/-/issues"
   }
 }
