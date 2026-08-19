@@ -328,12 +328,20 @@ class CRM_Core_Payment_HelloAssoBase extends CRM_Core_Payment
 
         // Check if it's a Drupal AJAX request (Webform)
         if ($this->isDrupalAjaxRequest()) {
-            $ajaxResponse = [
-                [
-                    'command' => 'helloassoRedirect',
-                    'url' => $response['redirectUrl']
-                ]
-            ];
+            if (class_exists('\\Drupal\\webform\\Ajax\\WebformRefreshCommand')) {
+                $command = (new \Drupal\webform\Ajax\WebformRefreshCommand($response['redirectUrl']))->render();
+                $command['paymentRedirect'] = TRUE;
+                $command['paymentProvider'] = 'helloasso';
+                $ajaxResponse = [$command];
+            }
+            else {
+                $ajaxResponse = [
+                    [
+                        'command' => 'helloassoRedirect',
+                        'url' => $response['redirectUrl'],
+                    ],
+                ];
+            }
             header('Content-Type: application/json');
             echo json_encode($ajaxResponse);
             CRM_Utils_System::civiExit();
