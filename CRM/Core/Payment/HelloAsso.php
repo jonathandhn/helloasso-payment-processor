@@ -3,7 +3,7 @@
 use Civi\Payment\Exception\PaymentProcessorException;
 use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 
-class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment implements \Civi\Mjwshared\PaymentProcessorWebhookInterface
+class CRM_Core_Payment_HelloAssoBase extends CRM_Core_Payment
 {
     private const SHORT_FOLLOWUP_MAX_ATTEMPTS = 3;
     private const LONG_FOLLOWUP_MAX_ATTEMPTS = 4;
@@ -1133,12 +1133,13 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment implements \Civi\Mjwsh
             Civi::log()->error('HelloAsso webhook processing failed: ' . $e->getMessage());
             http_response_code(500);
         }
+        return;
     }
 
     public function processWebhookEvent(array $webhookEvent): bool
     {
         try {
-            if (\Civi\Mjwshared\PaymentProcessorWebhook::rejectIfDuplicate($webhookEvent, E::ts("Duplicate webhook ignored."))) {
+            if ($this->rejectDuplicateWebhookEvent($webhookEvent)) {
                 return FALSE;
             }
 
@@ -2597,6 +2598,45 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment implements \Civi\Mjwsh
             ->execute();
     }
 
+    /**
+     * Use mjwshared's canonical deduplication helper when available, while
+     * retaining compatibility with the currently supported 1.5.x releases.
+     */
+    private function rejectDuplicateWebhookEvent(array $webhookEvent): bool
+    {
+        $helperClass = '\\Civi\\Mjwshared\\PaymentProcessorWebhook';
+        if (class_exists($helperClass)) {
+            if (!$helperClass::rejectIfDuplicate($webhookEvent, E::ts('Duplicate webhook ignored.'))) {
+                return FALSE;
+            }
+
+            // The helper records the error; retain this processor's completion timestamp.
+            \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+                ->addWhere('id', '=', $webhookEvent['id'])
+                ->addValue('processed_date', 'now')
+                ->execute();
+            return TRUE;
+        }
+
+        $duplicates = \Civi\Api4\PaymentprocessorWebhook::get(FALSE)
+            ->selectRowCount()
+            ->addWhere('event_id', '=', $webhookEvent['event_id'])
+            ->addWhere('id', '<', $webhookEvent['id'])
+            ->execute()
+            ->count();
+        if (!$duplicates) {
+            return FALSE;
+        }
+
+        \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
+            ->addWhere('id', '=', $webhookEvent['id'])
+            ->addValue('status', 'error')
+            ->addValue('message', E::ts('Duplicate webhook ignored.'))
+            ->addValue('processed_date', 'now')
+            ->execute();
+        return TRUE;
+    }
+
     private function buildWebhookEventId(array $params): string
     {
         $parts = [
@@ -3509,3 +3549,16 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment implements \Civi\Mjwsh
         return CRM_HelloassoPaymentProcessor_Webhook::getWebhookPath($this->getPaymentProcessorId());
     }
 }
+
+if (interface_exists('Civi\\Mjwshared\\PaymentProcessorWebhookInterface')) {
+    class CRM_Core_Payment_HelloAssoWebhook extends CRM_Core_Payment_HelloAssoBase implements \Civi\Mjwshared\PaymentProcessorWebhookInterface
+    {
+    }
+}
+else {
+    class CRM_Core_Payment_HelloAssoWebhook extends CRM_Core_Payment_HelloAssoBase
+    {
+    }
+}
+
+class_alias(CRM_Core_Payment_HelloAssoWebhook::class, 'CRM_Core_Payment_HelloAsso');
