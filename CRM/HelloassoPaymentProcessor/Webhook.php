@@ -5,11 +5,11 @@ class CRM_HelloassoPaymentProcessor_Webhook {
   /**
    * Build the standard CiviCRM webhook path for a payment processor.
    *
-   * This mirrors the shared mjwshared behavior so the processor does not
-   * hardcode CMS-specific assumptions about the webhook entrypoint.
+   * mjwshared is a hard dependency of this extension, so delegate to its
+   * canonical helper rather than keeping a second copy in sync.
    */
   public static function getWebhookPath(int $paymentProcessorID): string {
-    return CRM_Utils_System::url('civicrm/payment/ipn/' . $paymentProcessorID, NULL, TRUE, NULL, FALSE, TRUE);
+    return CRM_Mjwshared_Webhook::getWebhookPath($paymentProcessorID);
   }
 
   /**

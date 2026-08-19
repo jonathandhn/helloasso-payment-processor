@@ -3,7 +3,7 @@
 use Civi\Payment\Exception\PaymentProcessorException;
 use CRM_HelloassoPaymentProcessor_ExtensionUtil as E;
 
-class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
+class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment implements \Civi\Mjwshared\PaymentProcessorWebhookInterface
 {
     private const SHORT_FOLLOWUP_MAX_ATTEMPTS = 3;
     private const LONG_FOLLOWUP_MAX_ATTEMPTS = 4;
@@ -1063,6 +1063,9 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
     public function handlePaymentNotification(): void
     {
+        // Note: this returns rather than calling CRM_Utils_System::civiExit() so that
+        // CRM_Core_Payment::handleIPN() can finish its own postIPNProcess hook + exit
+        // once every matching payment processor instance has had a turn.
         http_response_code(200);
         if (!CRM_HelloassoPaymentProcessor_Webhook::acceptsJsonPayload($_SERVER['REQUEST_METHOD'] ?? NULL)) {
             CRM_HelloassoPaymentProcessor_Logger::debug(
@@ -1072,7 +1075,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                     'request_method' => $_SERVER['REQUEST_METHOD'] ?? NULL,
                 ]
             );
-            CRM_Utils_System::civiExit();
+            return;
         }
 
         $rawData = file_get_contents('php://input');
@@ -1081,13 +1084,13 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
         if (!is_array($params)) {
             Civi::log()->warning('HelloAsso webhook ignored: invalid JSON payload.');
             http_response_code(400);
-            CRM_Utils_System::civiExit();
+            return;
         }
 
         $eventType = $params['eventType'] ?? NULL;
         if ($eventType !== 'Payment' || empty($params['data']) || !is_array($params['data'])) {
             CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook ignored: unsupported event type or missing data.');
-            CRM_Utils_System::civiExit();
+            return;
         }
 
         try {
@@ -1099,12 +1102,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
 
             if (!$contribution) {
                 CRM_HelloassoPaymentProcessor_Logger::debug('HelloAsso webhook not matched to a contribution. Ignored.');
-                CRM_Utils_System::civiExit();
+                return;
             }
 
             if ($this->isWebhookQueueEnabled()) {
                 $this->queueWebhookPayload($params, (string) $rawData);
-                CRM_Utils_System::civiExit();
+                return;
             }
 
             $legacySignatureTrusted = $invoiceId
@@ -1117,7 +1120,7 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
                 : $this->fetchAuthoritativeWebhookPaymentState($params, $contribution);
             if (!$authoritativePayload) {
                 Civi::log()->warning('HelloAsso webhook ignored because it has no verifiable signature and no locally expected HelloAsso object identifier.');
-                CRM_Utils_System::civiExit();
+                return;
             }
 
             $this->applyHelloAssoPaymentState($contribution, $authoritativePayload[0], $authoritativePayload[1], $eventType);
@@ -1130,27 +1133,12 @@ class CRM_Core_Payment_HelloAsso extends CRM_Core_Payment
             Civi::log()->error('HelloAsso webhook processing failed: ' . $e->getMessage());
             http_response_code(500);
         }
-
-        CRM_Utils_System::civiExit();
     }
 
     public function processWebhookEvent(array $webhookEvent): bool
     {
         try {
-            $duplicates = \Civi\Api4\PaymentprocessorWebhook::get(FALSE)
-                ->selectRowCount()
-                ->addWhere('event_id', '=', $webhookEvent['event_id'])
-                ->addWhere('id', '<', $webhookEvent['id'])
-                ->execute()
-                ->count();
-
-            if ($duplicates) {
-                \Civi\Api4\PaymentprocessorWebhook::update(FALSE)
-                    ->addWhere('id', '=', $webhookEvent['id'])
-                    ->addValue('status', 'error')
-                    ->addValue('message', E::ts("Duplicate webhook ignored."))
-                    ->addValue('processed_date', 'now')
-                    ->execute();
+            if (\Civi\Mjwshared\PaymentProcessorWebhook::rejectIfDuplicate($webhookEvent, E::ts("Duplicate webhook ignored."))) {
                 return FALSE;
             }
 
