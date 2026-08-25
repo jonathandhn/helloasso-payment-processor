@@ -1920,19 +1920,18 @@ class CRM_Core_Payment_HelloAssoBase extends CRM_Core_Payment
         }
 
         $paymentAmount = $this->resolveContributionPaymentAmount($contribution, $paymentData);
-        $installmentNumber = 1;
         if (!empty($contribution->contribution_recur_id)) {
             $installmentNumber = (new CRM_HelloassoPaymentProcessor_InstallmentStore())
                 ->findInstallmentNumberByContributionId((int) $contribution->id) ?? 1;
-        }
-        $this->synchronizeInitialInstallmentContributionAmountShape(
-            (int) $contribution->id,
-            (int) round($paymentAmount * 100),
-            $installmentNumber
-        );
-        if (abs((float) $contribution->total_amount - $paymentAmount) > 0.0001) {
-            $contribution->total_amount = $paymentAmount;
-            $contribution->save();
+            $this->synchronizeInitialInstallmentContributionAmountShape(
+                (int) $contribution->id,
+                (int) round($paymentAmount * 100),
+                $installmentNumber
+            );
+            if (abs((float) $contribution->total_amount - $paymentAmount) > 0.0001) {
+                $contribution->total_amount = $paymentAmount;
+                $contribution->save();
+            }
         }
 
         $paymentDate = $this->formatCiviBusinessTimestamp($paymentData['date'] ?? NULL);

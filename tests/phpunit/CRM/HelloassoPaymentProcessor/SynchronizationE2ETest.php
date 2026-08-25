@@ -103,7 +103,78 @@ class CRM_HelloassoPaymentProcessor_SynchronizationE2ETest extends CRM_Helloasso
             $updatedContribution['contribution_status_id']
         );
     }
-    
+
+    public function testFollowupCronRecordsPartialPaymentWithoutChangingContributionTotal(): void
+    {
+        $processorId = $this->createTestProcessor();
+        $contactId = $this->createTestContact();
+
+        $contribution = civicrm_api3('Contribution', 'create', [
+            'contact_id' => $contactId,
+            'total_amount' => 100.00,
+            'financial_type_id' => 1,
+            'contribution_status_id' => 'Pending',
+            'payment_processor_id' => $processorId,
+            'trxn_id' => 'checkout-partial',
+            'invoice_id' => 'inv-' . uniqid(),
+            'currency' => 'EUR',
+            'source' => 'E2E Test Partial Payment',
+        ]);
+        $contributionId = $contribution['id'];
+
+        $metadata = new CRM_HelloassoPaymentProcessor_DAO_HelloAssoMetadata();
+        $metadata->contribution_id = $contributionId;
+        $metadata->payment_processor_id = $processorId;
+        $metadata->checkout_intent_id = '4321';
+        $metadata->sync_attempt_count = 0;
+        $metadata->sync_next_date = date('YmdHis', strtotime('-1 hour'));
+        $metadata->signing_key = 'fakekey';
+        $metadata->save();
+
+        $this->mockHandler->append(
+            new Response(200, [], json_encode([
+                'id' => 4321,
+                'order' => [
+                    'id' => 9876,
+                    'payments' => [
+                        [
+                            'id' => 8765,
+                            'state' => 'Authorized',
+                            'amount' => 2000,
+                        ],
+                    ],
+                ],
+            ]))
+        );
+
+        civicrm_api3('Job', 'process_helloasso', [
+            'only_scheduled' => 1,
+            'due_before' => 'now',
+            'limit' => 10,
+        ]);
+
+        $updatedContribution = civicrm_api3('Contribution', 'getsingle', [
+            'id' => $contributionId,
+        ]);
+        $payments = civicrm_api3('Payment', 'get', [
+            'contribution_id' => $contributionId,
+            'trxn_id' => '8765',
+        ]);
+
+        $this->assertSame(100.00, (float) $updatedContribution['total_amount']);
+        $this->assertSame(
+            CRM_Core_PseudoConstant::getKey(
+                'CRM_Contribute_BAO_Contribution',
+                'contribution_status_id',
+                'Partially paid'
+            ),
+            (int) $updatedContribution['contribution_status_id']
+        );
+        $this->assertSame(1, (int) $payments['count']);
+        $payment = reset($payments['values']);
+        $this->assertSame(20.00, (float) $payment['total_amount']);
+    }
+
     public function testLongFollowupCronDetectsRefundAndUpdatesContribution(): void
     {
         $processorId = $this->createTestProcessor();
