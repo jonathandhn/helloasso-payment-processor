@@ -71,7 +71,7 @@ class CRM_Core_Payment_HelloAssoBase extends CRM_Core_Payment
      */
     function checkConfig()
     {
-        $error = array();
+        $error = [];
         $processorAuthConfig = new CRM_HelloassoPaymentProcessor_ProcessorAuthConfig();
         $paymentProcessorId = $this->getPaymentProcessorId();
         $usesPluginPublic = $paymentProcessorId
