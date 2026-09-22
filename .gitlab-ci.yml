@@ -44,11 +44,11 @@ create_release:
     - echo "Creating release on GitLab for ${CI_COMMIT_TAG}"
   release:
     name: 'Release ${CI_COMMIT_TAG}'
-    description: 'Release automatique construite et packagée par le pipeline GitLab CI.'
+    description: 'Pour installer cette extension dans CiviCRM, utilisez le ZIP joint ci-dessous. Il contient les identifiants OAuth communautaires, absents des archives « Code source » générées par GitLab. Les traductions ne sont pas embarquées ; elles sont distribuées séparément via CiviCRM/Transifex.'
     tag_name: '${CI_COMMIT_TAG}'
     assets:
       links:
-        - name: 'HelloAsso installable ZIP'
+        - name: 'helloasso-payment-processor-${CI_COMMIT_TAG}.zip'
           url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/helloasso-payment-processor/${CI_COMMIT_TAG}/helloasso-payment-processor-${CI_COMMIT_TAG}.zip'
           filepath: '/extension.zip'
           link_type: 'package'

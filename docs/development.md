@@ -2,9 +2,9 @@
 
 ## Translations
 
-Interface translations are managed through Transifex. Generated Gettext
-catalogues are included under `l10n/` so translated strings are available as
-soon as the extension is installed.
+Interface translations are managed through Transifex and distributed separately
+through CiviCRM. Starting with 2.1.6, release archives do not bundle Gettext
+catalogues under `l10n/`.
 
 Documentation translations are maintained as separate evergreen MkDocs
 editions. The French edition is published from its own documentation repository.
