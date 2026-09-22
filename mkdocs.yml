@@ -1,0 +1,43 @@
+site_name: HelloAsso Payment Processor
+site_description: 'HelloAsso payment integration and reconciliation for CiviCRM.'
+site_author: 'Jonathan Dahan'
+repo_url: https://lab.civicrm.org/extensions/helloasso-payment-processor
+edit_uri: https://lab.civicrm.org/extensions/helloasso-payment-processor/-/edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: light blue
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Requirements and installation: installation.md
+  - Authentication: authentication.md
+  - Webhooks and reconciliation: reliability.md
+  - Settings and payment states: configuration.md
+  - Forms and integrations: integrations.md
+  - Development and testing: development.md
+  - Support, credits and license: support.md
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - def_list
+  - pymdownx.highlight:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.betterem
+  - pymdownx.mark
+
+plugins:
+  - search:
+      lang: en

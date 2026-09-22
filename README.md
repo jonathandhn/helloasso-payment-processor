@@ -1,542 +1,64 @@
 # HelloAsso Payment Processor for CiviCRM
 
-Cette extension permet d'encaisser avec HelloAsso des contributions créées
-dans CiviCRM : dons, adhésions, inscriptions et parcours Afform / Form Builder.
+HelloAsso Payment Processor collects CiviCRM contributions through HelloAsso
+Checkout. It supports donations, memberships, event registrations, traditional
+contribution pages, Webform integrations and Form Builder/Afform.
 
-CiviCRM reste la source de vérité du parcours métier. L'extension crée le
-checkout HelloAsso, rapproche le paiement de la contribution, traite les
-webhooks et revérifie les paiements lorsque le retour navigateur ou une
-notification ne suffit pas.
+CiviCRM remains the source of truth for the business workflow. The extension
+creates the HelloAsso checkout, reconciles payments with contributions, handles
+webhooks and schedules API checks when the browser return or a notification is
+not sufficient.
 
-L'extension est publiée sous licence [AGPL-3.0](LICENSE.txt).
+## Features
 
-## Fonctionnalités
+- Production and sandbox HelloAsso Checkout redirects.
+- API-key and HelloAsso partner authorization connections.
+- Signed webhook handling through the `PaymentprocessorWebhook` queue.
+- Short and long reconciliation schedules for asynchronous payment states.
+- Finite monthly installment plans and optional SEPA payments.
+- Form Builder/Afform, Webform and traditional CiviCRM form support.
+- Drupal, WordPress and Standalone compatibility.
 
-- Paiement redirigé via HelloAsso Checkout, en production et en sandbox.
-- Configuration historique par clé API HelloAsso.
-- Connexion optionnelle par mire d'autorisation HelloAsso, avec enregistrement
-  du webhook et vérification de sa signature.
-- Intégration Afform / Form Builder par `Checkout Option` CiviCRM.
-- File d'attente des webhooks via `PaymentprocessorWebhook`.
-- Revérifications courtes à `T+5`, `T+15` et `T+45` minutes après un checkout.
-- Suivi long indépendant pour détecter les évolutions ultérieures, notamment
-  les remboursements.
-- Fonctionnement validé sur des instances CiviCRM Drupal, WordPress et
-  Standalone.
+## Requirements
 
-## Prérequis
+- CiviCRM 6.14 or later.
+- PHP 8.1 to 8.5, subject to the selected CiviCRM version.
+- `mjwshared` 1.5.11 or later.
+- A HelloAsso account and API or partner credentials.
 
-- CiviCRM `6.14` ou version ultérieure.
-- Extension CiviCRM `mjwshared` `1.5.11` ou version ultérieure.
-- Un compte HelloAsso et, pour les essais, un compte
-  [HelloAsso sandbox](https://www.helloasso-sandbox.com/).
-- Pour la configuration par clé API : un `client_id`, un `client_secret` et le
-  slug de l'organisation HelloAsso.
-- Pour la mire : les identifiants partenaires dédiés fournis par HelloAsso
-  pour chaque environnement utilisé.
+## Documentation
 
-La version de PHP à utiliser est celle supportée par votre version de CiviCRM.
+- [English documentation](https://docs.civicrm.org/helloasso-payment-processor/en/latest/)
+- [Documentation française](https://docs.civicrm.org/helloasso-payment-processor/fr/latest/)
 
-## Installation
+The documentation is evergreen and describes installation, authentication,
+webhooks, reconciliation, settings, integrations and development workflows.
 
-1. Installer l'extension dans le répertoire d'extensions CiviCRM.
-2. Activer `mjwshared`, puis activer `helloasso-payment-processor`.
-3. Appliquer les mises à niveau et vider les caches :
+## Issues and support
 
-```bash
-cv updb
-cv flush
-```
+Report defects and feature requests in the
+[GitLab issue tracker](https://lab.civicrm.org/extensions/helloasso-payment-processor/-/issues).
+Commercial support is available from
+[Jonathan Dahan](https://www.jonathan.dhn.one/).
 
-4. Ouvrir **Administrer > CiviContribute > Passerelles de paiement** et créer
-   une passerelle de type **HelloAsso**.
+## Credits
 
-Les nouveaux processeurs HelloAsso utilisent `HelloAsso` comme moyen de
-paiement par défaut. Une instance qui dispose déjà d'un moyen de paiement en
-ligne dédié à HelloAsso peut le sélectionner ; les configurations existantes ne
-sont pas remplacées automatiquement lorsqu'un autre moyen de paiement est déjà
-configuré.
+The current version is maintained by Jonathan Dahan. The original extension
+was initiated by civiuser (Sidney) and Pierre Morvan. Version 1 was published
+by Makoa and developed by Antoine Breheret and Dewy Mercerais. Active testing
+and follow-up are provided by Guillaume Sorel / Gestad, with historical
+contributions from Symbiotic.
 
-Un moyen de paiement `HelloAsso` est aussi créé lors de la mise à niveau afin
-de faciliter les rapprochements comptables.
+## Support the project
 
-## Connexion Par Clé API
+The extension is independently developed and currently has no institutional or
+corporate sponsor. Organizations using it can help fund maintenance,
+documentation, testing and future development.
 
-La clé API classique est le mode conservateur pour une passerelle déjà en
-production. Renseigner sur le processeur HelloAsso :
+To sponsor work or request professional support, please
+[contact Jonathan Dahan](https://www.jonathan.dhn.one/).
 
-- `Client Id`
-- `Client Secret`
-- `Organization Name`, correspondant au slug de l'organisation
+## License
 
-Les URLs d'API par défaut sont :
-
-- Production : `https://api.helloasso.com`
-- Sandbox : `https://api.helloasso-sandbox.com`
-
-Ne pas ajouter `/v5` dans le champ URL de la passerelle. L'extension ajoute
-elle-même les routes API nécessaires, par exemple les routes de checkout et de
-paiement sous `/v5`.
-
-## Connexion Par Mire HelloAsso
-
-La mire est optionnelle et activée par défaut. Elle permet à une
-organisation de se connecter depuis CiviCRM et apporte la gestion automatique
-du webhook partenaire et de sa clé de signature.
-
-HelloAsso aide les associations à collecter des paiements en ligne et propose
-ses services gratuitement. Elle prend à sa charge tous les frais de
-transaction pour que vous puissiez bénéficier de la totalité des sommes
-versées par vos publics, sans frais. Les contributions volontaires laissées
-par ces derniers sont leur unique source de revenus.
-
-Pour utiliser la mire :
-
-1. Ouvrir **Administrer > Paramètres système > HelloAsso settings**.
-2. Activer **Mire HelloAsso : activer la connexion partagée**.
-3. Ouvrir le rail sandbox ou production proposé sur cette page.
-4. Saisir le `client_id` et le `client_secret` partenaires correspondant à cet
-   environnement.
-5. Copier l'URL de callback affichée par CiviCRM dans la configuration
-   HelloAsso, puis lancer la connexion.
-6. Vérifier l'organisation liée, l'URL webhook enregistrée et la présence de
-   la clé de signature webhook.
-
-Après une connexion mire réussie, le processeur concerné bascule sur ce mode,
-en sandbox comme en production. Les identifiants classiques stockés sur ce
-processeur sont alors vidés automatiquement afin que le rail connecté utilise
-bien la mire comme source de vérité.
-
-Les identifiants mire sandbox et production sont distincts. Ils ne doivent ni
-être intervertis, ni être versionnés dans un dépôt public.
-
-La connexion d'une organisation par la mire bascule automatiquement le
-processeur concerné sur ce mode, en live comme en sandbox. Les identifiants
-classiques présents sur ce processeur sont supprimés au moment de la
-connexion réussie.
-
-Une même organisation sandbox peut légitimement diffuser ses webhooks vers
-plusieurs instances CiviCRM, par exemple via un relais de test. En revanche,
-la connexion OAuth par mire doit être considérée comme exclusive pour un même
-couple client HelloAsso / organisation / environnement : reconnecter une autre
-instance peut invalider les refresh tokens déjà stockés ailleurs. Dans ce cas,
-une seule instance doit être propriétaire de la mire ; les autres peuvent
-recevoir les webhooks diffusés mais ne doivent pas gérer leur propre liaison
-OAuth concurrente avec les mêmes identifiants.
-
-### Restauration D'Une Sauvegarde Avec Mire
-
-Après restauration d'une sauvegarde, les tokens et informations webhook
-restaurés peuvent ne plus refléter l'état actuel côté HelloAsso.
-
-- Si la sauvegarde est récente et qu'aucune autre instance n'a reconnecté la
-  même mire, le refresh token restauré devrait permettre de récupérer un nouvel
-  access token au prochain appel API.
-- Si le refresh token restauré est expiré ou a été invalidé par une autre
-  reconnexion, l'extension marque la liaison comme `reconnect_required` ou
-  `refresh_failed` et une reconnexion administrateur est nécessaire.
-- Si la sauvegarde est restaurée sur un autre domaine, les alertes CiviCRM
-  signalent les écarts entre le domaine courant, l'URL de callback OAuth et
-  l'URL webhook enregistrée.
-- Les webhooks signés restent acceptés seulement si la clé de signature locale
-  correspond à celle enregistrée côté HelloAsso. Les webhooks non signés ou non
-  vérifiables ne valident pas directement un paiement ; ils ne déclenchent une
-  confirmation API que pour un objet HelloAsso déjà connu localement.
-
-Après un restore, vérifier les alertes CiviCRM HelloAsso, l'état
-`refresh_status`, l'URL webhook et le domaine de callback. Ne reconnecter la
-mire que sur l'instance qui doit être propriétaire de cette organisation et de
-cet environnement.
-
-## Webhooks Et Fiabilité
-
-En mode mire avec gestion automatique du webhook, l'extension enregistre
-l'URL et conserve la clé permettant de vérifier le header
-`x-ha-signature`.
-
-En mode clé API, déclarer l'URL de notification du processeur concerné chez
-HelloAsso. La route CiviCRM utilise le format :
-
-```text
-/civicrm/payment/ipn/ID_DU_PROCESSEUR
-```
-
-Utiliser l'URL absolue générée pour l'instance et l'ID réel du processeur
-production ou sandbox. Ne pas déduire l'ID sandbox à partir de l'ID production :
-les identifiants dépendent de chaque base CiviCRM.
-
-Pour obtenir l'URL absolue correcte, y compris sur WordPress :
-
-```bash
-cv ev 'echo CRM_HelloassoPaymentProcessor_Webhook::getWebhookPath(1), PHP_EOL;'
-```
-
-Remplacer `1` par l'ID du processeur à déclarer chez HelloAsso.
-
-### Annulation D'Un Plan D'Échéances
-
-L'annulation d'un plan HelloAsso ne se fait pas depuis l'écran de
-remboursement. Elle se déclenche depuis la page CiviCRM des contributions
-périodiques du contact, via l'action native d'annulation de la récurrence.
-
-Cette action n'est disponible que pour les processeurs HelloAsso reliés par la
-mire OAuth. En cas d'annulation acceptée par HelloAsso, l'extension annule
-localement les échéances futures non encaissées sans rembourser les paiements
-déjà collectés.
-
-Si une échéance d'un plan remonte l'état `Canceled`, l'extension programme un
-contrôle immédiat du plan au prochain cron court afin de recharger le
-`checkout_intent` et de vérifier le reste des échéances du même plan, sans
-attendre la prochaine date du rail long.
-
-Par défaut :
-
-- les webhooks sont mis en file d'attente ;
-- la signature partenaire est exigée lorsqu'une clé de signature est
-  enregistrée ;
-- la signature historique `invoiceID` / `sig` n'est pas exigée ;
-- deux revérifications courtes sont programmées après le checkout ;
-- le suivi long reste indépendant afin de détecter un remboursement postérieur.
-
-### Signatures Des Webhooks
-
-L'extension connaît deux mécanismes de signature, car les sites peuvent
-recevoir à la fois des notifications historiques configurées manuellement et
-des notifications créées par la mire.
-
-- `helloasso_v2_require_partner_webhook_signature` est **activé** par défaut.
-  En mode mire, il exige que le header `x-ha-signature` corresponde à la clé
-  stockée lors de l'enregistrement du webhook. Il peut être désactivé pour un
-  relais webhook ou une architecture multi-instances qui ne transmet pas cette
-  signature telle quelle.
-- `helloasso_v2_require_webhook_signature` est **désactivé** par défaut.
-  Il exige l'ancien HMAC local basé sur `metadata.invoiceID` et `metadata.sig`.
-  Ne l'activer que si les webhooks historiques envoyés à cette instance portent
-  bien cette signature.
-
-Une signature présente et vérifiable doit toujours être correcte. Une
-signature absente peut être tolérée selon les réglages ci-dessus, mais le
-payload n'est alors pas considéré comme une preuve suffisante de paiement.
-
-Pour les webhooks non signés ou non vérifiables, l'extension ne valide jamais
-directement l'état reçu. Elle appelle l'API HelloAsso uniquement si le webhook
-référence un objet déjà attendu localement, c'est-à-dire un
-`helloasso_payment_id` ou un `checkout_intent_id` stocké dans les métadonnées
-de la contribution. Un webhook qui ne correspond qu'à un `invoiceID` local est
-ignoré comme preuve directe ; les jobs de suivi se chargent du rattrapage.
-
-Ce comportement protège les installations en transition V1/V2 et les agences
-qui utilisent un relais commun : un webhook destiné à un autre client ne doit
-pas pouvoir valider une contribution locale ni provoquer des appels API
-HelloAsso sur des identifiants inconnus.
-
-## Tâches Planifiées
-
-Vérifier que les jobs suivants sont actifs dans CiviCRM :
-
-- `Job.process_paymentprocessor_webhooks` : traite les notifications placées
-  en file d'attente.
-- `Job.process_helloasso` : exécute le rattrapage court `T+5` / `T+15` /
-  `T+45`. Le dernier passage annule un plan multi-échéance resté sans paiement
-  ou marque un panier classique abandonné en conservant sa contribution
-  `Pending` pour les relances.
-- `Job.process_helloasso_long_followup` : contrôle les changements tardifs,
-  dont les remboursements.
-- `Job.refresh_helloasso_partner_links` : renouvelle les liaisons mire avant
-  leur expiration.
-
-## Commandes Utiles
-
-Traiter la file de webhooks :
-
-```bash
-cv api3 Job.process_paymentprocessor_webhooks
-```
-
-Exécuter les contrôles courts arrivés à échéance :
-
-```bash
-cv api3 Job.process_helloasso only_scheduled=1 due_before=now limit=15
-```
-
-Forcer la synchronisation d'une contribution, y compris lorsque le rail court
-automatique est désactivé :
-
-```bash
-cv api3 Job.process_helloasso contribution_id=12345 payment_processor_id=1 only_scheduled=0 limit=1
-```
-
-Exécuter le suivi long arrivé à échéance :
-
-```bash
-cv api3 Job.process_helloasso_long_followup due_before=now limit=15
-```
-
-## Réglages V2
-
-Les réglages principaux sont disponibles sur la page **HelloAsso settings**.
-Certains réglages techniques restent déclarés pour permettre une surcharge par
-configuration ou API, mais ne sont pas exposés dans l'interface afin d'éviter
-de désactiver accidentellement des protections de base.
-
-Quand un changement de réglage ou de feature flag ne semble pas se refléter
-dans l'interface, commencer par vider les caches CiviCRM avec `cv flush`. Selon
-les instances, `cv` peut ne pas reconstruire immédiatement toute l'interface ;
-si une entrée de menu ou un écran de configuration manque encore, utiliser aussi
-**Administrer > Paramètres système > Vider les caches**.
-
-### Réglages Techniques
-
-- `helloasso_v2_standard_frontend_bridge` (**activé**, non exposé) : active le
-  pont frontend `CRM.payment` / `mjwshared` utilisé par les formulaires
-  classiques et Webform.
-- `helloasso_v2_safe_abort_urls` (**activé**, non exposé) : remplace les URL
-  d'annulation ou d'erreur fragiles par une URL sûre dans un contexte AJAX ou
-  CiviCRM interne.
-- `helloasso_v2_queue_webhooks` (**activé**, page globale) : place les
-  webhooks dans la file `PaymentprocessorWebhook` au lieu de les traiter
-  immédiatement.
-- `helloasso_v2_followup_enabled` (**activé**, page globale) : programme les
-  contrôles courts `T+5` / `T+15` / `T+45`. À `T+45`, un checkout classique
-  sans paiement reste `Pending` pour permettre les relances de panier.
-- `helloasso_v2_afform_checkout` (**activé**, page globale) : expose la
-  Checkout Option HelloAsso pour Afform / Form Builder.
-- `helloasso_v2_cron_limit` (`15`, page globale) : limite le nombre de
-  contributions traitées par processeur lors des jobs de maintenance.
-
-### Fonctions De Paiement
-
-- `helloasso_enable_refunds` (**désactivé**, page globale) : autorise les
-  remboursements complets depuis l'écran CiviCRM. Nécessite le mode mire.
-- `helloasso_enable_installments` (**désactivé**, page globale) : autorise les
-  échéanciers mensuels finis de 2 à 12 paiements dans Afform, Webform et les
-  formulaires classiques. Dans QuickForm, laisser le champ vide conserve un
-  paiement unique.
-- `helloasso_enable_sepa` (**activé**, page globale) : demande à HelloAsso de
-  proposer le prélèvement SEPA. Son affichage dépend de l'éligibilité et du
-  réglage de l'association chez HelloAsso.
-- `helloasso_quickform_redirect_message` (page globale) : message de
-  redirection affiché uniquement lorsque HelloAsso est sélectionné sur les
-  formulaires classiques de contribution ou d'inscription. Son libellé dans
-  l'interface française est `Message de redirection HelloAsso sur les
-  formulaires standards`.
-
-### Mire HelloAsso
-
-- `helloasso_v2_require_webhook_signature` (**désactivé**, page globale) :
-  rejette les webhooks legacy dont `invoiceID` / `sig` est absent ou invalide.
-- `helloasso_v2_require_partner_webhook_signature` (**activé**, page globale) :
-  rejette les webhooks mire dont `x-ha-signature` est absent ou invalide quand
-  une clé de signature est stockée. Il peut être désactivé pour les
-  architectures multi-instances ou avec relais webhook.
-- `helloasso_partner_auth_enabled` (**activé**, page globale) : affiche et
-  autorise les pages de connexion par mire HelloAsso.
-- `helloasso_partner_client_id_test` et `helloasso_partner_client_secret_test`
-  (page mire sandbox) : identifiants partenaires sandbox.
-- `helloasso_partner_client_id_live` et `helloasso_partner_client_secret_live`
-  (page mire production) : identifiants partenaires production.
-- `helloasso_partner_authorize_url` (pages mire) : URL d'autorisation OAuth.
-- `helloasso_partner_token_url` (pages mire) : URL d'échange et de
-  renouvellement des tokens OAuth.
-
-Les données opérationnelles par processeur de la mire sont stockées dans la
-table dédiée de l'extension lorsque le schéma est à jour.
-
-Pour les échéances futures, les contrôles courts T+5/T+15/T+45 sont désactivés. En
-cas de webhook manquant, le cron long vérifie les paiements carte à J+1, J+7 et
-J+30 après l'échéance, et les prélèvements SEPA à J+9, J+15 et J+30. Les états
-HelloAsso d'attente restent en instance; les états validés terminent la
-contribution, les refus et incohérences passent en échec, et `Contested` devient
-un `Chargeback` CiviCRM.
-
-- `Authorized`, `Registered`, `AuthorizedPreprod`, `Corrected` : contribution
-  terminée.
-- `Pending`, `Unknown`, `Waiting`, `WaitingBankValidation`,
-  `WaitingBankWithdraw`, `WaitingAuthentication`, `Init` : contribution en
-  instance et suivi maintenu.
-- `Refused` sur une échéance future : contribution en échec, plan `Overdue`,
-  suivi de régularisation pendant 30 jours.
-- `Refused` hors régularisation, `Error`, `Canceled`, `Abandoned`, `Deleted`,
-  `Inconsistent`, `NoDonation` : contribution en échec, suivis arrêtés.
-- `Refunding` : statut courant conservé jusqu'à la confirmation.
-- `Refunded` : contribution remboursée, suivis arrêtés.
-- `Contested` : contribution en rejet bancaire (`Chargeback`), suivis arrêtés.
-
-Un état HelloAsso inconnu est conservé en instance par prudence. Les paiements
-terminés restent surveillés par le cron long pendant sa fenêtre afin de
-détecter un remboursement ou une contestation tardive; les webhooks restent la
-source principale après la dernière vérification planifiée.
-
-Une échéance refusée conserve sa contribution en échec et place le plan
-`ContributionRecur` en retard (`Overdue`). Le cron long vérifie sa
-régularisation à J+1, J+7, J+15 et J+30. HelloAsso transmet directement le lien
-de régularisation au payeur; ce lien n'est pas fourni dans son webhook ou son
-API publique. Une régularisation réussie réactive le cycle du plan. À J+30,
-une échéance toujours refusée est marquée localement `RecoveryExpired` et le
-plan passe en échec.
-
-## Notes Pratiques D'Utilisation
-
-- HelloAsso attend des paiements en euro. Les formulaires et contributions
-  envoyés au checkout doivent donc être en `EUR`.
-- Si un menu, un écran ou un réglage HelloAsso n'apparaît pas après activation
-  de l'extension ou modification d'un feature flag, vider d'abord les caches
-  CiviCRM avec `cv flush`, puis au besoin via **Administrer > Paramètres
-  système > Vider les caches**.
-- Dans Afform, après avoir ajouté HelloAsso comme mode de paiement sur un
-  formulaire, enregistrer une première fois le formulaire avant de revenir dans
-  son interface d'administration. Les paramètres supplémentaires, notamment
-  ceux des échéanciers, apparaissent au second passage.
-- Dans Afform, le contributeur HelloAsso est le contact défini dans l'onglet
-  **Contribution**, pas celui de l'onglet **Contact**. C'est donc ce contact
-  qui est envoyé à HelloAsso et contrôlé par les règles de validation sur le
-  prénom, le nom et l'adresse e-mail.
-- Pour transmettre un nom d'entreprise à HelloAsso, le contact payeur doit
-  être de type **Organisation**. Dans ce cas, l'adresse e-mail par défaut
-  utilisée pour le payeur est le `billing email`.
-- Dans les formulaires QuickForm, les paiements en plusieurs fois exigent une
-  fréquence de `1` mois et l'activation de l'option d'échéancier. L'extension
-  ne surcharge pas l'UI d'administration standard, mais les échéanciers envoyés
-  à HelloAsso restent toujours finis et ne créent pas de paiements perpétuels.
-- Le réglage `Message de redirection HelloAsso sur les formulaires standards`
-  permet d'insérer un texte explicatif sur les pages de paiement QuickForm.
-  L'extension fournit par défaut une version en trois langues. Vous pouvez la
-  remplacer, par exemple pour expliquer le modèle solidaire HelloAsso. Si ce
-  message doit rester multilingue, il faut traduire manuellement le nouveau
-  texte dans **Administrer > Localisation > Traduire les chaînes**.
-
-## Contributions Et Intégrations Spécifiques
-
-Le processeur doit conserver un coeur générique, mais il a également vocation
-à servir de point d'appui à des intégrations plus spécialisées.
-
-Deux formes d'intégration sont déjà utilisées sur le terrain :
-
-- La façade `CRM_HelloassoPaymentProcessor_Service` permet à une extension
-  tierce de consulter les données HelloAsso en lecture seule, sans exposer les
-  secrets du processeur ni ouvrir de méthode d'écriture. Ce point d'entrée est
-  particulièrement important avec la mire : une même instance CiviCRM ne doit
-  pas multiplier les clients actifs concurrents pour une même organisation et
-  un même environnement. La liaison HelloAsso et ses tokens restent portés par
-  le processeur ; les extensions complémentaires réutilisent cette connexion
-  via la façade.
-- Une extension Drupal peut s'insérer pleinement dans le flux de paiement
-  CiviCRM / HelloAsso, par exemple pour porter un parcours Webform métier tout
-  en laissant ce processeur gérer le checkout, les webhooks et la
-  réconciliation.
-  Le module Drupal
-  [helloasso_webform_validation](https://www.drupal.org/project/helloasso_webform_validation)
-  s'appuie sur ce point d'intégration pour compléter un parcours Webform et est recommandé,
-  particuliérement pour utiliser le formulaire de paiement dans un iframe.
-
-### Accès Service En Lecture Seule
-
-Une extension complémentaire peut instancier directement la façade :
-
-```php
-$service = new CRM_HelloassoPaymentProcessor_Service();
-```
-
-Les méthodes classiques utilisent le processeur HelloAsso actif préféré du
-mode demandé. Elles fonctionnent avec le mode clé API classique ou avec la
-mire, selon la configuration du processeur :
-
-```php
-$isTest = FALSE; // FALSE = production, TRUE = sandbox.
-
-$processors = $service->getProcessors($isTest);
-$processor = $service->getPreferredProcessor($isTest);
-$payments = $service->listOrganizationPayments($isTest, [
-  'from' => '2026-01-01',
-  'pageSize' => 100,
-]);
-$payment = $service->getPayment($isTest, 123456789);
-$checkoutIntent = $service->getCheckoutIntent($isTest, 987654321);
-```
-
-Les méthodes `Partner*` utilisent obligatoirement un processeur actif connecté
-par la mire HelloAsso. Elles choisissent le processeur par environnement :
-d'abord le processeur par défaut du mode demandé s'il est lié par mire, sinon
-le premier processeur actif lié par mire. Si aucun processeur mire n'est lié,
-une `PaymentProcessorException` est levée.
-
-```php
-$isTest = TRUE; // Sandbox.
-
-$organization = $service->getPartnerLinkedOrganization($isTest);
-$payments = $service->listPartnerOrganizationPayments($isTest, [
-  'pageSize' => 100,
-]);
-$payment = $service->getPartnerPayment(123456789, [], $isTest);
-$checkoutIntent = $service->getPartnerCheckoutIntent(987654321, [], $isTest);
-```
-
-Pour compatibilité, `listPartnerOrganizationPayments($query)` reste accepté et
-utilise la production par défaut. Les nouveaux développements doivent préférer
-`listPartnerOrganizationPayments($isTest, $query)` pour éviter toute ambiguïté.
-
-Les propositions de fonctions helper ou de points d'extension facilitant ce
-type d'intégration sont bienvenues, notamment pour Webform, Services ou
-d'autres parcours métier. Elles doivent rester isolées et documentées, afin
-de ne pas imposer un comportement spécifique aux parcours CiviCRM standards.
-
-## Traductions
-
-Les traductions de l'extension sont gérées via **Transifex**. Les catalogues
-Gettext générés sont inclus dans `l10n/` afin que les traductions soient
-immédiatement disponibles après l'installation de l'extension.
-
-## Développement et Tests
-
-L'extension inclut des tests unitaires rapides et des tests d'intégration complets nécessitant une base de données CiviCRM amorcée (boot complet).
-
-La CI clone le dernier tag stable public de `mjwshared`, déterminé à chaque
-run. Elle teste par défaut la matrice PHP 8.1 à 8.5 avec la dernière version
-CiviCRM satisfaisant `^6.14`.
-
-Pour tester ponctuellement une cible CiviCRM, ouvrir **Actions > PHPUnit > Run
-workflow** et renseigner :
-
-- `civicrm-version` : `6.14.2` pour le minimum pris en charge, une version
-  alpha ou beta précise, ou `dev-master`.
-- `php-version` : `matrix` pour toutes les versions, ou une version unique
-  adaptée à la cible CiviCRM. Pour `6.14.2`, choisir PHP `8.4`.
-
-Les essais de versions historiques peuvent installer des dépendances avec des
-advisories connus. Ce contournement est limité au clone CiviCRM temporaire de
-la CI : le projet de l'extension conserve sa politique Composer. La CI affiche
-ensuite le rapport `composer audit`; un tel run valide la compatibilité, pas la
-sécurité de cette version CiviCRM.
-
-**Exécuter les tests unitaires :**
-```bash
-phpunit -c phpunit.xml.dist
-```
-
-**Exécuter les tests d'intégration :**
-```bash
-phpunit -c phpunit-integration.xml
-```
-
-Les tests d'intégration manipulent la base de données réelle (transactions isolées par `CRM_Core_Transaction`). N'utilisez pas l'environnement de production pour lancer ces tests.
-
-## Crédits
-
-L'extension est actuellement maintenue par Jonathan Dahan
-([jonathan.dhn.one](https://jonathan.dhn.one), `jonathan@dhn.one`), qui a développé et validé la branche V2, ses intégrations multi-CMS et ses mécanismes de fiabilisation.
-
-L'extension originale a été initiée par civiuser (Sidney) et Pierre Morvan :
-[dépôt historique](https://github.com/ryarnyah/helloasso-payment-processor).
-
-La version 1 publiée par Makoa a été développée par Antoine Breheret et Dewy
-Mercerais.
-
-Tests actifs et suivi : Guillaume Sorel ([@GuillaumeSorel](https://lab.civicrm.org/GuillaumeSorel)) / Gestad.
-
-Contributions historiques : [Symbiotic](https://symbiotic.coop).
-
-## Licence
-
-HelloAsso Payment Processor for CiviCRM est un logiciel libre distribué sous
-licence [AGPL-3.0](LICENSE.txt). Ce projet n'est pas une publication officielle
-de HelloAsso.
+This extension is distributed under the [GNU AGPL-3.0](LICENSE.txt). It is not
+an official HelloAsso publication.

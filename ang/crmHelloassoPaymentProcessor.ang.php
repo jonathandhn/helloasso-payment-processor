@@ -11,4 +11,10 @@ return [
   'requires' => [
     'afCheckout',
   ],
+  // Load through the checkout option, editor or exported elements only.
+  'basePages' => [],
+  'exports' => [
+    'helloasso-installments' => 'E',
+    'helloasso-checkout-admin' => 'E',
+  ],
 ];

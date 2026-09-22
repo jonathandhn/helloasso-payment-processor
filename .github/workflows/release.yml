@@ -24,11 +24,15 @@ jobs:
           HELLOASSO_LIVE_CLIENT_SECRET: ${{ secrets.HELLOASSO_LIVE_CLIENT_SECRET }}
           HELLOASSO_SANDBOX_CLIENT_ID: ${{ secrets.HELLOASSO_SANDBOX_CLIENT_ID }}
           HELLOASSO_SANDBOX_CLIENT_SECRET: ${{ secrets.HELLOASSO_SANDBOX_CLIENT_SECRET }}
-        run: bash scripts/build_release.sh "${VERSION}"
+        run: |
+          bash scripts/build_release.sh "${VERSION}"
+          sha256sum "helloasso-payment-processor-${VERSION}.zip" > SHA256SUMS
 
       - name: Create GitHub Release and Upload Artifact
         uses: softprops/action-gh-release@v2
         with:
-          files: helloasso-payment-processor-*.zip
+          files: |
+            helloasso-payment-processor-*.zip
+            SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
