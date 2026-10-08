@@ -43,8 +43,9 @@ class HelloAssoHostedCheckout implements CheckoutOptionInterface, AfformCheckout
     return !empty($instrument['name']) ? (string) $instrument['name'] : NULL;
   }
 
-  public function getPaymentProcessorId(): ?int {
-    $connection = $this->liveConnection ?: $this->testConnection;
+  public function getPaymentProcessorId(bool $testMode = FALSE): ?int {
+    $connection = $testMode ? $this->testConnection : $this->liveConnection;
+    $connection ??= $this->liveConnection ?: $this->testConnection;
     return $connection['id'] ?? NULL;
   }
 
