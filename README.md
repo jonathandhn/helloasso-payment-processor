@@ -21,8 +21,8 @@ not sufficient.
 
 ## Requirements
 
-- CiviCRM 6.14 or later.
-- PHP 8.1 to 8.5, subject to the selected CiviCRM version.
+- CiviCRM 6.16 or later.
+- PHP 8.2 to 8.5, subject to the selected CiviCRM version.
 - `mjwshared` 1.5.11 or later.
 - A HelloAsso account and API or partner credentials.
 
