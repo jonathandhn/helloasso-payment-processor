@@ -15,14 +15,14 @@ abstract class CRM_Civirules_Condition {
 
   abstract public function doesConditionMatch(
     CRM_Civirules_TriggerData_TriggerData $triggerData,
-    CRM_Civirules_BAO_Rule $rule,
+    CRM_Civirules_BAO_CiviRulesRule $rule,
   ): bool;
 }
 
 abstract class CRM_Civirules_Trigger {
 }
 
-class CRM_Civirules_BAO_Rule {
+class CRM_Civirules_BAO_CiviRulesRule {
 }
 
 class CRM_Civirules_TriggerData_TriggerData {

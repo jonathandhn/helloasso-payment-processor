@@ -38,7 +38,7 @@ class CRM_HelloassoPaymentProcessor_Civirules_Condition_NotFutureInstallment ext
         return FALSE;
     }
 
-    public function doesWorkWithTrigger(CRM_Civirules_Trigger $trigger, CRM_Civirules_BAO_Rule $rule)
+    public function doesWorkWithTrigger(CRM_Civirules_Trigger $trigger, CRM_Civirules_BAO_CiviRulesRule $rule)
     {
         return $trigger->doesProvideEntity('Contribution');
     }

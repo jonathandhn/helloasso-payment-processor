@@ -228,8 +228,8 @@ namespace Civi\Afform\Event {
 
 namespace {
 
-  if (!class_exists('CRM_Civirules_BAO_Rule')) {
-    class CRM_Civirules_BAO_Rule {}
+  if (!class_exists('CRM_Civirules_BAO_CiviRulesRule')) {
+    class CRM_Civirules_BAO_CiviRulesRule {}
   }
 
   if (!class_exists('CRM_Civirules_TriggerData_TriggerData')) {
@@ -259,7 +259,7 @@ namespace {
       /** @return mixed */
       public function doesConditionMatch(
         CRM_Civirules_TriggerData_TriggerData $triggerData,
-        CRM_Civirules_BAO_Rule $rule,
+        CRM_Civirules_BAO_CiviRulesRule $rule,
       ) {
         return TRUE;
       }
@@ -267,7 +267,7 @@ namespace {
       /** @return mixed */
       public function doesWorkWithTrigger(
         CRM_Civirules_Trigger $trigger,
-        CRM_Civirules_BAO_Rule $rule,
+        CRM_Civirules_BAO_CiviRulesRule $rule,
       ) {
         return TRUE;
       }
