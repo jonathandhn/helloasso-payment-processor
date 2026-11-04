@@ -1770,7 +1770,23 @@ class CRM_Core_Payment_HelloAssoBase extends CRM_Core_Payment
 
             case CRM_HelloassoPaymentProcessor_PaymentState::PENDING:
                 // SEPA validation and withdrawal can take several business days.
-                // Keep the contribution Pending and continue scheduled reconciliation.
+                // Once the payer has completed their action, use CiviCRM's dedicated
+                // asynchronous-processing status when the installed core supports it.
+                if (CRM_HelloassoPaymentProcessor_PaymentState::isAwaitingProcessorResult((string) $state)) {
+                    $currentStatusName = CRM_Core_PseudoConstant::getName(
+                        'CRM_Contribute_BAO_Contribution',
+                        'contribution_status_id',
+                        (int) $contribution->contribution_status_id
+                    );
+                    if ($currentStatusName === 'Pending') {
+                        $processingStatusName = (new CRM_HelloassoPaymentProcessor_ContributionStatus())
+                            ->getProcessingStatusName();
+                        $contributionChanged = $this->updateContributionStatus(
+                            (int) $contribution->id,
+                            $processingStatusName
+                        ) || $contributionChanged;
+                    }
+                }
                 break;
         }
 

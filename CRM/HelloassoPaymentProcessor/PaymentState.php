@@ -77,4 +77,12 @@ class CRM_HelloassoPaymentProcessor_PaymentState
             self::CONTESTED,
         ], TRUE);
     }
+
+    public static function isAwaitingProcessorResult(string $state): bool
+    {
+        return in_array($state, [
+            'WaitingBankValidation',
+            'WaitingBankWithdraw',
+        ], TRUE);
+    }
 }

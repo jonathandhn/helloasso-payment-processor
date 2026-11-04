@@ -64,4 +64,15 @@ class CRM_HelloassoPaymentProcessor_PaymentStateTest extends \PHPUnit\Framework\
         $this->assertTrue(CRM_HelloassoPaymentProcessor_PaymentState::isShortFollowUpTerminal('Contested'));
         $this->assertTrue(CRM_HelloassoPaymentProcessor_PaymentState::isLongFollowUpTerminal('Contested'));
     }
+
+    public function testOnlyBankProcessingStatesConfirmPayerAction(): void
+    {
+        foreach (['WaitingBankValidation', 'WaitingBankWithdraw'] as $state) {
+            $this->assertTrue(CRM_HelloassoPaymentProcessor_PaymentState::isAwaitingProcessorResult($state));
+        }
+
+        foreach (['Pending', 'Unknown', 'Waiting', 'WaitingAuthentication', 'Init'] as $state) {
+            $this->assertFalse(CRM_HelloassoPaymentProcessor_PaymentState::isAwaitingProcessorResult($state));
+        }
+    }
 }
