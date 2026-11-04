@@ -97,6 +97,24 @@ class CRM_HelloassoPaymentProcessor_Service {
       ->getPayment($processor, $isTest, $paymentId, $query);
   }
 
+  public function getOrder(bool $isTest, int $orderId, array $query = []): array {
+    $processor = $this->getPreferredProcessorConfig($isTest);
+    return CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
+      ->getOrder($processor, $isTest, $orderId, $query);
+  }
+
+  public function getItem(bool $isTest, int $itemId, array $query = []): array {
+    $processor = $this->getPreferredProcessorConfig($isTest);
+    return CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
+      ->getItem($processor, $isTest, $itemId, $query);
+  }
+
+  public function getFormPublic(bool $isTest, string $formType, string $formSlug): array {
+    $processor = $this->getPreferredProcessorConfig($isTest);
+    return CRM_HelloassoPaymentProcessor_HelloAssoClient::getInstance()
+      ->getFormPublic($processor, $isTest, $formType, $formSlug);
+  }
+
   /**
    * Retrieve a checkout intent by HelloAsso checkout intent id.
    *
@@ -158,6 +176,22 @@ class CRM_HelloassoPaymentProcessor_Service {
    */
   public function getPartnerPayment(int $paymentId, array $query = [], bool $isTest = FALSE): array {
     return $this->getPreferredPartnerAuth($isTest)->getPayment($paymentId, $query);
+  }
+
+  public function getPartnerOrder(int $orderId, array $query = [], bool $isTest = FALSE): array {
+    return $this->getPreferredPartnerAuth($isTest)->getOrder($orderId, $query);
+  }
+
+  public function getPartnerItem(int $itemId, array $query = [], bool $isTest = FALSE): array {
+    return $this->getPreferredPartnerAuth($isTest)->getItem($itemId, $query);
+  }
+
+  public function getPartnerFormPublic(
+    string $formType,
+    string $formSlug,
+    bool $isTest = FALSE
+  ): array {
+    return $this->getPreferredPartnerAuth($isTest)->getFormPublic($formType, $formSlug);
   }
 
   /**

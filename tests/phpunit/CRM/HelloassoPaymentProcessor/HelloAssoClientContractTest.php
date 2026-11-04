@@ -124,6 +124,30 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClientContractTest extends CRM_Hell
         $this->assertSame('pageIndex=2&pageSize=50', $request->getUri()->getQuery());
     }
 
+    public function testImportReadEndpointsUseExpectedPaths(): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], json_encode(['access_token' => 'token123', 'expires_in' => 3600])),
+            new Response(200, [], json_encode(['id' => 42])),
+            new Response(200, [], json_encode(['id' => 84])),
+            new Response(200, [], json_encode(['formSlug' => 'annual gala']))
+        );
+
+        $processor = $this->getDummyProcessor();
+        $this->client->getOrder($processor, TRUE, 42, ['withDetails' => 'true']);
+        $this->client->getItem($processor, TRUE, 84);
+        $this->client->getFormPublic($processor, TRUE, 'Event', 'annual gala');
+
+        $this->assertCount(4, $this->history);
+        $this->assertSame('/v5/orders/42', $this->history[1]['request']->getUri()->getPath());
+        $this->assertSame('withDetails=true', $this->history[1]['request']->getUri()->getQuery());
+        $this->assertSame('/v5/items/84', $this->history[2]['request']->getUri()->getPath());
+        $this->assertSame(
+            '/v5/organizations/org-slug/forms/Event/annual%20gala/public',
+            $this->history[3]['request']->getUri()->getPath()
+        );
+    }
+
     public function testBrowserReturnProfileUsesShortTimeoutBudget(): void
     {
         $this->mockHandler->append(

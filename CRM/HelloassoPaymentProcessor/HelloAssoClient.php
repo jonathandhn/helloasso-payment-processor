@@ -217,6 +217,65 @@ class CRM_HelloassoPaymentProcessor_HelloAssoClient
         );
     }
 
+    public function getOrder(
+        array $paymentProcessor,
+        bool $isTest,
+        int $orderId,
+        array $query = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'GET',
+            '/v5/orders/' . $orderId,
+            ['query' => $query],
+            TRUE,
+            $requestProfile
+        );
+    }
+
+    public function getItem(
+        array $paymentProcessor,
+        bool $isTest,
+        int $itemId,
+        array $query = [],
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'GET',
+            '/v5/items/' . $itemId,
+            ['query' => $query],
+            TRUE,
+            $requestProfile
+        );
+    }
+
+    public function getFormPublic(
+        array $paymentProcessor,
+        bool $isTest,
+        string $formType,
+        string $formSlug,
+        string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+    ): array
+    {
+        return $this->requestHelloAsso(
+            $paymentProcessor,
+            $isTest,
+            'GET',
+            '/v5/organizations/' . rawurlencode($this->getOrganizationSlug($paymentProcessor, $isTest))
+                . '/forms/' . rawurlencode($formType)
+                . '/' . rawurlencode($formSlug) . '/public',
+            [],
+            TRUE,
+            $requestProfile
+        );
+    }
+
     public function listOrganizationPayments(
         array $paymentProcessor,
         bool $isTest,

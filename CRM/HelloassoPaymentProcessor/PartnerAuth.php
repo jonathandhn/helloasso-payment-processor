@@ -159,6 +159,43 @@ class CRM_HelloassoPaymentProcessor_PartnerAuth {
     ], TRUE, $requestProfile);
   }
 
+  public function getOrder(
+    int $orderId,
+    array $query = [],
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    return $this->request('GET', '/v5/orders/' . $orderId, [
+      'query' => $query,
+    ], TRUE, $requestProfile);
+  }
+
+  public function getItem(
+    int $itemId,
+    array $query = [],
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    return $this->request('GET', '/v5/items/' . $itemId, [
+      'query' => $query,
+    ], TRUE, $requestProfile);
+  }
+
+  public function getFormPublic(
+    string $formType,
+    string $formSlug,
+    string $requestProfile = CRM_HelloassoPaymentProcessor_RequestOptions::PROFILE_DEFAULT
+  ): array {
+    $link = $this->getUsableLink($requestProfile);
+    return $this->request(
+      'GET',
+      '/v5/organizations/' . rawurlencode($link['organization_slug'])
+        . '/forms/' . rawurlencode($formType)
+        . '/' . rawurlencode($formSlug) . '/public',
+      [],
+      TRUE,
+      $requestProfile
+    );
+  }
+
   public function getCheckoutIntent(
     int $checkoutIntentId,
     array $query = [],
