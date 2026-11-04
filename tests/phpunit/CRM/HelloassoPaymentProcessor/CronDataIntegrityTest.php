@@ -1,5 +1,12 @@
 <?php
 
+if (!function_exists('ts')) {
+    function ts(string $text, array $params = []): string
+    {
+        return $text;
+    }
+}
+
 class CRM_HelloassoPaymentProcessor_CronDataIntegrityTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -49,5 +56,20 @@ class CRM_HelloassoPaymentProcessor_CronDataIntegrityTest extends \PHPUnit\Frame
         );
 
         $this->assertTrue($isBlocked, 'Une erreur 409 sur la création de paiement signifie KYC manquant');
+    }
+
+    public function testManagedJobsUseOneApiParameterPerLine(): void
+    {
+        $extensionRoot = dirname(__DIR__, 4);
+        require_once $extensionRoot . '/helloasso_payment_processor.civix.php';
+        $jobs = require $extensionRoot . '/managed/ProcessHelloAsso.mgd.php';
+
+        foreach ($jobs as $job) {
+            $parameters = (string) ($job['params']['values']['parameters'] ?? '');
+            $this->assertStringStartsWith('version=3', $parameters);
+            foreach (array_filter(explode("\n", $parameters)) as $parameter) {
+                $this->assertSame(1, substr_count($parameter, '='), $parameter);
+            }
+        }
     }
 }

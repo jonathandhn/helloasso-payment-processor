@@ -16,7 +16,7 @@ return [
         'run_frequency' => 'Always',
         'api_entity' => 'Job',
         'api_action' => 'process_helloasso',
-        'parameters' => 'only_scheduled=1 due_before=now limit=15',
+        'parameters' => "version=3\nonly_scheduled=1\ndue_before=now\nlimit=15",
       ],
       'match' => [
         'name',
@@ -36,7 +36,7 @@ return [
         'run_frequency' => 'Hourly',
         'api_entity' => 'Job',
         'api_action' => 'process_helloasso_long_followup',
-        'parameters' => 'due_before=now limit=15',
+        'parameters' => "version=3\ndue_before=now\nlimit=15",
       ],
       'match' => [
         'name',
@@ -56,7 +56,7 @@ return [
         'run_frequency' => 'Daily',
         'api_entity' => 'Job',
         'api_action' => 'refresh_helloasso_partner_links',
-        'parameters' => '',
+        'parameters' => 'version=3',
       ],
       'match' => [
         'name',
